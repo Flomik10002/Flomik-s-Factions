@@ -1,0 +1,14 @@
+name: FlomiksFactions
+version: '1.0'
+main: org.flomik.flomiksFactions.FlomiksFactions
+api-version: '1.20'
+prefix: flomiksFactions
+authors: [ Flomik ]
+description: Factions plugin for 1.20.1
+website: https://flomik.xyz
+
+commands:
+  clan:
+    description: Основная команда для управления кланами.
+    usage: /clan <subcommand>
+    aliases: [cl]
