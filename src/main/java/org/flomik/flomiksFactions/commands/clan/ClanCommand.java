@@ -113,10 +113,10 @@ public class ClanCommand implements CommandExecutor {
             int maxStrength = memberCount * 10; // Максимально допустимая сила (10 на участника)
 
             // Форматирование строки с параметрами клана
-            message.append(ChatColor.GOLD).append(clan.getName())
-                    .append(ChatColor.YELLOW).append(" - Рейтинг: N/A")
-                    .append(ChatColor.YELLOW).append(" - Онлайн ").append(onlineMemberCount).append("/").append(memberCount)
-                    .append(ChatColor.YELLOW).append(" - Земли/Сила/Макс. Сила: 0/0/").append(maxStrength).append("\n");
+            message.append(ChatColor.GOLD).append(clan.getName())  // Название клана
+                    .append(ChatColor.YELLOW).append(" - Рейтинг: ").append(ChatColor.GOLD).append("N/A") // Рейтинг
+                    .append(ChatColor.YELLOW).append(" - Онлайн ").append(ChatColor.GOLD).append(onlineMemberCount).append("/").append(memberCount) // Онлайн
+                    .append(ChatColor.YELLOW).append(" - Земли/Сила/").append(ChatColor.GOLD).append("Макс. Сила: ").append(maxStrength).append("\n"); // Земли/Сила/Макс. Сила
         }
         message.append(ChatColor.GREEN + "**** Конец списка ****");
         player.sendMessage(message.toString());
