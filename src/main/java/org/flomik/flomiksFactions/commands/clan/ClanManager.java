@@ -72,6 +72,17 @@ public class ClanManager {
         saveInvitations();
     }
 
+    public void disbandClan(String clanName) {
+        clanName = clanName.toLowerCase();
+        Clan clan = getClan(clanName);
+        if (clan == null) {
+            throw new IllegalArgumentException("Клан не существует.");
+        }
+        clans.remove(clanName);
+        saveConfig(); // Сохраняем изменения
+    }
+
+
     public void joinClan(String clanName, String playerName) {
         clanName = clanName.toLowerCase();
         Clan clan = getClan(clanName);
