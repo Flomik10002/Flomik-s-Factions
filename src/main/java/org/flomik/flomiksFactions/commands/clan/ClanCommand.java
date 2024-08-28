@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClanCommand implements CommandExecutor, TabCompleter {
 
     private final ConcurrentHashMap<String, Long> pendingDisbands = new ConcurrentHashMap<>();
-
     private final ClanManager clanManager;
 
     public ClanCommand(ClanManager clanManager) {
@@ -57,10 +56,14 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
 
+                    if (!playerClan.getOwner().equals(player.getName())) {
+                        player.sendMessage(ChatColor.RED + "Только владелец клана может его распустить.");
+                        return true;
+                    }
+
                     if (pendingDisbands.containsKey(player.getName())) {
                         // Удаляем клан
-                        clanManager.getClans().remove(playerClan.getName());
-                        clanManager.saveAllClans();
+                        clanManager.disbandClan(playerClan.getName());
                         pendingDisbands.remove(player.getName());
                         player.sendMessage(ChatColor.GREEN + "Клан " + playerClan.getName() + " был успешно распущен.");
                     } else {
@@ -70,8 +73,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                player.sendMessage(ChatColor.RED + "Время для подтверждения истекло.");
-                                pendingDisbands.remove(player.getName());
+                                if (pendingDisbands.containsKey(player.getName())) {
+                                    player.sendMessage(ChatColor.RED + "Время для подтверждения истекло.");
+                                    pendingDisbands.remove(player.getName());
+                                }
                             }
                         }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 200L); // 200L = 10 секунд
                     }
@@ -137,7 +142,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 ChatColor.YELLOW + "/clan list " + ChatColor.WHITE + "- Показать список всех кланов";
         player.sendMessage(commandsInfo);
     }
-
 
     private void listClans(Player player) {
         if (clanManager.getClans().isEmpty()) {
