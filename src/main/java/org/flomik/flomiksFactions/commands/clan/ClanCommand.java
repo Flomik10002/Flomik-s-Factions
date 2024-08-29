@@ -6,9 +6,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.flomik.flomiksFactions.FlomiksFactions;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import java.text.SimpleDateFormat;
@@ -18,9 +24,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
     private final ConcurrentHashMap<String, Long> pendingDisbands = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> pendingInvites = new ConcurrentHashMap<>();
+
+    private final FlomiksFactions plugin;
     private final ClanManager clanManager;
 
-    public ClanCommand(ClanManager clanManager) {
+    public ClanCommand(ClanManager clanManager, FlomiksFactions plugin) {
+        this.plugin = plugin;
         this.clanManager = clanManager;
     }
 
@@ -58,7 +67,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     }
 
                     if (!playerClan.getOwner().equals(player.getName())) {
-                        player.sendMessage(ChatColor.RED + "Только владелец клана может его распустить.");
+                        player.sendMessage(ChatColor.RED + "Только Лидер клана может его распустить.");
                         return true;
                     }
 
@@ -70,7 +79,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     } else {
                         // Запрашиваем подтверждение
                         pendingDisbands.put(player.getName(), System.currentTimeMillis());
-                        player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 10 секунд для подтверждения.");
+                        player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 15 секунд для подтверждения.");
                         new BukkitRunnable() {
                             @Override
                             public void run() {
@@ -79,8 +88,64 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                                     pendingDisbands.remove(player.getName());
                                 }
                             }
-                        }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 200L); // 200L = 10 секунд
+                        }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 300L); // 300L = 15 секунд
                     }
+                    break;
+
+                case "promote":
+                    if (clanManager.getPlayerClan(player.getName()) == null) {
+                        player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
+                        return false;
+                    }
+
+                    String targetPromPlayerName = args[1];
+                    Clan promclan = clanManager.getPlayerClan(player.getName());
+
+                    if (promclan == null) {
+                        player.sendMessage(ChatColor.RED + "Не удалось найти ваш клан.");
+                        return false;
+                    }
+
+                    if (!player.getName().equals(promclan.getOwner())) {
+                        player.sendMessage(ChatColor.RED + "Только лидер клана может повысить ранг.");
+                        return false;
+                    }
+
+                    try {
+                        promclan.promoteMember(targetPromPlayerName);
+                        player.sendMessage(ChatColor.GREEN + "Игрок " + targetPromPlayerName + " повышен в должности.");
+                    } catch (IllegalArgumentException e) {
+                        player.sendMessage(ChatColor.RED + e.getMessage());
+                    }
+                    clanManager.saveClan(promclan);
+                    break;
+
+                case "demote":
+                    if (clanManager.getPlayerClan(player.getName()) == null) {
+                        player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
+                        return false;
+                    }
+
+                    String targetDemPlayerName = args[1];
+                    Clan demclan = clanManager.getPlayerClan(player.getName());
+
+                    if (demclan == null) {
+                        player.sendMessage(ChatColor.RED + "Не удалось найти ваш клан.");
+                        return false;
+                    }
+
+                    if (!player.getName().equals(demclan.getOwner())) {
+                        player.sendMessage(ChatColor.RED + "Только лидер клана может понизить ранг.");
+                        return false;
+                    }
+
+                    try {
+                        demclan.demoteMember(targetDemPlayerName);
+                        player.sendMessage(ChatColor.GREEN + "Игрок " + targetDemPlayerName + " понижен в должности.");
+                    } catch (IllegalArgumentException e) {
+                        player.sendMessage(ChatColor.RED + e.getMessage());
+                    }
+                    clanManager.saveClan(demclan);
                     break;
 
                 case "kick":
@@ -154,12 +219,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     }
 
                     if (currentClan.getOwner().equals(player.getName())) {
-                        // Если владелец клана и в нем больше одного участника (не только владелец)
+                        // Если Лидер клана и в нем больше одного участника (не только Лидер)
                         if (currentClan.getMembers().size() > 1) {
-                            player.sendMessage(ChatColor.RED + "Владелец клана не может покинуть клан, пока в нем есть другие участники. Передайте руководство или распустите клан.");
+                            player.sendMessage(ChatColor.RED + "Лидер клана не может покинуть клан, пока в нем есть другие участники. Передайте руководство или распустите клан.");
                             return true;
                         } else {
-                            // Подтверждение удаления только если владелец и в клане только он один
+                            // Подтверждение удаления только если Лидер и в клане только он один
                             if (pendingDisbands.containsKey(player.getName())) {
                                 // Выполняем удаление клана
                                 try {
@@ -172,7 +237,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                             } else {
                                 // Запрашиваем подтверждение
                                 pendingDisbands.put(player.getName(), System.currentTimeMillis());
-                                player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 10 секунд для подтверждения.");
+                                player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 15 секунд для подтверждения.");
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
@@ -181,7 +246,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                                             pendingDisbands.remove(player.getName());
                                         }
                                     }
-                                }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 200L); // 200L = 10 секунд
+                                }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 300L); // 300L = 15 секунд
                             }
                         }
                     } else {
@@ -298,7 +363,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 case "sethome":
                     Clan sethomeClan = clanManager.getPlayerClan(player.getName());
                     if (!player.getName().equals(sethomeClan.getOwner())) {
-                        player.sendMessage(ChatColor.RED + "Только владелец клана может установить точку дома.");
+                        player.sendMessage(ChatColor.RED + "Только Лидер клана может установить точку дома.");
                         return false;
                     }
 
@@ -318,7 +383,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                         }
 
                         if (!ownClan.getOwner().equals(player.getName())) {
-                            player.sendMessage(ChatColor.RED + "Только владелец клана может передать права.");
+                            player.sendMessage(ChatColor.RED + "Только Лидер клана может передать права.");
                             return false;
                         }
 
@@ -330,7 +395,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
                         if (ownClan.getMembers().contains(newLeaderName)) {
                             try {
-                                transferLeadership(ownClan.getName(), player.getName(), newLeaderName);
+                                // Передаем объект plugin в метод transferLeadership
+                                transferLeadership(ownClan.getName(), player.getName(), newLeaderName, plugin);
                                 player.sendMessage(ChatColor.GREEN + "Вы успешно передали права владельца клана игроку " + ChatColor.YELLOW + newLeaderName + ChatColor.GREEN + ".");
                                 newLeader.sendMessage(ChatColor.GREEN + "Вам переданы права владельца клана " + ChatColor.YELLOW + ownClan.getName() + ChatColor.GREEN + ".");
                             } catch (IllegalArgumentException e) {
@@ -347,7 +413,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 case "delhome":
                     Clan delhomeClan = clanManager.getPlayerClan(player.getName());
                     if (!player.getName().equals(delhomeClan.getOwner())) {
-                        player.sendMessage(ChatColor.RED + "Только владелец клана может удалить точку дома.");
+                        player.sendMessage(ChatColor.RED + "Только Лидер клана может удалить точку дома.");
                         return false;
                     }
 
@@ -381,6 +447,9 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String commandsInfo = ChatColor.GREEN + formatSection("Доступные команды:") + "\n" +
                 ChatColor.YELLOW + "/clan create <название> " + ChatColor.WHITE + "- Создать новый клан\n" +
                 ChatColor.YELLOW + "/clan disband " + ChatColor.WHITE + "- Распустить клан\n" +
+                ChatColor.YELLOW + "/clan leader <имя игрока> " + ChatColor.WHITE + "- Сделать игрока лидером\n" +
+                ChatColor.YELLOW + "/clan promote <имя игрока> " + ChatColor.WHITE + "- Повысить игрока\n" +
+                ChatColor.YELLOW + "/clan demote <имя игрока> " + ChatColor.WHITE + "- Понизить игрока\n" +
                 ChatColor.YELLOW + "/clan invite <имя игрока> " + ChatColor.WHITE + "- Пригласить игрока в ваш клан\n" +
                 ChatColor.YELLOW + "/clan join <название клана> " + ChatColor.WHITE + "- Присоединиться к клану\n" +
                 ChatColor.YELLOW + "/clan leave " + ChatColor.WHITE + "- Покинуть клан\n" +
@@ -453,12 +522,18 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return getPlayerSuggestions(args[1]);
         } else if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
             return getPlayerSuggestions(args[1]);
+        }else if (args.length == 2 && args[0].equalsIgnoreCase("promote")) {
+            return getPlayerSuggestions(args[1]);
+        }else if (args.length == 2 && args[0].equalsIgnoreCase("demote")) {
+            return getPlayerSuggestions(args[1]);
+        }else if (args.length == 2 && args[0].equalsIgnoreCase("leader")) {
+            return getPlayerSuggestions(args[1]);
         }
         return new ArrayList<>();
     }
 
     private List<String> getSubCommandSuggestions(String input) {
-        List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "sethome", "delhome", "home", "info");
+        List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "sethome", "delhome", "home", "info", "promote", "demote", "leader");
         return getSuggestions(input, subCommands);
     }
 
@@ -487,22 +562,38 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         return suggestions;
     }
 
-    public void transferLeadership(String clanName, String currentOwnerName, String newLeaderName) {
-        Clan clan = clanManager.getClan(clanName);
-        if (clan == null) {
-            throw new IllegalArgumentException("Клан с таким названием не найден.");
+    private void transferLeadership(String clanName, String currentLeader, String newLeaderName, FlomiksFactions plugin) {
+        // Получаем конфигурацию файла clans.yml
+        FileConfiguration clansConfig = new YamlConfiguration();
+        File clansFile = new File(plugin.getDataFolder(), "clans.yml");
+        try {
+            clansConfig.load(clansFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            plugin.getLogger().severe("Не удалось загрузить конфигурацию кланов!");
+            e.printStackTrace();
+            return;
         }
 
-        if (!clan.getOwner().equals(currentOwnerName)) {
-            throw new IllegalArgumentException("Вы не являетесь владельцем этого клана.");
+        // Проверяем, что клан существует
+        if (!clansConfig.contains(clanName)) {
+            throw new IllegalArgumentException("Клан с таким именем не найден.");
         }
 
-        if (!clan.getMembers().contains(newLeaderName)) {
-            throw new IllegalArgumentException("Игрок не является членом клана.");
+        // Проверяем, что текущий лидер существует в конфигурации
+        if (!clansConfig.getConfigurationSection(clanName).contains("roles." + currentLeader)) {
+            throw new IllegalArgumentException("Текущий лидер не найден в списке ролей.");
         }
 
-        clan.setOwner(newLeaderName);
-        clanManager.saveClan(clan);
+        // Обновляем роли в конфигурации
+        clansConfig.set(clanName + ".roles." + currentLeader, "Заместитель"); // Старый Лидер становится Заместитель
+        clansConfig.set(clanName + ".roles." + newLeaderName, "Лидер"); // Новый Лидер становится Лидером
+
+        // Сохраняем изменения
+        try {
+            clansConfig.save(clansFile);
+        } catch (IOException e) {
+            plugin.getLogger().severe("Не удалось сохранить конфигурацию кланов!");
+            e.printStackTrace();
+        }
     }
-
 }

@@ -11,8 +11,6 @@ import org.flomik.flomiksFactions.FlomiksFactions;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ClanManager {
@@ -40,7 +38,6 @@ public class ClanManager {
         if (getPlayerClan(owner) != null) {
             throw new IllegalArgumentException("Вы уже участник клана.");
         }
-
         // Параметры по умолчанию
         Date creationDate = new Date(); // Дата создания — текущая дата
         String description = ""; // Описание по умолчанию
@@ -48,7 +45,7 @@ public class ClanManager {
         int level = 1; // Начальный уровень клана
         int land = 0; // Начальное количество земель
         int strength = 0; // Начальная сила
-        int maxPower = 0; // Начальная максимальная сила (может быть вычислена позднее)
+        int maxPower = 10; // Начальная максимальная сила (может быть вычислена позднее)
 
         // Инициализация коллекций
         Set<String> members = new HashSet<>();
@@ -56,7 +53,7 @@ public class ClanManager {
 
         // Добавление владельца в список участников и назначение ему роли
         members.add(owner);
-        memberRoles.put(owner, "Владелец");
+        memberRoles.put(owner, "Лидер");
 
         // Создание нового клана
         Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, land, strength, maxPower);
@@ -120,7 +117,7 @@ public class ClanManager {
         }
 
         if (!clan.getOwner().equals(playerName)) {
-            throw new IllegalArgumentException("Только владелец клана может выгонять игроков.");
+            throw new IllegalArgumentException("Только Лидер клана может выгонять игроков.");
         }
 
         if (clan.getOwner().equals(targetName)) {
@@ -303,7 +300,7 @@ public class ClanManager {
 
         if (playerClan.getOwner().equals(playerName)) {
             if (playerClan.getMembers().size() > 1) {
-                throw new IllegalArgumentException("Владелец клана не может покинуть клан, пока в нем есть другие участники. Передайте руководство или распустите клан.");
+                throw new IllegalArgumentException("Лидер клана не может покинуть клан, пока в нем есть другие участники. Передайте руководство или распустите клан.");
             } else {
                 disbandClan(playerClan.getName());
             }

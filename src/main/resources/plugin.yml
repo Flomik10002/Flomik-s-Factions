@@ -10,5 +10,7 @@ website: https://flomik.xyz
 commands:
   clan:
     description: Основная команда для управления кланами.
-    usage: /clan <subcommand>
     aliases: [cl]
+  player:
+    description: Информация о игроке
+    aliases: [p]

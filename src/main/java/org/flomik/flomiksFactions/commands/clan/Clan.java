@@ -1,17 +1,16 @@
 package org.flomik.flomiksFactions.commands.clan;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class Clan {
     private static final int MAX_MEMBERS = 15; // Максимальное количество участников в клане
+    private static final List<String> ROLE_ORDER = Arrays.asList("Рядовой", "Воин", "Заместитель", "Лидер");
 
     private final Map<String, String> memberRoles; // Словарь ролей игроков
     private final String name;
-    public String owner;
+    private String owner;
     private final Set<String> members;
     private final Date creationDate; // Дата создания клана
     private final String description; // Описание клана
@@ -34,17 +33,69 @@ public class Clan {
         this.level = level;
         this.land = land;
         this.strength = strength;
-        this.maxPower = members.size() * 10; // Используем переданное значение maxPower
+        this.maxPower = maxPower; // Используем переданное значение maxPower
     }
 
-    public void setOwner(String newOwner) {
-        // Проверяем, что новый владелец действительно является членом клана
-        if (!members.contains(newOwner)) {
-            throw new IllegalArgumentException("Игрок не является членом клана.");
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getRole(String playerName) {
+        return memberRoles.getOrDefault(playerName, "Не состоит в клане");
+    }
+
+    public void setRole(String playerName, String role) {
+        if (ROLE_ORDER.contains(role)) {
+            memberRoles.put(playerName, role);
+        }
+    }
+
+    public void promoteMember(String playerName) {
+        if (playerName.equals(owner)) {
+            throw new IllegalArgumentException("Лидер клана не может изменить свою роль.");
         }
 
-        // Обновляем владельца
-        this.owner = newOwner;
+        String currentRole = getRole(playerName);
+        int currentIndex = ROLE_ORDER.indexOf(currentRole);
+
+        if (currentIndex == -1) {
+            throw new IllegalArgumentException("Неверная роль для повышения.");
+        }
+
+        if (currentIndex < ROLE_ORDER.size() - 1) {
+            String newRole = ROLE_ORDER.get(currentIndex + 1);
+            setRole(playerName, newRole);
+        } else {
+            throw new IllegalArgumentException("Игрок уже имеет наивысшую роль.");
+        }
+    }
+
+    public void demoteMember(String playerName) {
+        if (playerName.equals(owner)) {
+            throw new IllegalArgumentException("Лидер клана не может изменить свою роль.");
+        }
+
+        String currentRole = getRole(playerName);
+        int currentIndex = ROLE_ORDER.indexOf(currentRole);
+
+        if (currentIndex == -1) {
+            throw new IllegalArgumentException("Неверная роль для понижения.");
+        }
+
+        if (currentIndex > 0) {
+            String newRole = ROLE_ORDER.get(currentIndex - 1);
+            setRole(playerName, newRole);
+        } else {
+            throw new IllegalArgumentException("Игрок уже имеет минимальную роль.");
+        }
+    }
+
+    public Map<String, String> getRoles() {
+        return new HashMap<>(memberRoles);
     }
 
     public List<String> getAlliances() {
@@ -67,10 +118,6 @@ public class Clan {
         return home != null;
     }
 
-    public String getRole(String playerName) {
-        return memberRoles.getOrDefault(playerName, "Рядовой");
-    }
-
     public void removeMember(String player) {
         members.remove(player);
         memberRoles.remove(player);
@@ -80,16 +127,13 @@ public class Clan {
         return name;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
     public Set<String> getMembers() {
-        return members;
+        return new HashSet<>(members);
     }
 
     public void addMember(String player) {
         members.add(player);
+        memberRoles.putIfAbsent(player, "Рядовой"); // При добавлении нового участника роль по умолчанию "Рядовой"
     }
 
     public boolean isFull() {
