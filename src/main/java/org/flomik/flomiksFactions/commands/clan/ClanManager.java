@@ -1,12 +1,18 @@
 package org.flomik.flomiksFactions.commands.clan;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.FlomiksFactions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ClanManager {
@@ -24,16 +30,42 @@ public class ClanManager {
 
     public void createClan(String name, String owner) {
         name = name.toLowerCase(); // Приведение названия клана к нижнему регистру
+
+        // Проверка, существует ли уже клан с таким именем
         if (clans.containsKey(name)) {
             throw new IllegalArgumentException("Клан с таким названием уже существует.");
         }
+
+        // Проверка, состоит ли игрок уже в каком-либо клане
         if (getPlayerClan(owner) != null) {
-            throw new IllegalArgumentException("Вы уже участник клана."); // Изменено сообщение об ошибке
+            throw new IllegalArgumentException("Вы уже участник клана.");
         }
-        Clan clan = new Clan(name, owner);
+
+        // Параметры по умолчанию
+        Date creationDate = new Date(); // Дата создания — текущая дата
+        String description = ""; // Описание по умолчанию
+        List<String> alliances = new ArrayList<>(); // Пустой список альянсов по умолчанию
+        int level = 1; // Начальный уровень клана
+        int land = 0; // Начальное количество земель
+        int strength = 0; // Начальная сила
+        int maxPower = 0; // Начальная максимальная сила (может быть вычислена позднее)
+
+        // Инициализация коллекций
+        Set<String> members = new HashSet<>();
+        Map<String, String> memberRoles = new HashMap<>();
+
+        // Добавление владельца в список участников и назначение ему роли
+        members.add(owner);
+        memberRoles.put(owner, "Владелец");
+
+        // Создание нового клана
+        Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, land, strength, maxPower);
+
+        // Добавление клана в коллекцию и сохранение
         clans.put(name, clan);
         saveClan(clan);
     }
+
 
     public Clan getClan(String name) {
         return clans.get(name.toLowerCase()); // Приведение названия клана к нижнему регистру
@@ -51,6 +83,7 @@ public class ClanManager {
     public void invitePlayer(String clanName, String playerName) {
         clanName = clanName.toLowerCase();
         Clan clan = getClan(clanName);
+
         if (clan == null) {
             throw new IllegalArgumentException("Клан не существует.");
         }
@@ -65,12 +98,43 @@ public class ClanManager {
             throw new IllegalArgumentException("Клан уже достиг максимального количества участников.");
         }
 
+        // Проверка, что игрок онлайн
+        Player player = Bukkit.getPlayer(playerName);
+        if (player == null || !player.isOnline()) {
+            throw new IllegalArgumentException("Игрок не онлайн.");
+        }
+
         if (!invitations.containsKey(playerName)) {
             invitations.put(playerName, new HashSet<>());
         }
         invitations.get(playerName).add(clanName);
         saveInvitations();
     }
+
+    public void kickPlayer(String clanName, String playerName, String targetName) {
+        clanName = clanName.toLowerCase();
+        Clan clan = getClan(clanName);
+
+        if (clan == null) {
+            throw new IllegalArgumentException("Клан не существует.");
+        }
+
+        if (!clan.getOwner().equals(playerName)) {
+            throw new IllegalArgumentException("Только владелец клана может выгонять игроков.");
+        }
+
+        if (clan.getOwner().equals(targetName)) {
+            throw new IllegalArgumentException("Нельзя выгнать владельца клана.");
+        }
+
+        if (!clan.getMembers().contains(targetName)) {
+            throw new IllegalArgumentException("Игрок не является членом клана.");
+        }
+
+        clan.removeMember(targetName);
+        saveClan(clan);
+    }
+
 
     public void disbandClan(String clanName) {
         clanName = clanName.toLowerCase();
@@ -79,6 +143,7 @@ public class ClanManager {
             throw new IllegalArgumentException("Клан не существует.");
         }
         clans.remove(clanName);
+        config.set("clans." + clanName, null);
         saveConfig(); // Сохраняем изменения
     }
 
@@ -129,23 +194,97 @@ public class ClanManager {
 
     public void saveClan(Clan clan) {
         String path = "clans." + clan.getName().toLowerCase(); // Приведение названия клана к нижнему регистру
-        config.set(path + ".owner", clan.getOwner());
-        config.set(path + ".members", new ArrayList<>(clan.getMembers()));
-        saveConfig();
+
+        // Сохранение данных о клане
+        config.set(path + ".owner", clan.getOwner()); // Сохранение владельца клана
+        config.set(path + ".creationDate", clan.getCreationDate().getTime()); // Сохранение даты создания клана в виде миллисекунд
+        config.set(path + ".description", clan.getDescription()); // Сохранение описания клана
+        config.set(path + ".land", clan.getLand()); // Сохранение количества земель клана
+        config.set(path + ".strength", clan.getStrength()); // Сохранение текущей силы клана
+        config.set(path + ".alliances", new ArrayList<>(clan.getAlliances())); // Сохранение списка альянсов
+        config.set(path + ".level", clan.getLevel()); // Сохранение уровня клана
+        config.set(path + ".maxPower", clan.getMaxPower()); // Сохранение максимальной силы клана
+
+        config.set(path + ".members", new ArrayList<>(clan.getMembers())); // Сохранение списка членов клана
+
+        // Сохранение ролей членов клана
+        Map<String, String> memberRoles = new HashMap<>();
+        for (String member : clan.getMembers()) {
+            String role = clan.getRole(member); // Получение роли текущего члена клана
+            memberRoles.put(member, role); // Добавление пары "игрок-роль" в мапу
+        }
+        config.set(path + ".roles", memberRoles); // Сохранение ролей членов клана в конфигурации
+
+        // Сохранение точки дома клана
+        if (clan.hasHome()) {
+            Location home = clan.getHome();
+            config.set(path + ".home.world", home.getWorld().getName());
+            config.set(path + ".home.x", home.getX());
+            config.set(path + ".home.y", home.getY());
+            config.set(path + ".home.z", home.getZ());
+            config.set(path + ".home.yaw", home.getYaw());
+            config.set(path + ".home.pitch", home.getPitch());
+        } else {
+            config.set(path + ".home", null); // Удаление старой точки дома
+        }
+
+        saveConfig(); // Сохранение конфигурации
     }
 
     public void loadClans() {
         if (config.contains("clans")) {
             for (String clanName : config.getConfigurationSection("clans").getKeys(false)) {
                 String lowerCaseClanName = clanName.toLowerCase(); // Приведение названия клана к нижнему регистру
+
+                // Загрузка владельца
                 String owner = config.getString("clans." + lowerCaseClanName + ".owner");
-                List<String> membersList = config.getStringList("clans." + lowerCaseClanName + ".members");
-                Set<String> members = new HashSet<>(membersList);
-                Clan clan = new Clan(lowerCaseClanName, owner, members);
+
+                // Загрузка участников и их ролей
+                List<String> members = config.getStringList("clans." + lowerCaseClanName + ".members");
+                Set<String> memberSet = new HashSet<>(members); // Преобразование списка в Set
+                Map<String, String> memberRoles = new HashMap<>();
+                ConfigurationSection rolesSection = config.getConfigurationSection("clans." + lowerCaseClanName + ".roles");
+                if (rolesSection != null) {
+                    for (String key : rolesSection.getKeys(false)) {
+                        String role = rolesSection.getString(key);
+                        memberRoles.put(key, role); // Загрузка роли члена
+                    }
+                }
+
+                // Загрузка остальных данных
+                Date creationDate = new Date(config.getLong("clans." + lowerCaseClanName + ".creationDate")); // Преобразование миллисекунд в дату
+                String description = config.getString("clans." + lowerCaseClanName + ".description", "");
+                List<String> alliances = config.getStringList("clans." + lowerCaseClanName + ".alliances");
+                int level = config.getInt("clans." + lowerCaseClanName + ".level", 1);
+                int land = config.getInt("clans." + lowerCaseClanName + ".land", 0);
+                int strength = config.getInt("clans." + lowerCaseClanName + ".strength", 0);
+                int maxPower = config.getInt("clans." + lowerCaseClanName + ".maxPower", memberSet.size() * 10); // Задаём maxPower как размер членов клана * 10, если нет сохранённого значения
+
+                // Загрузка точки дома
+                Location home = null;
+                if (config.contains("clans." + lowerCaseClanName + ".home")) {
+                    String worldName = config.getString("clans." + lowerCaseClanName + ".home.world");
+                    double x = config.getDouble("clans." + lowerCaseClanName + ".home.x");
+                    double y = config.getDouble("clans." + lowerCaseClanName + ".home.y");
+                    double z = config.getDouble("clans." + lowerCaseClanName + ".home.z");
+                    float yaw = (float) config.getDouble("clans." + lowerCaseClanName + ".home.yaw");
+                    float pitch = (float) config.getDouble("clans." + lowerCaseClanName + ".home.pitch");
+
+                    World world = Bukkit.getWorld(worldName);
+                    if (world != null) {
+                        home = new Location(world, x, y, z, yaw, pitch);
+                    }
+                }
+
+                // Создание объекта клана
+                Clan clan = new Clan(
+                        lowerCaseClanName, owner, memberSet, memberRoles, creationDate, description, alliances, level, land, strength, maxPower
+                );
+                clan.setHome(home);
                 clans.put(lowerCaseClanName, clan);
             }
         }
-        loadInvitations();
+        loadInvitations(); // Загрузка приглашений (если это необходимо)
     }
 
     public void saveConfig() {
@@ -153,6 +292,24 @@ public class ClanManager {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void leaveClan(String playerName) {
+        Clan playerClan = getPlayerClan(playerName);
+        if (playerClan == null) {
+            throw new IllegalArgumentException("Вы не состоите в каком-либо клане.");
+        }
+
+        if (playerClan.getOwner().equals(playerName)) {
+            if (playerClan.getMembers().size() > 1) {
+                throw new IllegalArgumentException("Владелец клана не может покинуть клан, пока в нем есть другие участники. Передайте руководство или распустите клан.");
+            } else {
+                disbandClan(playerClan.getName());
+            }
+        } else {
+            playerClan.removeMember(playerName);
+            saveClan(playerClan);
         }
     }
 
@@ -172,9 +329,10 @@ public class ClanManager {
     }
 
     private void saveInvitations() {
+        config.set("invitations", null); // Сначала очищаем старые данные
         for (Map.Entry<String, Set<String>> entry : invitations.entrySet()) {
             config.set("invitations." + entry.getKey(), new ArrayList<>(entry.getValue()));
         }
-        saveConfig();
+        saveConfig(); // Сохраняем изменения после обновления
     }
 }
