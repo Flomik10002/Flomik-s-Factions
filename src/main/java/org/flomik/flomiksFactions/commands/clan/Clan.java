@@ -66,11 +66,13 @@ public class Clan {
             throw new IllegalArgumentException("Неверная роль для повышения.");
         }
 
+        if (currentIndex == 2){
+            throw new IllegalArgumentException("Игрок уже имеет наивысшую роль.");
+        }
+
         if (currentIndex < ROLE_ORDER.size() - 1) {
             String newRole = ROLE_ORDER.get(currentIndex + 1);
             setRole(playerName, newRole);
-        } else {
-            throw new IllegalArgumentException("Игрок уже имеет наивысшую роль.");
         }
     }
 

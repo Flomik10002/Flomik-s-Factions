@@ -1,10 +1,12 @@
-package org.flomik.flomiksFactions.commands.clan;
+package org.flomik.flomiksFactions.events;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.flomik.flomiksFactions.commands.clan.Clan;
+import org.flomik.flomiksFactions.commands.clan.ClanManager;
 
 import java.util.List;
 

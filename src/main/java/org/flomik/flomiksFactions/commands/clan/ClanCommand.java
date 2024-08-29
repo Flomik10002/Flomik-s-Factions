@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.flomik.flomiksFactions.FlomiksFactions;
+import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +28,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
     private final FlomiksFactions plugin;
     private final ClanManager clanManager;
+    private final PlayerDataHandler playerDataHandler;
 
-    public ClanCommand(ClanManager clanManager, FlomiksFactions plugin) {
+    public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler,FlomiksFactions plugin) {
         this.plugin = plugin;
         this.clanManager = clanManager;
+        this.playerDataHandler = playerDataHandler;
     }
 
     @Override
@@ -296,8 +299,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     listClans(player);
                     break;
 
-
-
                 case "ally":
 
                 case "info":
@@ -311,26 +312,24 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                             player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
                             return true;
                         }
-                    } else if (args.length == 2) {
-                        // Если аргумент есть, проверяем, является ли он именем игрока или названием клана
-                        if (Bukkit.getPlayer(arg) != null) {
-                            // Если аргумент - это имя игрока, показываем информацию о клане этого игрока
+                    } else {
+                        // Если аргумент есть, проверяем, является ли он именем игрока
+                        // Предполагается, что `playerDataHandler.hasPlayerData(arg)` возвращает true, если данные о игроке существуют
+                        if (playerDataHandler.hasPlayerData(arg)) {
+                            // Пытаемся получить клан игрока через playerDataHandler
                             curClan = clanManager.getPlayerClan(arg);
                             if (curClan == null) {
                                 player.sendMessage(ChatColor.RED + "Игрок не состоит в клане.");
                                 return true;
                             }
                         } else {
-                            // Иначе, если это название клана, показываем информацию о данном клане
-                            curClan = clanManager.getClan(arg.toLowerCase()); // Предполагаем, что `getClan` принимает название клана в нижнем регистре
+                            // Если аргумент не соответствует имени игрока, считаем, что это название клана
+                            curClan = clanManager.getClan(arg.toLowerCase());
                             if (curClan == null) {
                                 player.sendMessage(ChatColor.RED + "Клан с таким названием не найден.");
                                 return true;
                             }
                         }
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Неверное количество аргументов.");
-                        return true;
                     }
 
                     // Формирование информации о клане
@@ -371,44 +370,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     clanManager.saveClan(sethomeClan);
                     player.sendMessage(ChatColor.GREEN + "Точка дома клана установлена.");
                     return true;
-
-                case "leader":
-                    if (args.length == 1) {
-                        String newLeaderName = args[0];
-                        Clan ownClan = clanManager.getPlayerClan(player.getName());
-
-                        if (ownClan == null) {
-                            player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
-                            return false;
-                        }
-
-                        if (!ownClan.getOwner().equals(player.getName())) {
-                            player.sendMessage(ChatColor.RED + "Только Лидер клана может передать права.");
-                            return false;
-                        }
-
-                        Player newLeader = player.getServer().getPlayer(newLeaderName);
-                        if (newLeader == null || !newLeader.isOnline()) {
-                            player.sendMessage(ChatColor.RED + "Игрок с таким именем не найден или не в сети.");
-                            return false;
-                        }
-
-                        if (ownClan.getMembers().contains(newLeaderName)) {
-                            try {
-                                // Передаем объект plugin в метод transferLeadership
-                                transferLeadership(ownClan.getName(), player.getName(), newLeaderName, plugin);
-                                player.sendMessage(ChatColor.GREEN + "Вы успешно передали права владельца клана игроку " + ChatColor.YELLOW + newLeaderName + ChatColor.GREEN + ".");
-                                newLeader.sendMessage(ChatColor.GREEN + "Вам переданы права владельца клана " + ChatColor.YELLOW + ownClan.getName() + ChatColor.GREEN + ".");
-                            } catch (IllegalArgumentException e) {
-                                player.sendMessage(ChatColor.RED + "Ошибка: " + e.getMessage());
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Игрок " + newLeaderName + " не является членом вашего клана.");
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.YELLOW + "Использование: /clan leader <игрок>");
-                    }
-                    break;
 
                 case "delhome":
                     Clan delhomeClan = clanManager.getPlayerClan(player.getName());
@@ -560,40 +521,5 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
         return suggestions;
-    }
-
-    private void transferLeadership(String clanName, String currentLeader, String newLeaderName, FlomiksFactions plugin) {
-        // Получаем конфигурацию файла clans.yml
-        FileConfiguration clansConfig = new YamlConfiguration();
-        File clansFile = new File(plugin.getDataFolder(), "clans.yml");
-        try {
-            clansConfig.load(clansFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            plugin.getLogger().severe("Не удалось загрузить конфигурацию кланов!");
-            e.printStackTrace();
-            return;
-        }
-
-        // Проверяем, что клан существует
-        if (!clansConfig.contains(clanName)) {
-            throw new IllegalArgumentException("Клан с таким именем не найден.");
-        }
-
-        // Проверяем, что текущий лидер существует в конфигурации
-        if (!clansConfig.getConfigurationSection(clanName).contains("roles." + currentLeader)) {
-            throw new IllegalArgumentException("Текущий лидер не найден в списке ролей.");
-        }
-
-        // Обновляем роли в конфигурации
-        clansConfig.set(clanName + ".roles." + currentLeader, "Заместитель"); // Старый Лидер становится Заместитель
-        clansConfig.set(clanName + ".roles." + newLeaderName, "Лидер"); // Новый Лидер становится Лидером
-
-        // Сохраняем изменения
-        try {
-            clansConfig.save(clansFile);
-        } catch (IOException e) {
-            plugin.getLogger().severe("Не удалось сохранить конфигурацию кланов!");
-            e.printStackTrace();
-        }
     }
 }
