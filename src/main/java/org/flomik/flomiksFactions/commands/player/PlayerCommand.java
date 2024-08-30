@@ -2,7 +2,6 @@ package org.flomik.flomiksFactions.commands.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,7 +37,7 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     String arg = args.length > 1 ? args[1] : ""; // Получаем аргумент команды, если он есть
 
                     if (arg.isEmpty()) {
-                        player.sendMessage(ChatColor.RED + "Введите никнейм игрока.");
+                        player.sendMessage(ChatColor.YELLOW + "Использование:" + ChatColor.GOLD + "/p info <игрок>");
                         return true;
                     }
 
@@ -58,12 +57,12 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     // Конвертируем тики в секунды
                     int secondsPlayed = ticksPlayed / 20;
 
-// Конвертируем секунды в дни, часы и минуты (убираем секунды)
+                    // Конвертируем секунды в дни, часы и минуты (убираем секунды)
                     int days = secondsPlayed / 86400; // Количество секунд в дне
                     int hours = (secondsPlayed % 86400) / 3600;
                     int minutes = (secondsPlayed % 3600) / 60;
 
-// Формируем сообщение
+                    // Формируем сообщение
                     String playTimeMessage = String.format(
                             "%dд, %dч, %dм.", // Убрали отображение секунд
                             days, hours, minutes
@@ -85,7 +84,7 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     return true;
 
                 default:
-                    player.sendMessage(ChatColor.RED + "Неизвестная подкоманда. Используйте /clan для списка команд.");
+                    player.sendMessage(ChatColor.YELLOW + "Неизвестная подкоманда. Использование: " + ChatColor.GOLD + "/player" + ChatColor.YELLOW + " для списка команд.");
                     break;
             }
         } else {
@@ -106,12 +105,12 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
         return onlineCount;
     }
 
-    private String formatSection(String title) {
-        return ChatColor.GREEN + "**** " + ChatColor.WHITE + title + ChatColor.GREEN + " ****";
+    private String formatSection() {
+        return ChatColor.GREEN + "**** " + ChatColor.WHITE + "Доступные команды:" + ChatColor.GREEN + " ****";
     }
 
     private void showCommands(Player player) {
-        String commandsInfo = formatSection("Доступные команды:") + "\n" +
+        String commandsInfo = formatSection() + "\n" +
                 ChatColor.YELLOW + "/player info <игрок> " + ChatColor.WHITE + "- Информация о игроке";
         player.sendMessage(commandsInfo);
     }

@@ -8,8 +8,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
 
-import java.util.List;
-
 public class ClanPvPListener implements Listener {
 
     private final ClanManager clanManager;
@@ -30,17 +28,14 @@ public class ClanPvPListener implements Listener {
             Clan attackerClan = clanManager.getPlayerClan(attacker.getName());
             Clan defenderClan = clanManager.getPlayerClan(defender.getName());
 
-            // Проверяем, находятся ли оба игрока в одном клане
-            if (attackerClan != null && defenderClan != null && attackerClan.equals(defenderClan)) {
-                event.setCancelled(true); // Отменяем событие драки
-            }
-            for (Clan clan : clanManager.getClans().values()) {
-                List<String> alliances = clan.getAlliances();
-                for (String allyName : alliances) {
-                    Clan allyClan = clanManager.getClans().get(allyName);
-                    if (allyClan != null) {
-                        event.setCancelled(true); // Отменяем событие драки
-                    }
+            if (attackerClan != null && defenderClan != null) {
+                if (attackerClan.equals(defenderClan)) {
+                    event.setCancelled(true); // Отменяем событие драки
+                }
+                // Проверяем, находятся ли кланы в альянсе
+                if (attackerClan.getAlliances().contains(defenderClan.getName()) ||
+                        defenderClan.getAlliances().contains(attackerClan.getName())) {
+                    event.setCancelled(true); // Отменяем событие драки
                 }
             }
         }

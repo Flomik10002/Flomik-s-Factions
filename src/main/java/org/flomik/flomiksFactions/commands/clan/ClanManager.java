@@ -185,6 +185,15 @@ public class ClanManager {
         saveClan(clan);
     }
 
+    public Collection<Clan> getAllClans() {
+        return clans.values();
+    }
+
+    // Обновление данных о клане
+    public void updateClan(Clan clan) {
+        clans.put(clan.getName(), clan);
+    }
+
     public Map<String, Clan> getClans() {
         return clans;
     }

@@ -55,7 +55,7 @@ public class PlayerJoinListener implements Listener {
         int ticksPlayed = Bukkit.getPlayer(playerName).getStatistic(Statistic.PLAY_ONE_MINUTE);
         playerDataHandler.setPlayTime(playerName, ticksPlayed);
 
-        // Обновляем данные о уровне, силе и максимальной силе
+        // Обновляем данные об уровне, силе и максимальной силе
         int level = playerDataHandler.getPlayerLevel(playerName);
         int strength = playerDataHandler.getPlayerStrength(playerName);
         int maxStrength = playerDataHandler.getPlayerMaxStrength(playerName);

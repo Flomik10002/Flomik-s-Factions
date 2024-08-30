@@ -104,6 +104,15 @@ public class Clan {
         return new ArrayList<>(alliances);
     }
 
+    public void addAlliances(Clan clan) {
+        alliances.add(clan.getName());
+    }
+
+    // Удаляем альянс
+    public void removeAlliance(Clan clan) {
+        alliances.remove(clan.getName());
+    }
+
     public Location getHome() {
         return home;
     }
