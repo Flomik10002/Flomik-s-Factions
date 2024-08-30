@@ -34,8 +34,8 @@ public class DescCommandHandler {
 
             // Проверка, что игрок является владельцем клана
             String playerRole = playerClan.getRole(player.getName());
-            if (!playerRole.equals("Лидер")) {
-                player.sendMessage(ChatColor.RED + "Только Лидер клана может переименовать клан.");
+            if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
+                player.sendMessage(ChatColor.RED + "Только Лидер и Заместитель клана можгут переименовать клан.");
                 return true;
             }
 

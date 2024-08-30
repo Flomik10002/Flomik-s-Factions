@@ -68,6 +68,6 @@ public class PlayerJoinListener implements Listener {
             for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
                 updatePlayerStatistics(player.getName());
             }
-        }, 0L, 1200L); // 1200 тиков = 60 секунд
+        }, 0L, 20L);
     }
 }

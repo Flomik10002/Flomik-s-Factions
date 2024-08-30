@@ -1,7 +1,11 @@
 package org.flomik.flomiksFactions.commands.clan;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.flomik.flomiksFactions.FlomiksFactions;
 
+import java.io.File;
 import java.util.*;
 
 public class Clan {
@@ -200,10 +204,6 @@ public class Clan {
         // Demote to the previous role in the order
         String newRole = ROLE_ORDER.get(currentIndex - 1);
         setRole(targetPlayer, newRole);
-    }
-
-    public Map<String, String> getRoles() {
-        return new HashMap<>(memberRoles);
     }
 
     public List<String> getAlliances() {

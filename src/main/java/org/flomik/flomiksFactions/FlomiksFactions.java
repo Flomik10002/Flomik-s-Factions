@@ -6,6 +6,7 @@ import org.flomik.flomiksFactions.commands.clan.ClanCommand;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
 import org.flomik.flomiksFactions.events.ClanPvPListener;
 import org.flomik.flomiksFactions.commands.player.PlayerCommand;
+import org.flomik.flomiksFactions.events.PlayerDeathListener;
 import org.flomik.flomiksFactions.events.PlayerJoinListener;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
@@ -21,11 +22,14 @@ public final class FlomiksFactions extends JavaPlugin {
 
         PlayerJoinListener playerJoinListener = new PlayerJoinListener(playerDataHandler);
 
-
         getServer().getPluginManager().registerEvents(playerJoinListener, this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(playerDataHandler), this);
+
 
         getCommand("player").setExecutor(new PlayerCommand(playerDataHandler, clanManager));
         getCommand("clan").setExecutor(new ClanCommand(clanManager, playerDataHandler, this));
+
+        new StrengthTickTask(playerDataHandler).addStrength(this);
         new ClanPvPListener(this, clanManager);
         playerJoinListener.startPeriodicStatsUpdate(this);
     }

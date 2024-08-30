@@ -46,14 +46,6 @@ public class PlayerDataHandler {
         return playersConfig.contains(playerName);
     }
 
-    // Получает дату первого захода для данного игрока
-    public String getFirstJoinDate(String playerName) {
-        if (hasFirstJoinDate(playerName)) {
-            return playersConfig.getString(playerName + ".firstJoinDate", "Неизвестно");
-        }
-        return "Неизвестно";
-    }
-
     // Сохраняет уровень, силу и максимальную силу игрока
     public void savePlayerAttributes(String playerName, int level, int strength, int maxStrength) {
         playersConfig.set(playerName + ".level", level);
@@ -62,14 +54,32 @@ public class PlayerDataHandler {
         saveConfig();
     }
 
+    // Получает дату первого захода для данного игрока
+    public String getFirstJoinDate(String playerName) {
+        if (hasFirstJoinDate(playerName)) {
+            return playersConfig.getString(playerName + ".firstJoinDate", "Неизвестно");
+        }
+        return "Неизвестно";
+    }
+
     // Получает уровень игрока
     public int getPlayerLevel(String playerName) {
         return playersConfig.getInt(playerName + ".level", 1); // по умолчанию 1
     }
 
+    public void setPlayerLevel(String playerName, int level) {
+        playersConfig.set(playerName + ".level", level);
+        saveConfig();
+    }
+
     // Получает силу игрока
     public int getPlayerStrength(String playerName) {
         return playersConfig.getInt(playerName + ".strength", 10); // по умолчанию 10
+    }
+
+    public void setPlayerStrength(String playerName, int strength) {
+        playersConfig.set(playerName + ".strength", strength);
+        saveConfig();
     }
 
     // Получает максимальную силу игрока

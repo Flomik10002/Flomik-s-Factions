@@ -41,13 +41,7 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
 
-                    org.flomik.flomiksFactions.commands.player.Player playerInfo = getPlayerInfo(arg);
                     Clan curClan = clanManager.getPlayerClan(arg);
-
-                    if (playerInfo == null) {
-                        player.sendMessage(ChatColor.RED + "Информация о игроке не найдена.");
-                        return true;
-                    }
 
                     // Если игрок был оффлайн, но зарегистрирован
                     String firstJoinDate = playerDataHandler.getFirstJoinDate(arg);
@@ -72,8 +66,8 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     info.append(ChatColor.GREEN).append("***** ").append(ChatColor.WHITE).append("Игрок ").append(arg).append(ChatColor.GREEN).append(" *****\n");
                     info.append(ChatColor.GOLD).append("Играет с: ").append(ChatColor.YELLOW).append(firstJoinDate).append("\n");
                     info.append(ChatColor.GOLD).append("Онлайн: ").append(ChatColor.YELLOW).append(playTimeMessage).append("\n");
-                    info.append(ChatColor.GOLD).append("Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(playerInfo.getStrength()).append("/").append(playerInfo.getMaxPower()).append("\n");
-                    info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(playerInfo.getLevel()).append("\n");
+                    info.append(ChatColor.GOLD).append("Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerStrength(arg)).append("/").append(playerDataHandler.getPlayerMaxStrength(arg)).append("\n");
+                    info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerLevel(arg)).append("\n");
                     if (curClan != null) {
                         info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(arg)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
                     } else {
@@ -113,23 +107,6 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
         String commandsInfo = formatSection() + "\n" +
                 ChatColor.YELLOW + "/player info <игрок> " + ChatColor.WHITE + "- Информация о игроке";
         player.sendMessage(commandsInfo);
-    }
-
-    private org.flomik.flomiksFactions.commands.player.Player getPlayerInfo(String playerName) {
-        // Попробуйте получить информацию из PlayerDataHandler
-        if (playerDataHandler.hasPlayerData(playerName)) {
-            // Получаем уровень, силу и максимальную силу из PlayerDataHandler
-            int level = playerDataHandler.getPlayerLevel(playerName); // Получаем уровень игрока
-            int strength = playerDataHandler.getPlayerStrength(playerName); // Получаем текущую силу игрока
-            int maxPower = playerDataHandler.getPlayerMaxStrength(playerName); // Получаем максимальную силу игрока
-
-            // Создаем новый объект Player с полученными данными
-            org.flomik.flomiksFactions.commands.player.Player playerInfo = new org.flomik.flomiksFactions.commands.player.Player(level, strength, maxPower);
-            return playerInfo;
-        } else {
-            // Если данных нет, возвращаем null
-            return null;
-        }
     }
 
     @Override
