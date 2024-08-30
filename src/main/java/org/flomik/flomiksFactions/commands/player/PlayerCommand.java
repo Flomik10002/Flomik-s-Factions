@@ -37,7 +37,7 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     String arg = args.length > 1 ? args[1] : ""; // Получаем аргумент команды, если он есть
 
                     if (arg.isEmpty()) {
-                        player.sendMessage(ChatColor.YELLOW + "Использование:" + ChatColor.GOLD + "/p info <игрок>");
+                        player.sendMessage(ChatColor.YELLOW + "Использование:" + ChatColor.GOLD + " /p info <игрок>");
                         return true;
                     }
 

@@ -23,9 +23,15 @@ public class KickCommandHandler {
                 return true;
             }
 
-            if (!clan.getOwner().equals(player.getName())) {
-                player.sendMessage(ChatColor.RED + "Только лидер клана может исключать игроков.");
-                return true;
+            String playerRole = clan.getRole(player.getName());
+            if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
+                player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель клана может исключать игроков.");
+                return false;
+            }
+
+            if (targetPlayerName.equals(clan.getOwner())) {
+                player.sendMessage(ChatColor.RED + "Заместитель не может исключить Лидера из клана.");
+                return false;
             }
 
             if (clan.getMembers().contains(targetPlayerName)) {

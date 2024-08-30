@@ -1,0 +1,68 @@
+package org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.flomik.flomiksFactions.commands.clan.Clan;
+import org.flomik.flomiksFactions.commands.clan.ClanManager;
+
+public class NameCommandHandler {
+
+    private final ClanManager clanManager;
+
+    public NameCommandHandler(ClanManager clanManager) {
+        this.clanManager = clanManager;
+    }
+
+    public boolean handleCommand(Player player, String[] args) {
+        if (args.length > 1) {
+            String newClanName = args[1].toLowerCase();;
+
+            final int MAX_NAME_LENGTH = 14;
+
+            boolean wasTruncated = newClanName.length() > MAX_NAME_LENGTH;
+            if (wasTruncated) {
+                newClanName = newClanName.substring(0, MAX_NAME_LENGTH);
+            }
+
+            Clan playerClan = clanManager.getPlayerClan(player.getName());
+            if (playerClan == null) {
+                player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
+                return true;
+            }
+
+            // Проверка, что игрок является владельцем клана
+            String playerRole = playerClan.getRole(player.getName());
+            if (!playerRole.equals("Лидер")) {
+                player.sendMessage(ChatColor.RED + "Только Лидер клана может переименовать клан.");
+                return true;
+            }
+
+            // Проверка на допустимость нового имени (например, длина, уникальность и т.д.)
+            if (newClanName == null || newClanName.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "Название клана не может быть пустым.");
+                return true;
+            }
+
+            // Переименовываем клан
+            playerClan.renameClan(newClanName);
+            clanManager.updateClan(playerClan);
+
+            // Опционально, можно уведомить всех членов клана о смене имени
+            for (String memberName : playerClan.getMembers()) {
+                Player member = player.getServer().getPlayer(memberName);
+                if (member != null) {
+                    member.sendMessage(ChatColor.GREEN + "Клан был переименован в " + ChatColor.YELLOW + newClanName + ChatColor.GREEN + ".");
+                }
+            }
+
+            if (wasTruncated) {
+                player.sendMessage(ChatColor.YELLOW + "Название было слишком длинным и было обрезано до 14 символов.");
+            }
+
+            return false;
+        } else {
+            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan name <название>");
+        }
+        return true;
+    }
+}

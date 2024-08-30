@@ -191,8 +191,20 @@ public class ClanManager {
 
     // Обновление данных о клане
     public void updateClan(Clan clan) {
+        // Удаляем старое название клана из карты и конфигурации, если название изменилось
+        String oldName = clan.getOldName();
+        if (oldName != null && !oldName.equals(clan.getName())) {
+            clans.remove(oldName.toLowerCase());
+            config.set("clans." + oldName.toLowerCase(), null); // Удаляем старое название из конфигурации
+        }
+
+        // Обновляем карту кланов с новым названием
         clans.put(clan.getName(), clan);
+
+        // Сохраняем обновленные данные о клане
+        saveClan(clan);
     }
+
 
     public Map<String, Clan> getClans() {
         return clans;

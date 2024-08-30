@@ -31,8 +31,9 @@ public class InviteCommandHandler {
             }
 
             // Проверка, что игрок является лидером клана
-            if (!clan.getOwner().equals(player.getName())) {
-                player.sendMessage(ChatColor.RED + "Только лидер клана может отправлять и отзывать приглашения.");
+            String playerRole = clan.getRole(player.getName());
+            if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
+                player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель клана может отправлять и отзывать приглашения.");
                 return true;
             }
 

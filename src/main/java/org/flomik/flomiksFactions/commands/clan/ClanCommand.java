@@ -9,9 +9,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.FlomiksFactions;
 import org.flomik.flomiksFactions.commands.clan.handlers.*;
-import org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions.AllyCommandHandler;
-import org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions.CreateCommandHandler;
-import org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions.DisbandCommandHandler;
+import org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions.*;
 import org.flomik.flomiksFactions.commands.clan.handlers.home.DelHomeCommandHandler;
 import org.flomik.flomiksFactions.commands.clan.handlers.home.HomeCommandHandler;
 import org.flomik.flomiksFactions.commands.clan.handlers.home.SetHomeCommandHandler;
@@ -45,6 +43,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final DelHomeCommandHandler delHomeHandler;
     private final HomeCommandHandler homeHandler;
     private final AllyCommandHandler allyHandler;
+    private final LeaderCommandHandler leaderHandler;
+    private final NameCommandHandler nameHanler;
+    private final DescCommandHandler descriptionHanler;
+    private final ModerCommandHandler moderHanler;
 
     public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin) {
         this.plugin = plugin;
@@ -64,6 +66,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.delHomeHandler = new DelHomeCommandHandler(clanManager);
         this.homeHandler = new HomeCommandHandler(clanManager);
         this.allyHandler = new AllyCommandHandler(clanManager, pendingAllies);
+        this.leaderHandler = new LeaderCommandHandler(clanManager);
+        this.nameHanler = new NameCommandHandler(clanManager);
+        this.descriptionHanler = new DescCommandHandler(clanManager);
+        this.moderHanler = new ModerCommandHandler(clanManager);
     }
 
     @Override
@@ -105,9 +111,18 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     return homeHandler.handleCommand(player);
                 case "ally":
                     return allyHandler.handleCommand(player, args);
+                case "leader":
+                    return leaderHandler.handleCommand(player, args);
+                case "name":
+                    return nameHanler.handleCommand(player, args);
+                case "desc":
+                    return descriptionHanler.handleCommand(player, args);
+                case "moder":
+                    return moderHanler.handleCommand(player, args);
 
                 default:
-                    player.sendMessage(ChatColor.YELLOW + "Неизвестная подкоманда. Использование: " + ChatColor.GOLD + "/clan" + ChatColor.YELLOW + " для списка команд.");
+                    player.sendMessage(ChatColor.YELLOW + "Неизвестная подкоманда. Использование: " +
+                            ChatColor.GOLD + "/clan" + ChatColor.YELLOW + " для списка команд.");
                     break;
             }
         } else {
@@ -120,9 +135,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private void showCommands(Player player) {
         String commandsInfo = ChatColor.GREEN + "**** " + ChatColor.WHITE + "Доступные команды:" + ChatColor.GREEN + " ****" + "\n" +
                 ChatColor.YELLOW + "/clan create <название> " + ChatColor.WHITE + "- Создать новый клан\n" +
+                ChatColor.YELLOW + "/clan name <название> " + ChatColor.WHITE + "- Поменять название клана\n" +
+                ChatColor.YELLOW + "/clan desc <описание> " + ChatColor.WHITE + "- Поменять описание клана\n" +
                 ChatColor.YELLOW + "/clan disband " + ChatColor.WHITE + "- Распустить клан\n" +
                 ChatColor.YELLOW + "/clan ally <название> " + ChatColor.WHITE + "- предложить альянс клану\n" +
                 ChatColor.YELLOW + "/clan leader <игрок> " + ChatColor.WHITE + "- Сделать игрока лидером\n" +
+                ChatColor.YELLOW + "/clan moder <игрок> " + ChatColor.WHITE + "- Повысить игрока до Заместителя\n" +
                 ChatColor.YELLOW + "/clan promote <игрок> " + ChatColor.WHITE + "- Повысить игрока\n" +
                 ChatColor.YELLOW + "/clan demote <игрок> " + ChatColor.WHITE + "- Понизить игрока\n" +
                 ChatColor.YELLOW + "/clan invite <игрок> " + ChatColor.WHITE + "- Пригласить игрока в ваш клан\n" +
@@ -168,12 +186,15 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return getPlayerSuggestions(args[1]);
         }else if (args.length == 2 && args[0].equalsIgnoreCase("leader")) {
             return getPlayerSuggestions(args[1]);
+        }else if (args.length == 2 && args[0].equalsIgnoreCase("moder")) {
+            return getPlayerSuggestions(args[1]);
         }
         return new ArrayList<>();
     }
 
     private List<String> getSubCommandSuggestions(String input) {
-        List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "sethome", "delhome", "home", "info", "promote", "demote", "ally");
+        List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "sethome",
+                "delhome", "home", "info", "promote", "demote", "ally", "leader", "name", "desc", "moder");
         return getSuggestions(input, subCommands);
     }
 
