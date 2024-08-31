@@ -43,7 +43,7 @@ public class InviteCommandHandler {
                 // Отзываем приглашение
                 invites.remove(clan.getName());
                 pendingInvites.put(playerName, invites); // Обновляем список приглашений
-                player.sendMessage(ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " было отменено для игрока " + ChatColor.YELLOW + playerName + ChatColor.GREEN + ".");
+                sendMessageToRole(clan, ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " было отменено для игрока " + ChatColor.YELLOW + playerName + ChatColor.GREEN + ".");
                 Player invitedPlayer = player.getServer().getPlayer(playerName);
                 if (invitedPlayer != null) {
                     invitedPlayer.sendMessage(ChatColor.RED + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + " было отменено.");
@@ -54,8 +54,8 @@ public class InviteCommandHandler {
                     clanManager.invitePlayer(clan.getName(), playerName);
                     invites.add(clan.getName());
                     pendingInvites.put(playerName, invites); // Сохраняем обновлённый список приглашений
-                    player.sendMessage(ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " отправлено игроку " + ChatColor.YELLOW + playerName + ChatColor.GREEN + "!");
-                    player.sendMessage(ChatColor.YELLOW + "Для отмены приглашения игроку " + ChatColor.GOLD + playerName + ChatColor.YELLOW + " повторите команду.");
+                    sendMessageToRole(clan, ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " отправлено игроку " + ChatColor.YELLOW + playerName + ChatColor.GREEN + "!");
+                    sendMessageToRole(clan, ChatColor.YELLOW + "Для отмены приглашения игроку " + ChatColor.GOLD + playerName + ChatColor.YELLOW + " повторите команду.");
                     Player invitedPlayer = player.getServer().getPlayer(playerName);
                     if (invitedPlayer != null) {
                         invitedPlayer.sendMessage(ChatColor.GREEN + "Вам пришло приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " от игрока " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + ". Используйте " + ChatColor.YELLOW + "/clan join <название>" + ChatColor.GREEN + " для принятия приглашения.");
@@ -73,7 +73,7 @@ public class InviteCommandHandler {
                                 } else {
                                     pendingInvites.put(playerName, currentInvites);
                                 }
-                                player.sendMessage(ChatColor.RED + "Приглашение для игрока " + ChatColor.YELLOW + playerName + ChatColor.RED + " в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.RED + " истекло.");
+                                sendMessageToRole(clan, ChatColor.RED + "Приглашение для игрока " + ChatColor.YELLOW + playerName + ChatColor.RED + " в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.RED + " истекло.");
                                 Player invitedPlayer = player.getServer().getPlayer(playerName);
                                 if (invitedPlayer != null) {
                                     invitedPlayer.sendMessage(ChatColor.RED + "Ваше приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.RED + " истекло.");
@@ -91,5 +91,21 @@ public class InviteCommandHandler {
         }
 
         return true;
+    }
+    private void sendMessageToRole(Clan clan, String message) {
+        try {
+            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
+            List<String> rolesToNotify = List.of("Лидер", "Заместитель");
+            for (String role : rolesToNotify) {
+                List<String> playersWithRole = clan.getPlayersWithRole(role);
+                for (String playerName : playersWithRole) {
+                    Player player = Bukkit.getPlayer(playerName);
+                    if (player != null) { // Проверяем, что игрок онлайн
+                        player.sendMessage(message);
+                    }
+                }
+            }
+        } finally {
+        }
     }
 }

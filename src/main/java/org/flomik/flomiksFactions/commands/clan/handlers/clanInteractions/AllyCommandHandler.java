@@ -90,7 +90,7 @@ public class AllyCommandHandler {
                     pendingAllies.put(playerClanName, allies); // Сохраняем обновлённый список предложений
                     player.sendMessage(ChatColor.GREEN + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClanName + ChatColor.GREEN + " отправлено.");
                     player.sendMessage(ChatColor.YELLOW + "Для отмены предложения о союзе повторите команду.");
-                    sendMessageToRole(allyClan, "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " предложил вам союз. Используйте " + ChatColor.YELLOW + "/clan ally " + playerClan.getName() + ChatColor.GREEN + " для принятия предложения.");
+                    sendMessageToRole(allyClan,ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " предложил вам союз. Используйте " + ChatColor.YELLOW + "/clan ally " + playerClan.getName() + ChatColor.GREEN + " для принятия предложения.");
 
                     // Запускаем задачу для автоматического удаления предложения через 5 минут
                     new BukkitRunnable() {

@@ -7,6 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ModerCommandHandler {
@@ -35,7 +36,7 @@ public class ModerCommandHandler {
 
             try {
                 clan.moderMember(player.getName(), targetPromPlayerName);
-                player.sendMessage(ChatColor.GREEN + "Игрок " + targetPromPlayerName + " назначен заместителем.");
+                sendMessageToRole(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPromPlayerName + ChatColor.GREEN + " назначен заместителем.");
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + e.getMessage());
             }
@@ -45,5 +46,21 @@ public class ModerCommandHandler {
             player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan moder <игрок>");
         }
         return true;
+    }
+    private void sendMessageToRole(Clan clan, String message) {
+        try {
+            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
+            List<String> rolesToNotify = List.of("Лидер", "Заместитель");
+            for (String role : rolesToNotify) {
+                List<String> playersWithRole = clan.getPlayersWithRole(role);
+                for (String playerName : playersWithRole) {
+                    Player player = Bukkit.getPlayer(playerName);
+                    if (player != null) { // Проверяем, что игрок онлайн
+                        player.sendMessage(message);
+                    }
+                }
+            }
+        } finally {
+        }
     }
 }

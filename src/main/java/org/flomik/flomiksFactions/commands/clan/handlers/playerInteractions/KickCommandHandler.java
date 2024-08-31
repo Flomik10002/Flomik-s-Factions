@@ -1,9 +1,12 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
+
+import java.util.List;
 
 public class KickCommandHandler {
 
@@ -36,7 +39,7 @@ public class KickCommandHandler {
 
             if (clan.getMembers().contains(targetPlayerName)) {
                 clan.removeMember(targetPlayerName);
-                player.sendMessage(ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN +" исключен из клана.");
+                sendMessageToRole(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN +" исключен из клана.");
                 Player targetPlayer = player.getServer().getPlayer(targetPlayerName);
                 if (targetPlayer != null) {
                     targetPlayer.sendMessage(ChatColor.RED + "Вы были исключены из клана " + ChatColor.GOLD + clan.getName()  + ChatColor.RED + ".");
@@ -48,5 +51,21 @@ public class KickCommandHandler {
             player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan kick <игрок>");
         }
         return true;
+    }
+    private void sendMessageToRole(Clan clan, String message) {
+        try {
+            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
+            List<String> rolesToNotify = List.of("Лидер", "Заместитель");
+            for (String role : rolesToNotify) {
+                List<String> playersWithRole = clan.getPlayersWithRole(role);
+                for (String playerName : playersWithRole) {
+                    Player player = Bukkit.getPlayer(playerName);
+                    if (player != null) { // Проверяем, что игрок онлайн
+                        player.sendMessage(message);
+                    }
+                }
+            }
+        } finally {
+        }
     }
 }

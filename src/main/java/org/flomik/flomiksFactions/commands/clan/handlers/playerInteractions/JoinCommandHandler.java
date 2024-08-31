@@ -43,10 +43,7 @@ public class JoinCommandHandler {
                         pendingInvites.put(invitedPlayer, invites); // Обновляем список приглашений
                     }
                     player.sendMessage(ChatColor.GREEN + "Вы успешно присоединились к клану " + ChatColor.YELLOW + clanName + ChatColor.GREEN + "!");
-                    Player invitingPlayer = Bukkit.getPlayer(invitedClan.getOwner());
-                    if (invitingPlayer != null) {
-                        invitingPlayer.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " присоединился к вашему клану " + ChatColor.YELLOW + clanName + ChatColor.GREEN + "!");
-                    }
+                    sendMessageToRole(invitedClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " присоединился к вашему клану " + ChatColor.YELLOW + clanName + ChatColor.GREEN + "!");
                 } catch (IllegalArgumentException e) {
                     player.sendMessage(ChatColor.RED + e.getMessage());
                 }
@@ -57,5 +54,22 @@ public class JoinCommandHandler {
             player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan join <название клана>");
         }
         return true;
+    }
+
+    private void sendMessageToRole(Clan clan, String message) {
+        try {
+            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
+            List<String> rolesToNotify = List.of("Лидер", "Заместитель", "Воин", "Рекрут");
+            for (String role : rolesToNotify) {
+                List<String> playersWithRole = clan.getPlayersWithRole(role);
+                for (String playerName : playersWithRole) {
+                    Player player = Bukkit.getPlayer(playerName);
+                    if (player != null) { // Проверяем, что игрок онлайн
+                        player.sendMessage(message);
+                    }
+                }
+            }
+        } finally {
+        }
     }
 }
