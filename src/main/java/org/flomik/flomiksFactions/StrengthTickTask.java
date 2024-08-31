@@ -27,6 +27,6 @@ public class StrengthTickTask {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0L, 20 * 10); // 18000 тиков = 15 минут
+        }.runTaskTimer(plugin, 0L, 20 * 60 * 15); // 18000 тиков = 15 минут
     }
 }
