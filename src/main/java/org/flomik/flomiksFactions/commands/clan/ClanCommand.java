@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClanCommand implements CommandExecutor, TabCompleter {
 
+    private Map<String, Clan> clans; // Словарь кланов
+
     private final ConcurrentHashMap<String, Long> pendingDisbands = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<String>> pendingInvites = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<String>> pendingAllies = new ConcurrentHashMap<>();
@@ -47,6 +49,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final NameCommandHandler nameHanler;
     private final DescCommandHandler descriptionHanler;
     private final ModerCommandHandler moderHanler;
+    private final ClaimRegionCommandHandler claimRegionHandler;
+    private final UnclaimRegionCommandHandler unclaimRegionHandler;
 
     public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin) {
         this.plugin = plugin;
@@ -70,6 +74,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.nameHanler = new NameCommandHandler(clanManager);
         this.descriptionHanler = new DescCommandHandler(clanManager);
         this.moderHanler = new ModerCommandHandler(clanManager);
+        this.claimRegionHandler = new ClaimRegionCommandHandler(clanManager);
+        this.unclaimRegionHandler = new UnclaimRegionCommandHandler(clanManager);
     }
 
     @Override
@@ -119,6 +125,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     return descriptionHanler.handleCommand(player, args);
                 case "moder":
                     return moderHanler.handleCommand(player, args);
+                case "claim":
+                    return claimRegionHandler.handleCommand(player);
+                case "unclaim":
+                    return unclaimRegionHandler.handleCommand(player);
 
                 default:
                     player.sendMessage(ChatColor.YELLOW + "Неизвестная подкоманда. Использование: " +
@@ -137,6 +147,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 ChatColor.YELLOW + "/clan create <название> " + ChatColor.WHITE + "- Создать новый клан\n" +
                 ChatColor.YELLOW + "/clan name <название> " + ChatColor.WHITE + "- Поменять название клана\n" +
                 ChatColor.YELLOW + "/clan desc <описание> " + ChatColor.WHITE + "- Поменять описание клана\n" +
+                ChatColor.YELLOW + "/clan claim " + ChatColor.WHITE + "- Заприватить чанк\n" +
+                ChatColor.YELLOW + "/clan unclaim " + ChatColor.WHITE + "- Убрать приват чанка\n" +
                 ChatColor.YELLOW + "/clan disband " + ChatColor.WHITE + "- Распустить клан\n" +
                 ChatColor.YELLOW + "/clan ally <название> " + ChatColor.WHITE + "- предложить альянс клану\n" +
                 ChatColor.YELLOW + "/clan leader <игрок> " + ChatColor.WHITE + "- Сделать игрока лидером\n" +

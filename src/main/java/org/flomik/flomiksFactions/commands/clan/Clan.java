@@ -1,12 +1,9 @@
 package org.flomik.flomiksFactions.commands.clan;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.flomik.flomiksFactions.FlomiksFactions;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
-import java.io.File;
 import java.util.*;
 
 public class Clan {
@@ -26,6 +23,7 @@ public class Clan {
     private int land; // Земли клана
     private int strength; // Сила клана
     private final int maxPower; // Максимальная сила клана
+    private final Set<String> claimedChunks;
     private Location home;
 
     // Конструктор с maxPower
@@ -42,7 +40,23 @@ public class Clan {
         this.land = land;
         this.strength = strength;
         this.maxPower = maxPower; // Используем переданное значение maxPower
+        this.claimedChunks = new HashSet<>(); // Инициализация
         this.playerDataHandler = playerDataHandler;
+    }
+
+    // Метод для проверки, запривачен ли чанк данным кланом
+    public boolean hasClaimedChunk(String chunkId) {
+        return claimedChunks.contains(chunkId);
+    }
+
+    // Метод для добавления чанка в список занятых чанков
+    public void addClaimedChunk(String chunkId) {
+        claimedChunks.add(chunkId);
+    }
+
+    // Метод для удаления чанка из списка занятых чанков
+    public void removeClaimedChunk(String chunkId) {
+        claimedChunks.remove(chunkId);
     }
 
     public void updateStrength(PlayerDataHandler playerDataHandler) {

@@ -15,11 +15,19 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        url = "https://maven.enginehub.org/repo/"
+    }
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+
+    // Зависимость для WorldGuard
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.9' // Используйте последнюю доступную версию
+
+    // Зависимость для WorldEdit (также необходима для WorldGuard)
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.15' // Используйте последнюю доступную версию
 }
 
 def targetJavaVersion = 17

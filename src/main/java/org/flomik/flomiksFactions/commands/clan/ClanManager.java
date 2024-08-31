@@ -19,7 +19,7 @@ public class ClanManager {
     private PlayerDataHandler playerDataHandler;
     private final File file;
     private final FileConfiguration config;
-    private final Map<String, Clan> clans = new HashMap<>();
+    public Map<String, Clan> clans = new HashMap<>();
     private final Map<String, Set<String>> invitations = new HashMap<>();
 
     public ClanManager(FlomiksFactions plugin) {
