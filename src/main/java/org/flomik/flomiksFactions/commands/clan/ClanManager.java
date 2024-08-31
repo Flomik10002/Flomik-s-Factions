@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.FlomiksFactions;
+import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.*;
 
 public class ClanManager {
 
+    private PlayerDataHandler playerDataHandler;
     private final File file;
     private final FileConfiguration config;
     private final Map<String, Clan> clans = new HashMap<>();
@@ -108,30 +110,23 @@ public class ClanManager {
         saveInvitations();
     }
 
-    public void kickPlayer(String clanName, String playerName, String targetName) {
-        clanName = clanName.toLowerCase();
-        Clan clan = getClan(clanName);
-
-        if (clan == null) {
-            throw new IllegalArgumentException("Клан не существует.");
+    // Метод для поиска клана по игроку
+    public Clan getClanByPlayer(String playerName) {
+        for (Clan clan : clans.values()) {
+            if (clan.getMembers().contains(playerName)) {
+                return clan;
+            }
         }
-
-        if (!clan.getOwner().equals(playerName)) {
-            throw new IllegalArgumentException("Только Лидер клана может выгонять игроков.");
-        }
-
-        if (clan.getOwner().equals(targetName)) {
-            throw new IllegalArgumentException("Нельзя выгнать владельца клана.");
-        }
-
-        if (!clan.getMembers().contains(targetName)) {
-            throw new IllegalArgumentException("Игрок не является членом клана.");
-        }
-
-        clan.removeMember(targetName);
-        saveClan(clan);
+        return null;
     }
 
+    // Метод для обновления силы клана по нику игрока
+    public void updateStrengthForPlayer(String playerName, PlayerDataHandler playerDataHandler) {
+        Clan clan = getClanByPlayer(playerName);
+        if (clan != null) {
+            clan.updateStrength(playerDataHandler);
+        }
+    }
 
     public void disbandClan(String clanName) {
         clanName = clanName.toLowerCase();

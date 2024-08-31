@@ -7,6 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.flomik.flomiksFactions.commands.clan.Clan;
+import org.flomik.flomiksFactions.commands.clan.ClanManager;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 import java.time.LocalDate;
@@ -14,9 +16,11 @@ import java.time.LocalDate;
 public class PlayerJoinListener implements Listener {
 
     private final PlayerDataHandler playerDataHandler;
+    private final ClanManager clanManager;
 
-    public PlayerJoinListener(PlayerDataHandler playerDataHandler) {
+    public PlayerJoinListener(PlayerDataHandler playerDataHandler, ClanManager clanManager) {
         this.playerDataHandler = playerDataHandler;
+        this.clanManager = clanManager;
     }
 
     @EventHandler
@@ -37,16 +41,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         String playerName = event.getPlayer().getName();
-
-        // Получаем текущее время игры в тиках и сохраняем его
-        int ticksPlayed = event.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE);
-        playerDataHandler.setPlayTime(playerName, ticksPlayed);
-
-        // Сохраняем уровень, силу и максимальную силу игрока при выходе
-        int level = playerDataHandler.getPlayerLevel(playerName);
-        int strength = playerDataHandler.getPlayerStrength(playerName);
-        int maxStrength = playerDataHandler.getPlayerMaxStrength(playerName);
-        playerDataHandler.savePlayerAttributes(playerName, level, strength, maxStrength);
+        updatePlayerStatistics(playerName);
     }
 
     // Метод для обновления статистики игрока
@@ -60,6 +55,7 @@ public class PlayerJoinListener implements Listener {
         int strength = playerDataHandler.getPlayerStrength(playerName);
         int maxStrength = playerDataHandler.getPlayerMaxStrength(playerName);
         playerDataHandler.savePlayerAttributes(playerName, level, strength, maxStrength);
+        clanManager.updateStrengthForPlayer(playerName, playerDataHandler);
     }
 
     // Метод для запуска периодического обновления статистики всех игроков

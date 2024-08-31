@@ -2,6 +2,7 @@
 package org.flomik.flomiksFactions;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanCommand;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
 import org.flomik.flomiksFactions.events.ClanPvPListener;
@@ -13,6 +14,7 @@ import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 public final class FlomiksFactions extends JavaPlugin {
 
     private ClanManager clanManager;
+    private Clan clan;
     private PlayerDataHandler playerDataHandler;
 
     @Override
@@ -20,7 +22,7 @@ public final class FlomiksFactions extends JavaPlugin {
         this.clanManager = new ClanManager(this);
         this.playerDataHandler = new PlayerDataHandler(this);
 
-        PlayerJoinListener playerJoinListener = new PlayerJoinListener(playerDataHandler);
+        PlayerJoinListener playerJoinListener = new PlayerJoinListener(playerDataHandler, clanManager);
 
         getServer().getPluginManager().registerEvents(playerJoinListener, this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(playerDataHandler), this);

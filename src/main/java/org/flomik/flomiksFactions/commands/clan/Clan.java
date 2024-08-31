@@ -4,11 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.flomik.flomiksFactions.FlomiksFactions;
+import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 import java.io.File;
 import java.util.*;
 
 public class Clan {
+    private PlayerDataHandler playerDataHandler;
     private static final int MAX_MEMBERS = 15; // Максимальное количество участников в клане
     private static final List<String> ROLE_ORDER = Arrays.asList("Рекрут", "Воин", "Заместитель", "Лидер");
 
@@ -40,7 +42,22 @@ public class Clan {
         this.land = land;
         this.strength = strength;
         this.maxPower = maxPower; // Используем переданное значение maxPower
+        this.playerDataHandler = playerDataHandler;
     }
+
+    public void updateStrength(PlayerDataHandler playerDataHandler) {
+        int totalStrength = 0;
+
+        for (String member : members) {
+            // Получаем силу игрока из PlayerDataHandler
+            int playerStrength = playerDataHandler.getPlayerStrength(member);
+            totalStrength += playerStrength;
+        }
+
+        // Устанавливаем новую силу клана
+        this.strength = totalStrength;
+    }
+
 
     public void setDescription(String description) {
         this.description = description;
