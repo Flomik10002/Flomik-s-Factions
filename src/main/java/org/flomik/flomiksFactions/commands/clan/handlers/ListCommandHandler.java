@@ -44,7 +44,7 @@ public class ListCommandHandler {
             }
         }
 
-        int clansPerPage = 1; // Количество кланов на странице
+        int clansPerPage = 5; // Количество кланов на странице
         int totalClans = clanManager.getClans().size();
         int maxPages = (int) Math.ceil((double) totalClans / clansPerPage);
 
