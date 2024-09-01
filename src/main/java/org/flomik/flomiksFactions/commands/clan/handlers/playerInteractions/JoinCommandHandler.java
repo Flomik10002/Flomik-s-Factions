@@ -55,9 +55,9 @@ public class JoinCommandHandler {
             }
         } else {
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan join <название>");
-            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join "));
-            usageMessage.addExtra(inviteCommand);
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan join <название>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join "));
+            usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
         }
         return true;

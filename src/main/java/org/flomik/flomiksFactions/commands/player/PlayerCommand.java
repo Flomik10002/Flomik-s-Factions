@@ -40,9 +40,9 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
 
                     if (arg.isEmpty()) {
                         TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-                        TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/p info <игрок>");
-                        inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player info "));
-                        usageMessage.addExtra(inviteCommand);
+                        TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/p info <игрок>");
+                        clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player info "));
+                        usageMessage.addExtra(clickCommand);
                         player.spigot().sendMessage(usageMessage);
                         return true;
                     }
@@ -85,9 +85,9 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
 
                 default:
                     TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Для списка команд: ");
-                    TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/player ");
-                    inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player "));
-                    usageMessage.addExtra(inviteCommand);
+                    TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/player ");
+                    clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player "));
+                    usageMessage.addExtra(clickCommand);
                     player.spigot().sendMessage(usageMessage);
                     break;
             }
@@ -109,14 +109,14 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
         return onlineCount;
     }
 
-    private String formatSection() {
-        return ChatColor.GREEN + "**** " + ChatColor.WHITE + "Доступные команды:" + ChatColor.GREEN + " ****";
-    }
-
     private void showCommands(Player player) {
-        String commandsInfo = formatSection() + "\n" +
-                ChatColor.YELLOW + "/player info <игрок> " + ChatColor.WHITE + "- Информация о игроке";
-        player.sendMessage(commandsInfo);
+        TextComponent headerMessage = new TextComponent(ChatColor.GREEN + "**** " + ChatColor.WHITE + "Доступные команды:" + ChatColor.GREEN + " ****\n");
+        TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/p info <игрок> ");
+        clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/p info "));
+        TextComponent usageMessage = new TextComponent(ChatColor.WHITE + " - Информация о игроке");
+        headerMessage.addExtra(clickCommand);
+        headerMessage.addExtra(usageMessage);
+        player.spigot().sendMessage(headerMessage);
     }
 
     @Override

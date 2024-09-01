@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InviteCommandHandler {
+public class clickCommandHandler {
 
     private final ClanManager clanManager;
     private final ConcurrentHashMap<String, List<String>> pendingInvites;
 
-    public InviteCommandHandler(ClanManager clanManager, ConcurrentHashMap<String, List<String>> pendingInvites) {
+    public clickCommandHandler(ClanManager clanManager, ConcurrentHashMap<String, List<String>> pendingInvites) {
         this.clanManager = clanManager;
         this.pendingInvites = pendingInvites;
     }
@@ -96,9 +96,9 @@ public class InviteCommandHandler {
             }
         } else {
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan invite <игрок>");
-            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan invite "));
-            usageMessage.addExtra(inviteCommand);
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan invite <игрок>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan invite "));
+            usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
         }
 

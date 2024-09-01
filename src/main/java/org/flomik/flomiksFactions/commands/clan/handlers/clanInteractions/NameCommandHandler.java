@@ -64,9 +64,9 @@ public class NameCommandHandler {
             return false;
         } else {
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan name <название>");
-            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan name "));
-            usageMessage.addExtra(inviteCommand);
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan name <название>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan name "));
+            usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
         }
         return true;

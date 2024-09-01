@@ -54,9 +54,9 @@ public class PromoteCommandHandler {
             return true;
         } else {
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan promote <игрок>");
-            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan promote "));
-            usageMessage.addExtra(inviteCommand);
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan promote <игрок>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan promote "));
+            usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
         }
         return true;

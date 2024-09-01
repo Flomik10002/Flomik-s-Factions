@@ -37,7 +37,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final DisbandCommandHandler disbandHandler;
     private final PromoteCommandHandler promoteHandler;
     private final DemoteCommandHandler demoteHandler;
-    private final InviteCommandHandler inviteHandler;
+    private final clickCommandHandler inviteHandler;
     private final JoinCommandHandler joinHandler;
     private final KickCommandHandler kickHandler;
     private final ListCommandHandler listHandler;
@@ -62,7 +62,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.disbandHandler = new DisbandCommandHandler(clanManager, pendingDisbands);
         this.promoteHandler = new PromoteCommandHandler(clanManager);
         this.demoteHandler = new DemoteCommandHandler(clanManager);
-        this.inviteHandler = new InviteCommandHandler(clanManager, pendingInvites);
+        this.inviteHandler = new clickCommandHandler(clanManager, pendingInvites);
         this.joinHandler = new JoinCommandHandler(clanManager, pendingInvites);
         this.kickHandler = new KickCommandHandler(clanManager);
         this.listHandler = new ListCommandHandler(clanManager);
@@ -133,8 +133,11 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     return unclaimRegionHandler.handleCommand(player);
 
                 default:
-                    player.sendMessage(ChatColor.YELLOW + "Неизвестная подкоманда. Использование: " +
-                            ChatColor.GOLD + "/clan" + ChatColor.YELLOW + " для списка команд.");
+                    TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Неизвестная подкоманда. Для списка команд: ");
+                    TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan");
+                    clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan "));
+                    usageMessage.addExtra(clickCommand);
+                    player.spigot().sendMessage(usageMessage);
                     break;
             }
         } else {

@@ -38,9 +38,9 @@ public class CreateCommandHandler {
         } else {
 
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Пожалуйста, укажите название клана. Использование: ");
-            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan create <название>");
-            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan create "));
-            usageMessage.addExtra(inviteCommand);
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan create <название>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan create "));
+            usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
             }
         return true;
