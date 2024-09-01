@@ -1,5 +1,10 @@
 package org.flomik.flomiksFactions.commands.clan;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -28,6 +33,89 @@ public class ClanManager {
         loadClans();
     }
 
+    public void addPlayerToClanRegionsAsMember(Player player, Clan clan) {
+        // Получаем UUID игрока
+        UUID newMemberUUID = player.getUniqueId();
+
+        // Получаем UUID главы клана
+        String clanLeaderName = clan.getOwner(); // Предполагается, что есть метод для получения имени главы клана
+        UUID clanLeaderUUID = Bukkit.getOfflinePlayer(clanLeaderName).getUniqueId();
+
+        // Проходим по всем мирам сервера
+        for (World world : Bukkit.getWorlds()) {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
+
+            if (regionManager != null) {
+                // Ищем все регионы, где глава клана является владельцем
+                for (ProtectedRegion region : regionManager.getRegions().values()) {
+                    if (region.getOwners().contains(clanLeaderUUID)) {
+                        // Добавляем нового участника в регион как участника
+                        region.getMembers().addPlayer(newMemberUUID);
+                    }
+                }
+            }
+        }
+    }
+
+    public void addPlayerToClanRegionsAsOwner(Player player, Clan clan) {
+        // Получаем UUID игрока
+        UUID newMemberUUID = player.getUniqueId();
+
+        // Получаем UUID главы клана
+        String clanLeaderName = clan.getOwner(); // Предполагается, что есть метод для получения имени главы клана
+        UUID clanLeaderUUID = Bukkit.getOfflinePlayer(clanLeaderName).getUniqueId();
+
+        // Проходим по всем мирам сервера
+        for (World world : Bukkit.getWorlds()) {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
+
+            if (regionManager != null) {
+                // Ищем все регионы, где глава клана является владельцем
+                for (ProtectedRegion region : regionManager.getRegions().values()) {
+                    if (region.getOwners().contains(clanLeaderUUID)) {
+                        // Добавляем нового участника в регион как участника
+                        region.getOwners().addPlayer(newMemberUUID);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removePlayerFromClanRegions(Player playerToRemove, Clan clan) {
+        // Получаем UUID игрока, которого нужно удалить
+        UUID playerToRemoveUUID = playerToRemove.getUniqueId();
+
+        // Получаем UUID главы клана
+        String clanLeaderName = clan.getOwner(); // Предполагается, что есть метод для получения имени главы клана
+
+        UUID clanOfflineLeaderUUID = Bukkit.getOfflinePlayer(clanLeaderName).getUniqueId();
+        UUID clanLeaderUUID = Bukkit.getPlayerExact(clanLeaderName).getUniqueId();
+
+        // Проходим по всем мирам сервера
+        for (World world : Bukkit.getWorlds()) {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
+
+            if (regionManager != null) {
+                // Ищем все регионы, где глава клана является владельцем
+                for (ProtectedRegion region : regionManager.getRegions().values()) {
+                    if (region.getOwners().contains(clanLeaderUUID) || region.getOwners().contains(clanOfflineLeaderUUID)) {
+                        // Если игрок есть в списке владельцев, удаляем его
+                        if (region.getOwners().contains(playerToRemoveUUID)) {
+                            region.getOwners().removePlayer(playerToRemoveUUID);
+                        }
+                        // Если игрок есть в списке участников, удаляем его
+                        if (region.getMembers().contains(playerToRemoveUUID)) {
+                            region.getMembers().removePlayer(playerToRemoveUUID);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void createClan(String name, String owner) {
         name = name.toLowerCase(); // Приведение названия клана к нижнему регистру
 
@@ -53,12 +141,14 @@ public class ClanManager {
         Set<String> members = new HashSet<>();
         Map<String, String> memberRoles = new HashMap<>();
 
+        List<String> claimedChunks = new ArrayList<>();
+
         // Добавление владельца в список участников и назначение ему роли
         members.add(owner);
         memberRoles.put(owner, "Лидер");
 
         // Создание нового клана
-        Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, land, strength, maxPower);
+        Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, land, strength, maxPower, claimedChunks);
 
         // Добавление клана в коллекцию и сохранение
         clans.put(name, clan);
@@ -134,6 +224,9 @@ public class ClanManager {
         if (clan == null) {
             throw new IllegalArgumentException("Клан не существует.");
         }
+
+
+
         clans.remove(clanName);
         config.set("clans." + clanName, null);
         saveConfig(); // Сохраняем изменения
@@ -212,7 +305,7 @@ public class ClanManager {
         config.set(path + ".owner", clan.getOwner()); // Сохранение владельца клана
         config.set(path + ".creationDate", clan.getCreationDate().getTime()); // Сохранение даты создания клана в виде миллисекунд
         config.set(path + ".description", clan.getDescription()); // Сохранение описания клана
-        config.set(path + ".land", clan.getLand()); // Сохранение количества земель клана
+        config.set(path + ".land", clan.getLands()); // Сохранение количества земель клана
         config.set(path + ".strength", clan.getStrength()); // Сохранение текущей силы клана
         config.set(path + ".alliances", new ArrayList<>(clan.getAlliances())); // Сохранение списка альянсов
         config.set(path + ".level", clan.getLevel()); // Сохранение уровня клана
@@ -241,6 +334,8 @@ public class ClanManager {
             config.set(path + ".home", null); // Удаление старой точки дома
         }
 
+        List<String> chunks = clan.getRegionNames();
+        config.set(path + ".chunks", chunks);
         saveConfig(); // Сохранение конфигурации
     }
 
@@ -272,6 +367,7 @@ public class ClanManager {
                 int land = config.getInt("clans." + lowerCaseClanName + ".land", 0);
                 int strength = config.getInt("clans." + lowerCaseClanName + ".strength", 0);
                 int maxPower = config.getInt("clans." + lowerCaseClanName + ".maxPower", memberSet.size() * 10); // Задаём maxPower как размер членов клана * 10, если нет сохранённого значения
+                List<String> chunks = config.getStringList("clans." + lowerCaseClanName + ".chunks");
 
                 // Загрузка точки дома
                 Location home = null;
@@ -291,7 +387,7 @@ public class ClanManager {
 
                 // Создание объекта клана
                 Clan clan = new Clan(
-                        lowerCaseClanName, owner, memberSet, memberRoles, creationDate, description, alliances, level, land, strength, maxPower
+                        lowerCaseClanName, owner, memberSet, memberRoles, creationDate, description, alliances, level, land, strength, maxPower, chunks
                 );
                 clan.setHome(home);
                 clans.put(lowerCaseClanName, clan);

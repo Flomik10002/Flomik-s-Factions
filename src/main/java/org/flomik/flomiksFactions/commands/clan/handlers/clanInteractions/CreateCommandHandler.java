@@ -1,5 +1,7 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
@@ -34,8 +36,13 @@ public class CreateCommandHandler {
                 player.sendMessage(ChatColor.RED + e.getMessage());
             }
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Пожалуйста, укажите название клана. Использование: " + ChatColor.GOLD + "/clan create <название>");
-        }
+
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Пожалуйста, укажите название клана. Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan create <название>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan create "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
+            }
         return true;
     }
 }

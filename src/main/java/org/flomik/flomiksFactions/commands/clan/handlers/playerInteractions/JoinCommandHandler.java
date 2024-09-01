@@ -1,5 +1,7 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -44,6 +46,7 @@ public class JoinCommandHandler {
                     }
                     player.sendMessage(ChatColor.GREEN + "Вы успешно присоединились к клану " + ChatColor.YELLOW + clanName + ChatColor.GREEN + "!");
                     sendMessageToRole(invitedClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " присоединился к вашему клану " + ChatColor.YELLOW + clanName + ChatColor.GREEN + "!");
+
                 } catch (IllegalArgumentException e) {
                     player.sendMessage(ChatColor.RED + e.getMessage());
                 }
@@ -51,7 +54,11 @@ public class JoinCommandHandler {
                 player.sendMessage(ChatColor.RED + "Вы не получили приглашение в этот клан.");
             }
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan join <название клана>");
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan join <название>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
         }
         return true;
     }

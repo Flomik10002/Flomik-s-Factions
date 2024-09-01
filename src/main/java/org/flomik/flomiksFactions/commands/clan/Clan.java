@@ -1,7 +1,9 @@
 package org.flomik.flomiksFactions.commands.clan;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 import java.util.*;
@@ -20,14 +22,14 @@ public class Clan {
     private String description; // Описание клана
     private final List<String> alliances; // Альянсы клана
     private final int level; // Уровень клана
-    private int land; // Земли клана
+    private int lands; // Земли клана
     private int strength; // Сила клана
     private final int maxPower; // Максимальная сила клана
-    private final Set<String> claimedChunks;
+    private final List<String> claimedChunks;
     private Location home;
 
-    // Конструктор с maxPower
-    public Clan(String name, String owner, Set<String> members, Map<String, String> memberRoles, Date creationDate, String description, List<String> alliances, int level, int land, int strength, int maxPower) {
+    //Конструктор без clanManager
+    public Clan(String name, String owner, Set<String> members, Map<String, String> memberRoles, Date creationDate, String description, List<String> alliances, int level, int lands, int strength, int maxPower, List<String> claimedChunks) {
         this.name = name;
         this.oldName = null;
         this.owner = owner;
@@ -37,10 +39,10 @@ public class Clan {
         this.description = description;
         this.alliances = new ArrayList<>(alliances); // Используем ArrayList для альянсов
         this.level = level;
-        this.land = land;
+        this.lands = lands;
         this.strength = strength;
         this.maxPower = maxPower; // Используем переданное значение maxPower
-        this.claimedChunks = new HashSet<>(); // Инициализация
+        this.claimedChunks = new ArrayList<>(claimedChunks); // Инициализация
         this.playerDataHandler = playerDataHandler;
     }
 
@@ -237,6 +239,10 @@ public class Clan {
         setRole(targetPlayer, newRole);
     }
 
+    public List<String> getRegionNames() {
+        return claimedChunks;
+    }
+
     public List<String> getAlliances() {
         return new ArrayList<>(alliances);
     }
@@ -304,12 +310,22 @@ public class Clan {
         return level;
     }
 
-    public int getLand() {
-        return land;
+    public int getLands() {
+        return lands;
     }
 
-    public void setLand(int land) {
-        this.land = land;
+    public void setLands(int lands) {
+        this.lands = lands;
+    }
+
+    public void updateLands() {
+        int totalLands = 0;
+
+        for (String land : claimedChunks) {
+            totalLands++;
+        }
+
+        this.lands = totalLands;
     }
 
     public int getStrength() {

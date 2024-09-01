@@ -56,7 +56,7 @@ public class InfoCommandHandler {
         info.append(ChatColor.GREEN).append("**** ").append(ChatColor.WHITE).append("Информация о клане: ").append(clan.getName()).append(ChatColor.GREEN).append(" ****\n");
         info.append(ChatColor.GOLD).append("Дата создания: ").append(ChatColor.YELLOW).append(dateFormat.format(clan.getCreationDate())).append("\n");
         info.append(ChatColor.GOLD).append("Описание: ").append(ChatColor.YELLOW).append(clan.getDescription()).append("\n");
-        info.append(ChatColor.GOLD).append("Земли/Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(clan.getLand()).append("/").append(clan.getStrength()).append("/").append(clan.getMembers().size() * 10).append("\n");
+        info.append(ChatColor.GOLD).append("Земли/Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(clan.getLands()).append("/").append(clan.getStrength()).append("/").append(clan.getMembers().size() * 10).append("\n");
         info.append(ChatColor.GOLD).append("Альянсы: ").append(ChatColor.YELLOW).append(String.join(", ", clan.getAlliances())).append("\n");
         info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(clan.getLevel()).append("\n");
         info.append(ChatColor.GOLD).append("Онлайн: ").append(ChatColor.YELLOW).append(getOnlineMembersCount(clan)).append("/").append(clan.getMembers().size()).append("\n");

@@ -57,7 +57,7 @@ public class UnclaimRegionCommandHandler {
         return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
     }
 
-    private void removeWorldGuardRegion(Chunk chunk, String clanName) {
+    public void removeWorldGuardRegion(Chunk chunk, String clanName) {
         WorldGuard wg = WorldGuard.getInstance();
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager regions = container.get(BukkitAdapter.adapt(chunk.getWorld()));

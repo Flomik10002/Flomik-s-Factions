@@ -1,5 +1,7 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -58,7 +60,13 @@ public class InviteCommandHandler {
                     sendMessageToRole(clan, ChatColor.YELLOW + "Для отмены приглашения игроку " + ChatColor.GOLD + playerName + ChatColor.YELLOW + " повторите команду.");
                     Player invitedPlayer = player.getServer().getPlayer(playerName);
                     if (invitedPlayer != null) {
-                        invitedPlayer.sendMessage(ChatColor.GREEN + "Вам пришло приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " от игрока " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + ". Используйте " + ChatColor.YELLOW + "/clan join <название>" + ChatColor.GREEN + " для принятия приглашения.");
+                        TextComponent message = new TextComponent(ChatColor.GREEN + "Вам пришло приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " от игрока " + ChatColor.YELLOW + playerName + ChatColor.GREEN + ". Используйте ");
+                        TextComponent joinCommand = new TextComponent(ChatColor.YELLOW + "/clan join " + clan.getName());
+                        joinCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join " + clan.getName()));
+                        message.addExtra(joinCommand);
+                        message.addExtra(new TextComponent(ChatColor.GREEN + " для принятия приглашения."));
+
+                        invitedPlayer.spigot().sendMessage(message);
                     }
 
                     // Запускаем задачу для автоматического удаления инвайта через 5 минут
@@ -87,7 +95,11 @@ public class InviteCommandHandler {
                 }
             }
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan invite <игрок>");
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan invite <игрок>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan invite "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
         }
 
         return true;

@@ -1,5 +1,7 @@
 package org.flomik.flomiksFactions.commands.player;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -37,7 +39,11 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     String arg = args.length > 1 ? args[1] : ""; // Получаем аргумент команды, если он есть
 
                     if (arg.isEmpty()) {
-                        player.sendMessage(ChatColor.YELLOW + "Использование:" + ChatColor.GOLD + " /p info <игрок>");
+                        TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+                        TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/p info <игрок>");
+                        inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player info "));
+                        usageMessage.addExtra(inviteCommand);
+                        player.spigot().sendMessage(usageMessage);
                         return true;
                     }
 
@@ -78,7 +84,11 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     return true;
 
                 default:
-                    player.sendMessage(ChatColor.YELLOW + "Неизвестная подкоманда. Использование: " + ChatColor.GOLD + "/player" + ChatColor.YELLOW + " для списка команд.");
+                    TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Для списка команд: ");
+                    TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/player ");
+                    inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player "));
+                    usageMessage.addExtra(inviteCommand);
+                    player.spigot().sendMessage(usageMessage);
                     break;
             }
         } else {

@@ -7,11 +7,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.flomik.flomiksFactions.FlomiksFactions;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 public class PlayerJoinListener implements Listener {
 
@@ -59,10 +61,14 @@ public class PlayerJoinListener implements Listener {
     }
 
     // Метод для запуска периодического обновления статистики всех игроков
-    public void startPeriodicStatsUpdate(JavaPlugin plugin) {
+    public void startPeriodicStatsUpdate(FlomiksFactions plugin) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
                 updatePlayerStatistics(player.getName());
+            }
+            Map<String, Clan> clans = clanManager.getClans();
+            for (Clan clan : clans.values()) {
+                clan.updateLands();
             }
         }, 0L, 20L);
     }

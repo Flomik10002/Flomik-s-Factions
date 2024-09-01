@@ -1,9 +1,14 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
+
+import java.util.Objects;
 
 public class PromoteCommandHandler {
 
@@ -32,13 +37,27 @@ public class PromoteCommandHandler {
             try {
                 clan.promoteMember(player.getName(), targetPromPlayerName);
                 player.sendMessage(ChatColor.GREEN + "Игрок " + targetPromPlayerName + " повышен в должности.");
+
+                String targetPlayerRole = clan.getRole(targetPromPlayerName);
+                Player targetPlayer = Bukkit.getPlayerExact(targetPromPlayerName);
+                if(Objects.equals(targetPlayerRole, "Заместитель")) {
+                    clanManager.removePlayerFromClanRegions(targetPlayer, clan);
+                    clanManager.addPlayerToClanRegionsAsOwner(targetPlayer, clan);
+                }
+                if(Objects.equals(targetPlayerRole, "Воин")) {
+                    clanManager.addPlayerToClanRegionsAsMember(targetPlayer, clan);
+                }
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + e.getMessage());
             }
             clanManager.saveClan(clan);
             return true;
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan promote <игрок>");
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan promote <игрок>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan promote "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
         }
         return true;
     }

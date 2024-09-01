@@ -1,9 +1,14 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
+
+import java.util.Objects;
 
 public class DemoteCommandHandler {
 
@@ -32,13 +37,27 @@ public class DemoteCommandHandler {
             try {
                 clan.demoteMember(player.getName(), targetDemPlayerName);
                 player.sendMessage(ChatColor.GREEN + "Игрок " + targetDemPlayerName + " понижен в должности.");
+
+                String targetPlayerRole = clan.getRole(targetDemPlayerName);
+                Player targetPlayer = Bukkit.getPlayerExact(targetDemPlayerName);
+                if(Objects.equals(targetPlayerRole, "Воин")) {
+                    this.clanManager.removePlayerFromClanRegions(targetPlayer, clan);
+                    this.clanManager.addPlayerToClanRegionsAsMember(targetPlayer, clan);
+                }
+                if(Objects.equals(targetPlayerRole, "Рекрут")) {
+                    this.clanManager.removePlayerFromClanRegions(targetPlayer, clan);
+                }
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + e.getMessage());
             }
             clanManager.saveClan(clan);
             return true;
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan demote <игрок>");
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan demote <игрок>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan demote "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
         }
         return true;
     }

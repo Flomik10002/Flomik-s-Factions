@@ -1,5 +1,7 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -22,6 +24,7 @@ public class ModerCommandHandler {
         if (args.length > 1) {
             String targetPromPlayerName = args[1];
             Clan clan = clanManager.getPlayerClan(player.getName());
+            Player targetPlayer = Bukkit.getPlayerExact(targetPromPlayerName);
 
             if (clan == null) {
                 player.sendMessage(ChatColor.RED + "Не удалось найти ваш клан.");
@@ -37,13 +40,19 @@ public class ModerCommandHandler {
             try {
                 clan.moderMember(player.getName(), targetPromPlayerName);
                 sendMessageToRole(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPromPlayerName + ChatColor.GREEN + " назначен заместителем.");
+                clanManager.removePlayerFromClanRegions(targetPlayer, clan);
+                clanManager.addPlayerToClanRegionsAsOwner(targetPlayer, clan);
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + e.getMessage());
             }
             clanManager.saveClan(clan);
             return true;
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan moder <игрок>");
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan moder <игрок>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan moder "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
         }
         return true;
     }

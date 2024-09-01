@@ -1,5 +1,7 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.playerInteractions;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -20,6 +22,7 @@ public class KickCommandHandler {
         if (args.length > 1) {
             String targetPlayerName = args[1];
             Clan clan = clanManager.getPlayerClan(player.getName());
+            Player targetPlayer = Bukkit.getPlayerExact(targetPlayerName);
 
             if (clan == null) {
                 player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
@@ -40,7 +43,7 @@ public class KickCommandHandler {
             if (clan.getMembers().contains(targetPlayerName)) {
                 clan.removeMember(targetPlayerName);
                 sendMessageToRole(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN +" исключен из клана.");
-                Player targetPlayer = player.getServer().getPlayer(targetPlayerName);
+                clanManager.removePlayerFromClanRegions(targetPlayer, clan);
                 if (targetPlayer != null) {
                     targetPlayer.sendMessage(ChatColor.RED + "Вы были исключены из клана " + ChatColor.GOLD + clan.getName()  + ChatColor.RED + ".");
                 }
@@ -48,7 +51,11 @@ public class KickCommandHandler {
                 player.sendMessage(ChatColor.RED + "Игрок не найден в вашем клане.");
             }
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Использование: " + ChatColor.GOLD + "/clan kick <игрок>");
+            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
+            TextComponent inviteCommand = new TextComponent(ChatColor.GOLD + "/clan kick <игрок>");
+            inviteCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan kick "));
+            usageMessage.addExtra(inviteCommand);
+            player.spigot().sendMessage(usageMessage);
         }
         return true;
     }

@@ -14,7 +14,6 @@ import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 public final class FlomiksFactions extends JavaPlugin {
 
     private ClanManager clanManager;
-    private Clan clan;
     private PlayerDataHandler playerDataHandler;
 
     @Override
