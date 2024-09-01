@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class clickCommandHandler {
+public class InviteCommandHandler {
 
     private final ClanManager clanManager;
     private final ConcurrentHashMap<String, List<String>> pendingInvites;
 
-    public clickCommandHandler(ClanManager clanManager, ConcurrentHashMap<String, List<String>> pendingInvites) {
+    public InviteCommandHandler(ClanManager clanManager, ConcurrentHashMap<String, List<String>> pendingInvites) {
         this.clanManager = clanManager;
         this.pendingInvites = pendingInvites;
     }
