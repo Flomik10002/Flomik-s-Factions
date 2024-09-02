@@ -202,7 +202,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return getPlayerSuggestions(args[1]);
         } else if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
             return getPlayerSuggestions(args[1]);
-        }else if (args.length == 2 && args[0].equalsIgnoreCase("promote")) {
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("promote")) {
             return getPlayerSuggestions(args[1]);
         }else if (args.length == 2 && args[0].equalsIgnoreCase("demote")) {
             return getPlayerSuggestions(args[1]);

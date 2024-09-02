@@ -77,7 +77,8 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     if (curClan != null) {
                         info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(arg)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
                     } else {
-                        info.append(ChatColor.GOLD).append("Не состоит в клане.");
+                        info.append(ChatColor.GOLD).append("Не состоит в клане.\n");
+                        info.append(ChatColor.YELLOW).append("Не состоит в клане.");
                     }
 
                     player.sendMessage(info.toString());

@@ -27,6 +27,7 @@ public class InviteCommandHandler {
         if (args.length > 1) {
             String playerName = args[1];
             Clan clan = clanManager.getPlayerClan(player.getName());
+            Clan playerClan = clanManager.getPlayerClan(playerName);
             if (clan == null) {
                 player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
                 return true;
@@ -36,6 +37,13 @@ public class InviteCommandHandler {
             String playerRole = clan.getRole(player.getName());
             if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
                 player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель клана может отправлять и отзывать приглашения.");
+                return true;
+            }
+
+
+
+            if (playerClan != null) {
+                player.sendMessage(ChatColor.RED + "Игрок уже участник другого клана!");
                 return true;
             }
 

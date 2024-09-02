@@ -74,7 +74,7 @@ public class PlayerDataHandler {
 
     // Получает силу игрока
     public int getPlayerStrength(String playerName) {
-        return playersConfig.getInt(playerName + ".strength", 10); // по умолчанию 10
+        return playersConfig.getInt(playerName + ".strength", 0); // по умолчанию 10
     }
 
     public void setPlayerStrength(String playerName, int strength) {
