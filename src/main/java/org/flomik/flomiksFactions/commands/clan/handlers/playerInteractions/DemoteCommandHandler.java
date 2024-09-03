@@ -36,7 +36,7 @@ public class DemoteCommandHandler {
 
             try {
                 clan.demoteMember(player.getName(), targetDemPlayerName);
-                player.sendMessage(ChatColor.GREEN + "Игрок " + targetDemPlayerName + " понижен в должности.");
+                clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + targetDemPlayerName + " понижен в должности.");
 
                 String targetPlayerRole = clan.getRole(targetDemPlayerName);
                 Player targetPlayer = Bukkit.getPlayerExact(targetDemPlayerName);

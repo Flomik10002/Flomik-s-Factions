@@ -36,7 +36,7 @@ public class PromoteCommandHandler {
 
             try {
                 clan.promoteMember(player.getName(), targetPromPlayerName);
-                player.sendMessage(ChatColor.GREEN + "Игрок " + targetPromPlayerName + " повышен в должности.");
+                clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + targetPromPlayerName + " повышен в должности.");
 
                 String targetPlayerRole = clan.getRole(targetPromPlayerName);
                 Player targetPlayer = Bukkit.getPlayerExact(targetPromPlayerName);

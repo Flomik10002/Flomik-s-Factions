@@ -51,7 +51,7 @@ public class LeaveCommandHandler {
                         }
                         clanManager.disbandClan(clan.getName());
                         pendingDisbands.remove(player.getName());
-                        player.sendMessage(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN +" был успешно распущен.");
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN +" был успешно распущен.");
 
                         com.sk89q.worldedit.entity.Player wgPlayer = BukkitAdapter.adapt(player);
                         WorldGuard wg = WorldGuard.getInstance();
@@ -96,6 +96,7 @@ public class LeaveCommandHandler {
             try {
                 clanManager.leaveClan(player.getName());
                 clanManager.removePlayerFromClanRegions(player, clan);
+                clanManager.sendClanMessage(clan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " покидает ваш клан.");
                 player.sendMessage(ChatColor.GREEN + "Вы успешно покинули клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN +".");
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + e.getMessage());

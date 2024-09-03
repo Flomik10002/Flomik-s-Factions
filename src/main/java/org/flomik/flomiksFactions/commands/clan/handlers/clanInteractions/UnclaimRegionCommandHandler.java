@@ -43,7 +43,7 @@ public class UnclaimRegionCommandHandler {
 
         // Убираем чанк из клана
         clan.removeClaimedChunk(chunkId);
-        player.sendMessage(ChatColor.GREEN + "Чанк успешно распривачен.");
+        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы сняли приват с чанка!");
         return true;
     }
 

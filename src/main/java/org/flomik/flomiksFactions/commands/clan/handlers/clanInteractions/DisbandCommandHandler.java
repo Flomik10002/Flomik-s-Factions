@@ -49,7 +49,7 @@ public class DisbandCommandHandler  {
             }
             clanManager.disbandClan(clan.getName());
             pendingDisbands.remove(player.getName());
-            player.sendMessage(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " был успешно распущен.");
+            Bukkit.broadcastMessage(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " был успешно распущен.");
 
             com.sk89q.worldedit.entity.Player wgPlayer = BukkitAdapter.adapt(player);
             WorldGuard wg = WorldGuard.getInstance();

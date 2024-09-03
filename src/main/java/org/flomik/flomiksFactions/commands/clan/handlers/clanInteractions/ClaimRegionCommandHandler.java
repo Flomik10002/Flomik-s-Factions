@@ -2,7 +2,6 @@ package org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -61,7 +60,8 @@ public class ClaimRegionCommandHandler {
                         addWorldGuardRegion(chunk, clan.getName(), player);
                         clan.addClaimedChunk(chunkId);
 
-                        player.sendMessage(ChatColor.GREEN + "Вы успешно захватили чанк!");
+                        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы успешно захватили чанк!");
+                        clanManager.sendClanMessage(oldClan, ChatColor.RED + "Ваш чанк был захвачен");
                         return true;
                     }
                 }
@@ -79,7 +79,7 @@ public class ClaimRegionCommandHandler {
 
         // Добавляем чанк к клану
         clan.addClaimedChunk(chunkId);
-        player.sendMessage(ChatColor.GREEN + "Чанк успешно занят вашим кланом!");
+        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы успешно заняли чанк!");
         return true;
     }
 

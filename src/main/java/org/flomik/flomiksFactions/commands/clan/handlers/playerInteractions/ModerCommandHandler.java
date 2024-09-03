@@ -39,7 +39,7 @@ public class ModerCommandHandler {
 
             try {
                 clan.moderMember(player.getName(), targetPromPlayerName);
-                sendMessageToRole(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPromPlayerName + ChatColor.GREEN + " назначен заместителем.");
+                clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPromPlayerName + ChatColor.GREEN + " назначен заместителем.");
                 clanManager.removePlayerFromClanRegions(targetPlayer, clan);
                 clanManager.addPlayerToClanRegionsAsOwner(targetPlayer, clan);
             } catch (IllegalArgumentException e) {
@@ -55,21 +55,5 @@ public class ModerCommandHandler {
             player.spigot().sendMessage(usageMessage);
         }
         return true;
-    }
-    private void sendMessageToRole(Clan clan, String message) {
-        try {
-            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
-            List<String> rolesToNotify = List.of("Лидер", "Заместитель");
-            for (String role : rolesToNotify) {
-                List<String> playersWithRole = clan.getPlayersWithRole(role);
-                for (String playerName : playersWithRole) {
-                    Player player = Bukkit.getPlayer(playerName);
-                    if (player != null) { // Проверяем, что игрок онлайн
-                        player.sendMessage(message);
-                    }
-                }
-            }
-        } finally {
-        }
     }
 }

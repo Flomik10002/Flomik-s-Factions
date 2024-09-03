@@ -48,6 +48,7 @@ public class LeaderCommandHandler {
 
                 player.sendMessage(ChatColor.GREEN + "Вы передали права Лидера клана " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " игроку " + ChatColor.YELLOW + newLeaderName + ChatColor.GREEN + ".");
                 Player oldLeader = player.getServer().getPlayer(player.getName());
+                clanManager.sendClanMessage(playerClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " передал лидерство клана игроку " + ChatColor.YELLOW + newLeader.getName());
                 if (oldLeader != null) {
                     oldLeader.sendMessage(ChatColor.YELLOW + "Теперь вы Заместитель клана " + ChatColor.GOLD + playerClan.getName() + ChatColor.YELLOW + ".");
                 }

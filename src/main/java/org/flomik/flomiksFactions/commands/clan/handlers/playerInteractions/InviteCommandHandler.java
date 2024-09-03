@@ -64,7 +64,7 @@ public class InviteCommandHandler {
                     clanManager.invitePlayer(clan.getName(), playerName);
                     invites.add(clan.getName());
                     pendingInvites.put(playerName, invites); // Сохраняем обновлённый список приглашений
-                    sendMessageToRole(clan, ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " отправлено игроку " + ChatColor.YELLOW + playerName + ChatColor.GREEN + "!");
+                    clanManager.sendClanMessage(clan, ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " отправлено игроку " + ChatColor.YELLOW + playerName + ChatColor.GREEN + "!");
                     sendMessageToRole(clan, ChatColor.YELLOW + "Для отмены приглашения игроку " + ChatColor.GOLD + playerName + ChatColor.YELLOW + " повторите команду.");
                     Player invitedPlayer = player.getServer().getPlayer(playerName);
                     if (invitedPlayer != null) {

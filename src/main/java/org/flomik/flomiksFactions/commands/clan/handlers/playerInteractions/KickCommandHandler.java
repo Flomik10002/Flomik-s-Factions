@@ -42,7 +42,7 @@ public class KickCommandHandler {
 
             if (clan.getMembers().contains(targetPlayerName)) {
                 clan.removeMember(targetPlayerName);
-                sendMessageToRole(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN +" исключен из клана.");
+                clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN +" исключен из клана.");
                 clanManager.removePlayerFromClanRegions(targetPlayer, clan);
                 if (targetPlayer != null) {
                     targetPlayer.sendMessage(ChatColor.RED + "Вы были исключены из клана " + ChatColor.GOLD + clan.getName()  + ChatColor.RED + ".");
@@ -58,21 +58,5 @@ public class KickCommandHandler {
             player.spigot().sendMessage(usageMessage);
         }
         return true;
-    }
-    private void sendMessageToRole(Clan clan, String message) {
-        try {
-            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
-            List<String> rolesToNotify = List.of("Лидер", "Заместитель");
-            for (String role : rolesToNotify) {
-                List<String> playersWithRole = clan.getPlayersWithRole(role);
-                for (String playerName : playersWithRole) {
-                    Player player = Bukkit.getPlayer(playerName);
-                    if (player != null) { // Проверяем, что игрок онлайн
-                        player.sendMessage(message);
-                    }
-                }
-            }
-        } finally {
-        }
     }
 }

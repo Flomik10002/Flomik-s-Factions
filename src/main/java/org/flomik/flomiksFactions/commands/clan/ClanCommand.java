@@ -172,6 +172,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         addCommand(commandsInfo, "/clan kick <игрок>", "/clan kick ", "Выгнать игрока из клана");
         addCommand(commandsInfo, "/clan info <игрок>", "/clan info ", "Информация о клане игрока");
         addCommand(commandsInfo, "/clan info <название>", "/clan info ", "Информация о клане");
+        addCommand(commandsInfo, "/clan info", "/clan info ", "Информация о вашем клане");
         addCommand(commandsInfo, "/clan home", "/clan home", "Телепорт на точку дома");
         addCommand(commandsInfo, "/clan sethome", "/clan sethome", "Добавить точку дома");
         addCommand(commandsInfo, "/clan delhome", "/clan delhome", "Удалить точку дома");

@@ -46,12 +46,7 @@ public class DescCommandHandler {
             clanManager.updateClan(playerClan);
 
             // Опционально, можно уведомить всех членов клана о смене имени
-            for (String memberName : playerClan.getMembers()) {
-                Player member = player.getServer().getPlayer(memberName);
-                if (member != null) {
-                    member.sendMessage(ChatColor.GREEN + "Описание клана обновлено.");
-                }
-            }
+            clanManager.sendClanMessage(playerClan, ChatColor.GREEN + "Описание клана успешно обновлено!");
 
             if (wasTruncated) {
                 player.sendMessage(ChatColor.YELLOW + "Описание было слишком длинным и было обрезано до 48 символов.");

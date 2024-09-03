@@ -41,8 +41,18 @@ public class AllyCommandHandler {
                 return true;
             }
 
+            if (playerClan.getAlliances().size() == 3){
+                player.sendMessage(ChatColor.RED + "У вас превышен лимит альянсов.");
+                return true;
+            }
+
             if (allyClan == null) {
                 player.sendMessage(ChatColor.RED + "Клан с таким названием не существует.");
+                return true;
+            }
+
+            if (allyClan.getAlliances().size() == 3){
+                player.sendMessage(ChatColor.RED + "У желаемого клана превышен лимит альянсов.");
                 return true;
             }
 
@@ -59,8 +69,7 @@ public class AllyCommandHandler {
                 clanManager.updateClan(playerClan);
                 clanManager.updateClan(allyClan);
 
-                player.sendMessage(ChatColor.GREEN + "Вы успешно расторгли союз с кланом " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + ".");
-                sendMessageToRole(allyClan, "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.RED + " расторг союз с вашим кланом.");
+                Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW +  ChatColor.GREEN + playerClan.getName() + " расторгли союз.");
                 return true;
             }
 
@@ -84,8 +93,7 @@ public class AllyCommandHandler {
 
                     // Удаляем предложение после принятия
                     pendingAllies.get(allyClan.getName()).remove(playerClanName);
-                    player.sendMessage(ChatColor.GREEN + "Вы приняли предложение о союзе с кланом " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + ".");
-                    sendMessageToRole(allyClan, "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " принял ваше предложение о союзе.");
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW +  ChatColor.GREEN + playerClan.getName() + " заключили союз.");
                 } else {
                     // Отправляем предложение о союзе
                     allies.add(allyClanName);

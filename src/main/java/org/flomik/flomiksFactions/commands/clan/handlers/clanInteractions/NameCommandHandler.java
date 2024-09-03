@@ -2,6 +2,7 @@ package org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.Clan;
@@ -45,17 +46,13 @@ public class NameCommandHandler {
                 return true;
             }
 
+            clanManager.sendClanMessage(playerClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " был переименован в " + ChatColor.YELLOW + newClanName + ChatColor.GREEN + ".");
+
             // Переименовываем клан
             playerClan.renameClan(newClanName);
             clanManager.updateClan(playerClan);
 
             // Опционально, можно уведомить всех членов клана о смене имени
-            for (String memberName : playerClan.getMembers()) {
-                Player member = player.getServer().getPlayer(memberName);
-                if (member != null) {
-                    member.sendMessage(ChatColor.GREEN + "Клан был переименован в " + ChatColor.YELLOW + newClanName + ChatColor.GREEN + ".");
-                }
-            }
 
             if (wasTruncated) {
                 player.sendMessage(ChatColor.YELLOW + "Название было слишком длинным и было обрезано до 14 символов.");

@@ -37,22 +37,27 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
             switch (subCommand) {
                 case "info":
                     String arg = args.length > 1 ? args[1] : ""; // Получаем аргумент команды, если он есть
+                    String playerName = "";
+                    Clan curClan = null;
+                    String firstJoinDate = null;
+                    int ticksPlayed = 0;
 
                     if (arg.isEmpty()) {
-                        TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-                        TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/p info <игрок>");
-                        clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/player info "));
-                        usageMessage.addExtra(clickCommand);
-                        player.spigot().sendMessage(usageMessage);
-                        return true;
+                        curClan = clanManager.getPlayerClan(player.getName());
+                        firstJoinDate = playerDataHandler.getFirstJoinDate(player.getName());
+                        ticksPlayed = playerDataHandler.getPlayTime(player.getName());
+                        playerName = player.getName();
+                    } else {
+                        if (playerDataHandler.hasPlayerData(arg)) {
+                            curClan = clanManager.getPlayerClan(arg);
+                            playerName = arg;
+                            firstJoinDate = playerDataHandler.getFirstJoinDate(arg);
+                            ticksPlayed = playerDataHandler.getPlayTime(arg);
+                        } else {
+                            player.sendMessage("Игрок не найден");
+                            return true;
+                        }
                     }
-
-                    Clan curClan = clanManager.getPlayerClan(arg);
-
-                    // Если игрок был оффлайн, но зарегистрирован
-                    String firstJoinDate = playerDataHandler.getFirstJoinDate(arg);
-                    // Получаем информацию о времени игры из PlayerDataHandler
-                    int ticksPlayed = playerDataHandler.getPlayTime(arg);
 
                     // Конвертируем тики в секунды
                     int secondsPlayed = ticksPlayed / 20;
@@ -69,16 +74,15 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     );
 
                     StringBuilder info = new StringBuilder();
-                    info.append(ChatColor.GREEN).append("***** ").append(ChatColor.WHITE).append("Игрок ").append(arg).append(ChatColor.GREEN).append(" *****\n");
+                    info.append(ChatColor.GREEN).append("***** ").append(ChatColor.WHITE).append("Игрок ").append(playerName).append(ChatColor.GREEN).append(" *****\n");
                     info.append(ChatColor.GOLD).append("Играет с: ").append(ChatColor.YELLOW).append(firstJoinDate).append("\n");
                     info.append(ChatColor.GOLD).append("Онлайн: ").append(ChatColor.YELLOW).append(playTimeMessage).append("\n");
-                    info.append(ChatColor.GOLD).append("Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerStrength(arg)).append("/").append(playerDataHandler.getPlayerMaxStrength(arg)).append("\n");
-                    info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerLevel(arg)).append("\n");
+                    info.append(ChatColor.GOLD).append("Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerStrength(playerName)).append("/").append(playerDataHandler.getPlayerMaxStrength(playerName)).append("\n");
+                    info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerLevel(playerName)).append("\n");
                     if (curClan != null) {
-                        info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(arg)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
+                        info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(playerName)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
                     } else {
-                        info.append(ChatColor.GOLD).append("Не состоит в клане.\n");
-                        info.append(ChatColor.YELLOW).append("Не состоит в клане.");
+                        info.append(ChatColor.GOLD).append("Не состоит в клане.");
                     }
 
                     player.sendMessage(info.toString());

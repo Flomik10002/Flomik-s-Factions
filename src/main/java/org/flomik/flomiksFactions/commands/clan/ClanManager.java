@@ -169,6 +169,15 @@ public class ClanManager {
         return null;
     }
 
+    public void sendClanMessage(Clan clan, String message) {
+        for (String member : clan.getMembers()) {
+            Player clanMember = Bukkit.getPlayer(member);
+            if (clanMember != null && clanMember.isOnline()) {
+                clanMember.sendMessage(message);
+            }
+        }
+    }
+
     public void invitePlayer(String clanName, String playerName) {
         clanName = clanName.toLowerCase();
         Clan clan = getClan(clanName);
