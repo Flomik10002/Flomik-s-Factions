@@ -128,7 +128,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 case "claim":
                     return claimRegionHandler.handleCommand(player);
                 case "unclaim":
-                    return unclaimRegionHandler.handleCommand(player);
+                    return unclaimRegionHandler.handleCommand(player, args);
 
                 default:
                     TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Неизвестная подкоманда. Для списка команд: ");

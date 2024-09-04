@@ -1,17 +1,19 @@
 package org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
+
+import java.util.Map;
 
 public class UnclaimRegionCommandHandler {
 
@@ -21,7 +23,8 @@ public class UnclaimRegionCommandHandler {
         this.clanManager = clanManager;
     }
 
-    public boolean handleCommand(Player player) {
+    // Основной метод обработки команды
+    public boolean handleCommand(Player player, String[] args) {
         Clan clan = clanManager.getPlayerClan(player.getName());
 
         if (clan == null || !isLeaderOrDeputy(player, clan)) {
@@ -29,39 +32,77 @@ public class UnclaimRegionCommandHandler {
             return true;
         }
 
+        if (args.length > 1 && args[1].equalsIgnoreCase("all")) {
+            // Если аргумент "all" указан, снимаем все приваты
+            unclaimAllRegionsForClan(player, clan);
+        } else {
+            // В противном случае, снимаем приват только с текущего чанка
+            unclaimCurrentChunk(player, clan);
+        }
+
+        return true;
+    }
+
+    // Снятие привата с текущего чанка
+    private void unclaimCurrentChunk(Player player, Clan clan) {
         Chunk chunk = player.getLocation().getChunk();
         String chunkId = getChunkId(chunk);
 
-        // Проверка, занят ли чанк этим кланом
+        // Проверка, принадлежит ли чанк клану
         if (!clan.hasClaimedChunk(chunkId)) {
             player.sendMessage(ChatColor.RED + "Этот чанк не принадлежит вашему клану.");
-            return true;
+            return;
         }
 
         // Удаляем регион WorldGuard
         removeWorldGuardRegion(chunk, clan.getName());
 
-        // Убираем чанк из клана
+        // Убираем чанк из списка клана
         clan.removeClaimedChunk(chunkId);
         clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы сняли приват с чанка!");
-        return true;
     }
 
+    // Снятие привата со всех чанков клана
+    private void unclaimAllRegionsForClan(Player player, Clan clan) {
+        WorldGuard wg = WorldGuard.getInstance();
+        RegionContainer container = wg.getPlatform().getRegionContainer();
+
+        for (World world : player.getServer().getWorlds()) {
+            RegionManager regions = container.get(BukkitAdapter.adapt(world));
+
+            if (regions != null) {
+                for (Map.Entry<String, ProtectedRegion> entry : regions.getRegions().entrySet()) {
+                    ProtectedRegion region = entry.getValue();
+
+                    // Проверяем, является ли регион частью клана и если игрок - лидер
+                    if (region.getId().startsWith("clan_" + clan.getName()) && isLeaderOrDeputy(player, clan)) {
+                        regions.removeRegion(region.getId());
+                        clan.clearClaimedChunks();
+                        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Регион " + region.getId() + " был снят с привата.");
+                    }
+                }
+            }
+        }
+    }
+    // Проверка роли игрока
     private boolean isLeaderOrDeputy(Player player, Clan clan) {
         String playerRole = clan.getRole(player.getName());
         return playerRole.equals("Лидер") || playerRole.equals("Заместитель");
     }
 
+    // Формирование идентификатора чанка
     private String getChunkId(Chunk chunk) {
-        // Используем подчеркивания вместо двоеточий
         return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
     }
 
+    // Удаление региона WorldGuard
     public void removeWorldGuardRegion(Chunk chunk, String clanName) {
         WorldGuard wg = WorldGuard.getInstance();
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager regions = container.get(BukkitAdapter.adapt(chunk.getWorld()));
         String regionId = "clan_" + clanName + "_" + getChunkId(chunk);
-        regions.removeRegion(regionId);
+        if (regions != null) {
+            regions.removeRegion(regionId);
+        }
     }
 }

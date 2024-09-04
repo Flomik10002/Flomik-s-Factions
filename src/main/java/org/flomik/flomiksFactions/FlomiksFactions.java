@@ -6,10 +6,8 @@ import org.flomik.flomiksFactions.commands.chat.ChatCommandHandler;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanCommand;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
-import org.flomik.flomiksFactions.events.ClanPvPListener;
+import org.flomik.flomiksFactions.events.*;
 import org.flomik.flomiksFactions.commands.player.PlayerCommand;
-import org.flomik.flomiksFactions.events.PlayerDeathListener;
-import org.flomik.flomiksFactions.events.PlayerJoinListener;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
 
 public final class FlomiksFactions extends JavaPlugin {
@@ -25,7 +23,9 @@ public final class FlomiksFactions extends JavaPlugin {
         PlayerJoinListener playerJoinListener = new PlayerJoinListener(playerDataHandler, clanManager);
 
         getServer().getPluginManager().registerEvents(playerJoinListener, this);
+        getServer().getPluginManager().registerEvents(new OnPlayerMoveListener(clanManager, this), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(playerDataHandler), this);
+        getServer().getPluginManager().registerEvents(new ChatPrefixListener(clanManager), this);
 
 
         getCommand("player").setExecutor(new PlayerCommand(playerDataHandler, clanManager));

@@ -61,6 +61,11 @@ public class Clan {
         claimedChunks.remove(chunkId);
     }
 
+    public void clearClaimedChunks() {
+        claimedChunks.clear();
+    }
+
+
     public void updateStrength(PlayerDataHandler playerDataHandler) {
         int totalStrength = 0;
 

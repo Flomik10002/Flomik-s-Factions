@@ -1,6 +1,7 @@
 package org.flomik.flomiksFactions.commands.chat;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,7 @@ public class ChatCommandHandler implements CommandExecutor {
         for (String member : playerClan.getMembers()) {
             Player clanMember = Bukkit.getPlayer(member);
             if (clanMember != null && clanMember.isOnline()) {
-                clanMember.sendMessage("[cc] " + playerName + ": " + message);
+                clanMember.sendMessage(ChatColor.GREEN + "©<" + playerName + "> " + ChatColor.RESET + message);
             }
         }
 
