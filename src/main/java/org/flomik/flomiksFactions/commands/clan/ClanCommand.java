@@ -1,6 +1,7 @@
 package org.flomik.flomiksFactions.commands.clan;
 
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -51,6 +52,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final ModerCommandHandler moderHanler;
     private final ClaimRegionCommandHandler claimRegionHandler;
     private final UnclaimRegionCommandHandler unclaimRegionHandler;
+    private final HelpCommandHandler helpCommandHandler;
 
     public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin) {
         this.plugin = plugin;
@@ -68,7 +70,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.infoHandler = new InfoCommandHandler(clanManager, playerDataHandler);
         this.setHomeHandler = new SetHomeCommandHandler(clanManager);
         this.delHomeHandler = new DelHomeCommandHandler(clanManager);
-        this.homeHandler = new HomeCommandHandler(clanManager);
+        this.homeHandler = new HomeCommandHandler(clanManager, plugin);
         this.allyHandler = new AllyCommandHandler(clanManager, pendingAllies);
         this.leaderHandler = new LeaderCommandHandler(clanManager);
         this.nameHanler = new NameCommandHandler(clanManager);
@@ -76,6 +78,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.moderHanler = new ModerCommandHandler(clanManager);
         this.unclaimRegionHandler = new UnclaimRegionCommandHandler(clanManager);
         this.claimRegionHandler = new ClaimRegionCommandHandler(clanManager, unclaimRegionHandler);
+        this.helpCommandHandler = new HelpCommandHandler();
     }
 
     @Override
@@ -84,8 +87,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             Player player = (Player) sender;
 
             if (args.length == 0) {
-                showCommands(player);
-                return true;
+                TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Неизвестная подкоманда. Для списка команд: ");
+                TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan help");
+                clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan help "));
+                usageMessage.addExtra(clickCommand);
+                player.spigot().sendMessage(usageMessage);
+                return false;
             }
 
             switch (args[0].toLowerCase()) {
@@ -129,11 +136,13 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     return claimRegionHandler.handleCommand(player);
                 case "unclaim":
                     return unclaimRegionHandler.handleCommand(player, args);
+                case "help":
+                    return helpCommandHandler.handleCommand(player, args);
 
                 default:
                     TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Неизвестная подкоманда. Для списка команд: ");
-                    TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan");
-                    clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan "));
+                    TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan help");
+                    clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan help "));
                     usageMessage.addExtra(clickCommand);
                     player.spigot().sendMessage(usageMessage);
                     break;
@@ -142,42 +151,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ChatColor.RED + "Эту команду могут использовать только игроки.");
         }
         return true;
-    }
-
-    void addCommand(TextComponent parent, String commandText, String commandSuggestion, String description) {
-        TextComponent cmdComponent = new TextComponent("\n" +ChatColor.YELLOW + commandText);
-        cmdComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, commandSuggestion));
-        TextComponent descComponent = new TextComponent(ChatColor.WHITE + " - " + description); // Дополнительный перенос строки
-        parent.addExtra(cmdComponent);
-        parent.addExtra(descComponent);
-    }
-
-
-    private void showCommands(Player player) {
-        TextComponent commandsInfo = new TextComponent(ChatColor.GREEN + "**** " + ChatColor.WHITE + "Доступные команды:" + ChatColor.GREEN + " ****");
-        addCommand(commandsInfo, "/clan create <название>", "/clan create ", "Создать новый клан");
-        addCommand(commandsInfo, "/clan name <название>", "/clan name ", "Поменять название клана");
-        addCommand(commandsInfo, "/clan desc <описание>", "/clan desc ", "Поменять описание клана");
-        addCommand(commandsInfo, "/clan claim", "/clan claim", "Заприватить чанк");
-        addCommand(commandsInfo, "/clan unclaim", "/clan unclaim", "Убрать приват чанка");
-        addCommand(commandsInfo, "/clan disband", "/clan disband", "Распустить клан");
-        addCommand(commandsInfo, "/clan ally <название>", "/clan ally ", "Предложить альянс клану");
-        addCommand(commandsInfo, "/clan leader <игрок>", "/clan leader ", "Сделать игрока лидером");
-        addCommand(commandsInfo, "/clan moder <игрок>", "/clan moder ", "Повысить игрока до Заместителя");
-        addCommand(commandsInfo, "/clan promote <игрок>", "/clan promote ", "Повысить игрока");
-        addCommand(commandsInfo, "/clan demote <игрок>", "/clan demote ", "Понизить игрока");
-        addCommand(commandsInfo, "/clan invite <игрок>", "/clan invite ", "Пригласить игрока в ваш клан");
-        addCommand(commandsInfo, "/clan join <название клана>", "/clan join ", "Присоединиться к клану");
-        addCommand(commandsInfo, "/clan leave", "/clan leave", "Покинуть клан");
-        addCommand(commandsInfo, "/clan kick <игрок>", "/clan kick ", "Выгнать игрока из клана");
-        addCommand(commandsInfo, "/clan info <игрок>", "/clan info ", "Информация о клане игрока");
-        addCommand(commandsInfo, "/clan info <название>", "/clan info ", "Информация о клане");
-        addCommand(commandsInfo, "/clan info", "/clan info ", "Информация о вашем клане");
-        addCommand(commandsInfo, "/clan home", "/clan home", "Телепорт на точку дома");
-        addCommand(commandsInfo, "/clan sethome", "/clan sethome", "Добавить точку дома");
-        addCommand(commandsInfo, "/clan delhome", "/clan delhome", "Удалить точку дома");
-        addCommand(commandsInfo, "/clan list", "/clan list", "Показать список всех кланов");
-        player.spigot().sendMessage(commandsInfo);
     }
 
     // Получение списка всех кланов

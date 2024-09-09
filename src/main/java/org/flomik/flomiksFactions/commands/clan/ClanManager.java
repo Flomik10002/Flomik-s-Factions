@@ -117,17 +117,18 @@ public class ClanManager {
     }
 
     public void createClan(String name, String owner) {
-        name = name.toLowerCase(); // Приведение названия клана к нижнему регистру
 
-        // Проверка, существует ли уже клан с таким именем
-        if (clans.containsKey(name)) {
-            throw new IllegalArgumentException("Клан с таким названием уже существует.");
+        for (String existingClanName : clans.keySet()) {
+            if (existingClanName.equalsIgnoreCase(name)) {
+                throw new IllegalArgumentException("Клан с таким названием уже существует.");
+            }
         }
 
         // Проверка, состоит ли игрок уже в каком-либо клане
         if (getPlayerClan(owner) != null) {
             throw new IllegalArgumentException("Вы уже участник клана.");
         }
+
         // Параметры по умолчанию
         Date creationDate = new Date(); // Дата создания — текущая дата
         String description = ""; // Описание по умолчанию
@@ -147,14 +148,13 @@ public class ClanManager {
         members.add(owner);
         memberRoles.put(owner, "Лидер");
 
-        // Создание нового клана
+        // Создание нового клана с сохранением регистра в имени
         Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, land, strength, maxPower, claimedChunks);
 
-        // Добавление клана в коллекцию и сохранение
-        clans.put(name, clan);
+        // Добавление клана в коллекцию (оригинальное название) и сохранение
+        clans.put(name, clan); // Здесь сохраняется оригинальное имя с заглавными буквами
         saveClan(clan);
     }
-
 
     public Clan getClan(String name) {
         return clans.get(name.toLowerCase()); // Приведение названия клана к нижнему регистру

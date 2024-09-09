@@ -60,8 +60,8 @@ public class ClaimRegionCommandHandler {
                         addWorldGuardRegion(chunk, clan.getName(), player);
                         clan.addClaimedChunk(chunkId);
 
-                        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы успешно захватили чанк!");
-                        clanManager.sendClanMessage(oldClan, ChatColor.RED + "Ваш чанк был захвачен");
+                        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " захватил территорию клана " + ChatColor.YELLOW + oldClan.getName() + ChatColor.GREEN + "!");
+                        clanManager.sendClanMessage(oldClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " захватил вашу территорию!");
                         return true;
                     }
                 }
@@ -70,7 +70,7 @@ public class ClaimRegionCommandHandler {
 
         // Проверка, не занят ли чанк другим кланом
         if (isChunkClaimedByAnotherClan(chunkId, clan)) {
-            player.sendMessage(ChatColor.RED + "Этот чанк уже занят другим кланом.");
+            player.sendMessage(ChatColor.RED + "Этот чанк уже занят кланом.");
             return true;
         }
 
@@ -79,7 +79,8 @@ public class ClaimRegionCommandHandler {
 
         // Добавляем чанк к клану
         clan.addClaimedChunk(chunkId);
-        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы успешно заняли чанк!");
+        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " заприватил территорию!");
+
         return true;
     }
 
@@ -134,6 +135,7 @@ public class ClaimRegionCommandHandler {
         // Устанавливаем флаги региона
         region.setFlag(Flags.INTERACT, StateFlag.State.ALLOW);
         region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
+        region.setFlag(Flags.TNT, StateFlag.State.ALLOW);
 
         if (regions != null) {
             regions.addRegion(region);

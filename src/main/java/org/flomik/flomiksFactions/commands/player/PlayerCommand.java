@@ -1,7 +1,9 @@
 package org.flomik.flomiksFactions.commands.player;
 
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -79,13 +81,28 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     info.append(ChatColor.GOLD).append("Онлайн: ").append(ChatColor.YELLOW).append(playTimeMessage).append("\n");
                     info.append(ChatColor.GOLD).append("Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerStrength(playerName)).append("/").append(playerDataHandler.getPlayerMaxStrength(playerName)).append("\n");
                     info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerLevel(playerName)).append("\n");
+//                    if (curClan != null) {
+//                        info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(playerName)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
+//                    } else {
+//                        info.append(ChatColor.GOLD).append("Не состоит в клане.");
+//                    }
+//
+//                    player.sendMessage(info.toString());
+
                     if (curClan != null) {
-                        info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(playerName)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
+                        // Создаем кликабельный текст для клана
+                        TextComponent clanInfoComponent = new TextComponent();
+                        clanInfoComponent.setText(ChatColor.GRAY + "[" + ChatColor.YELLOW + "-" + ChatColor.GRAY + "] " + ChatColor.YELLOW + curClan.getName());
+                        clanInfoComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan info " + curClan.getName()));
+                        clanInfoComponent.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new Text("Нажмите, чтобы узнать больше о клане")));
+
+                        // Добавляем информацию о клане
+                        info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(playerName)).append(ChatColor.GOLD).append(" в ");
+                        player.spigot().sendMessage(new ComponentBuilder(info.toString()).append(clanInfoComponent).append(ChatColor.GOLD + " (" + ChatColor.GREEN + getOnlineMembersCount(curClan) + ChatColor.GRAY + "/" + ChatColor.YELLOW + curClan.getMembers().size() + ChatColor.GOLD + ")").create());
                     } else {
                         info.append(ChatColor.GOLD).append("Не состоит в клане.");
+                        player.sendMessage(info.toString());
                     }
-
-                    player.sendMessage(info.toString());
                     return true;
 
                 default:

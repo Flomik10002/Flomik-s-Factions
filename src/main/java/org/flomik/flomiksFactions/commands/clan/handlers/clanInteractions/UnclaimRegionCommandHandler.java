@@ -8,6 +8,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.commands.clan.Clan;
@@ -57,9 +58,15 @@ public class UnclaimRegionCommandHandler {
         // Удаляем регион WorldGuard
         removeWorldGuardRegion(chunk, clan.getName());
 
+        // Проверка, находится ли точка дома в удаляемом регионе
+        if (isHomeInChunk(clan, chunk)) {
+            clan.removeHome();
+            player.sendMessage(ChatColor.YELLOW + "Точка дома была удалена, так как она находилась в этом привате.");
+        }
+
         // Убираем чанк из списка клана
         clan.removeClaimedChunk(chunkId);
-        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Вы сняли приват с чанка!");
+        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " убрал приват с чанка!");
     }
 
     // Снятие привата со всех чанков клана
@@ -77,13 +84,21 @@ public class UnclaimRegionCommandHandler {
                     // Проверяем, является ли регион частью клана и если игрок - лидер
                     if (region.getId().startsWith("clan_" + clan.getName()) && isLeaderOrDeputy(player, clan)) {
                         regions.removeRegion(region.getId());
-                        clan.clearClaimedChunks();
-                        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Регион " + region.getId() + " был снят с привата.");
+
+                        // Проверяем, находится ли точка дома в одном из удаляемых приватов
+                        Location homeLocation = clan.getHome();
+                        if (homeLocation != null && isHomeInRegion(clan, region, homeLocation)) {
+                            clan.removeHome();
+                            clanManager.sendClanMessage(clan,ChatColor.YELLOW + "Точка дома была удалена, так как она находилась в одном из удалённых приватов.");
+                        }
                     }
                 }
+                clan.clearClaimedChunks();
             }
         }
+        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " убрал все приваты!");
     }
+
     // Проверка роли игрока
     private boolean isLeaderOrDeputy(Player player, Clan clan) {
         String playerRole = clan.getRole(player.getName());
@@ -104,5 +119,22 @@ public class UnclaimRegionCommandHandler {
         if (regions != null) {
             regions.removeRegion(regionId);
         }
+    }
+
+    // Проверка, находится ли точка дома в текущем чанке
+    private boolean isHomeInChunk(Clan clan, Chunk chunk) {
+        Location homeLocation = clan.getHome();
+        if (homeLocation == null) {
+            return false; // Точка дома не установлена
+        }
+
+        return homeLocation.getChunk().equals(chunk);
+    }
+
+    // Проверка, находится ли точка дома в удаляемом регионе
+    private boolean isHomeInRegion(Clan clan, ProtectedRegion region, Location homeLocation) {
+        String regionId = region.getId();
+        String homeChunkId = getChunkId(homeLocation.getChunk());
+        return regionId.contains(homeChunkId);
     }
 }

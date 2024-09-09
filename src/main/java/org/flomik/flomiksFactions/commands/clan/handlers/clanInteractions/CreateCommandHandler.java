@@ -17,13 +17,19 @@ public class CreateCommandHandler {
 
     public boolean handleCommand(Player player, String[] args) {
         if (args.length > 1) {
-            String clanName = args[1].toLowerCase();
+            String clanName = args[1];
 
             final int MAX_NAME_LENGTH = 14;
 
             boolean wasTruncated = clanName.length() > MAX_NAME_LENGTH;
             if (wasTruncated) {
                 clanName = clanName.substring(0, MAX_NAME_LENGTH);
+            }
+
+            // Регулярное выражение для проверки, чтобы название содержало только буквы, цифры и допустимые символы .,!?:
+            if (!clanName.matches("[a-zA-Z0-9.!?]+")) {
+                player.sendMessage(ChatColor.RED + "Название клана может содержать только буквы, цифры и символы: .,!?");
+                return true;
             }
 
             try {
@@ -37,13 +43,13 @@ public class CreateCommandHandler {
                 player.sendMessage(ChatColor.RED + e.getMessage());
             }
         } else {
-
+            // Сообщение об использовании команды
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Пожалуйста, укажите название клана. Использование: ");
             TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan create <название>");
             clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan create "));
             usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
-            }
+        }
         return true;
     }
 }

@@ -31,10 +31,18 @@ public class ChatPrefixListener implements Listener {
 
         if (playerClan != null) {
             // Формирование префикса с названием клана
+//            String clanPrefix = ChatColor.GREEN + "[" + playerClan.getName() + "] " + ChatColor.RESET;
+//            // Изменение сообщения
+//            String message = event.getMessage();
+//            event.setFormat(clanPrefix + "<" + playerName + "> " + message);
+
             String clanPrefix = ChatColor.GREEN + "[" + playerClan.getName() + "] " + ChatColor.RESET;
             // Изменение сообщения
             String message = event.getMessage();
-            event.setFormat(clanPrefix + "<" + playerName + "> " + message);
+            event.setFormat(clanPrefix + playerName + ": " + message);
+        } else {
+            String message = event.getMessage();
+            event.setFormat(playerName + ": " + message);
         }
     }
 }

@@ -23,6 +23,7 @@ public class DescCommandHandler {
 
             final int MAX_DESCRIPTION_LENGTH = 48;
 
+
             boolean wasTruncated = newDescription.length() > MAX_DESCRIPTION_LENGTH;
             if (wasTruncated) {
                 newDescription = newDescription.substring(0, MAX_DESCRIPTION_LENGTH);
@@ -38,6 +39,11 @@ public class DescCommandHandler {
             String playerRole = playerClan.getRole(player.getName());
             if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
                 player.sendMessage(ChatColor.RED + "Только Лидер и Заместитель клана можгут переименовать клан.");
+                return true;
+            }
+
+            if (!newDescription.matches("[a-zA-Z0-9.!?]+")) {
+                player.sendMessage(ChatColor.RED + "Описание клана может содержать только буквы, цифры и символы: .,!?");
                 return true;
             }
 

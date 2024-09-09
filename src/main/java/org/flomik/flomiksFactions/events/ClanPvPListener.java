@@ -1,5 +1,6 @@
 package org.flomik.flomiksFactions.events;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -31,11 +32,13 @@ public class ClanPvPListener implements Listener {
             if (attackerClan != null && defenderClan != null) {
                 if (attackerClan.equals(defenderClan)) {
                     event.setCancelled(true); // Отменяем событие драки
+                    attacker.sendMessage(ChatColor.RED + "Вы состоите в одном клане с целью!");
                 }
                 // Проверяем, находятся ли кланы в альянсе
                 if (attackerClan.getAlliances().contains(defenderClan.getName()) ||
                         defenderClan.getAlliances().contains(attackerClan.getName())) {
                     event.setCancelled(true); // Отменяем событие драки
+                    attacker.sendMessage(ChatColor.RED + "Вы состоите в альянсе с целью!");
                 }
             }
         }

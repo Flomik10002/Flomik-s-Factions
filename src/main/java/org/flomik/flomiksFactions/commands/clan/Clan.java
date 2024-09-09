@@ -90,7 +90,7 @@ public class Clan {
 
     public void renameClan(String newName) {
         oldName = name; // Сохраняем старое название
-        name = newName.toLowerCase(); // Устанавливаем новое название
+        name = newName; // Устанавливаем новое название
     }
 
     public String getOldName() {

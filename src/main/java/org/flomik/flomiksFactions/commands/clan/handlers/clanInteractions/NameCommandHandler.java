@@ -18,7 +18,7 @@ public class NameCommandHandler {
 
     public boolean handleCommand(Player player, String[] args) {
         if (args.length > 1) {
-            String newClanName = args[1].toLowerCase();;
+            String newClanName = args[1];;
 
             final int MAX_NAME_LENGTH = 14;
 
@@ -44,6 +44,13 @@ public class NameCommandHandler {
             if (newClanName == null || newClanName.isEmpty()) {
                 player.sendMessage(ChatColor.RED + "Название клана не может быть пустым.");
                 return true;
+            }
+
+            for (String existingClanName : clanManager.clans.keySet()) {
+                if (existingClanName.equalsIgnoreCase(newClanName)) {
+                    player.sendMessage(ChatColor.RED + "Клан с таким названием уже существует.");
+                    return true;
+                }
             }
 
             clanManager.sendClanMessage(playerClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " был переименован в " + ChatColor.YELLOW + newClanName + ChatColor.GREEN + ".");

@@ -51,7 +51,8 @@ public class ChatCommandHandler implements CommandExecutor {
         for (String member : playerClan.getMembers()) {
             Player clanMember = Bukkit.getPlayer(member);
             if (clanMember != null && clanMember.isOnline()) {
-                clanMember.sendMessage(ChatColor.GREEN + "©<" + playerName + "> " + ChatColor.RESET + message);
+                String clanPrefix = ChatColor.LIGHT_PURPLE + "[" + playerClan.getRole(playerName) + "] " + ChatColor.GREEN;
+                clanMember.sendMessage(ChatColor.GREEN + "© "+ clanPrefix + playerName + ": " + ChatColor.RESET + message);
             }
         }
 

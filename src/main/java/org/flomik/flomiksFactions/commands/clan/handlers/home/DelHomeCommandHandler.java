@@ -18,8 +18,9 @@ public class DelHomeCommandHandler {
             player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
             return false;
         }
-        if (!player.getName().equals(clan.getOwner())) {
-            player.sendMessage(ChatColor.RED + "Только Лидер клана может удалить точку дома.");
+        String playerRole = clan.getRole(player.getName());
+        if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
+            player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель может удалить точку дома.");
             return false;
         }
 

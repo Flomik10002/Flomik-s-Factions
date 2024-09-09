@@ -17,3 +17,7 @@ commands:
   clanchat:
     description: Написать сообщение в чат клана
     aliases: [cc]
+  menu:
+    description: Открыть меню
+  clanmenu:
+    description: Открыть меню Клановы
