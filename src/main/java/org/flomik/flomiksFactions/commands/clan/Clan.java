@@ -97,6 +97,10 @@ public class Clan {
         return oldName;
     }
 
+    public void resetOldName() {
+        this.oldName = null;
+    }
+
     public void transferLeadership(String newLeader) {
         if (!members.contains(newLeader)) {
             throw new IllegalArgumentException("Игрок не является членом клана.");
@@ -137,6 +141,8 @@ public class Clan {
     public void setRole(String playerName, String role) {
         if (ROLE_ORDER.contains(role)) {
             memberRoles.put(playerName, role);
+        } else {
+            throw new IllegalArgumentException("Неверная роль: " + role);
         }
     }
 
@@ -324,13 +330,7 @@ public class Clan {
     }
 
     public void updateLands() {
-        int totalLands = 0;
-
-        for (String land : claimedChunks) {
-            totalLands++;
-        }
-
-        this.lands = totalLands;
+        this.lands = claimedChunks.size(); // Количество земель — это размер списка чанков
     }
 
     public int getStrength() {

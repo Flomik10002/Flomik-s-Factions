@@ -47,35 +47,38 @@ public class DisbandCommandHandler  {
                     clanManager.updateClan(otherClan); // Обновляем данные о клане
                 }
             }
-            clanManager.disbandClan(clan.getName());
-            pendingDisbands.remove(player.getName());
+            pendingDisbands.remove(player.getName()); // Сначала удаляем игрока из карты ожидания
+            clanManager.disbandClan(clan.getName().toLowerCase());
+
             Bukkit.broadcastMessage(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " был успешно распущен.");
 
+            // Удаляем регионы WorldGuard, если это необходимо
             com.sk89q.worldedit.entity.Player wgPlayer = BukkitAdapter.adapt(player);
+            if (wgPlayer == null) {
+                player.sendMessage(ChatColor.RED + "Ошибка при взаимодействии с WorldGuard.");
+                return true;
+            }
             WorldGuard wg = WorldGuard.getInstance();
             RegionContainer container = wg.getPlatform().getRegionContainer();
             RegionManager regionManager = container.get(BukkitAdapter.adapt(player.getWorld()));
 
-            if (regionManager == null) {
-                return true;
-            }
-
-            List<String> regionsToRemove = new ArrayList<>();
-
-            for (ProtectedRegion region : regionManager.getRegions().values()) {
-                if (region.getOwners().contains(wgPlayer.getUniqueId())) {
-                    regionsToRemove.add(region.getId());
+            if (regionManager != null) {
+                List<String> regionsToRemove = new ArrayList<>();
+                for (ProtectedRegion region : regionManager.getRegions().values()) {
+                    if (region.getOwners().contains(wgPlayer.getUniqueId())) {
+                        regionsToRemove.add(region.getId());
+                    }
+                }
+                for (String regionId : regionsToRemove) {
+                    regionManager.removeRegion(regionId);
                 }
             }
-
-            for (String regionId : regionsToRemove) {
-                regionManager.removeRegion(regionId);
-            }
-
         } else {
             // Запрашиваем подтверждение
             pendingDisbands.put(player.getName(), System.currentTimeMillis());
             player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 15 секунд для подтверждения.");
+
+            // Таймер на 15 секунд
             new BukkitRunnable() {
                 @Override
                 public void run() {

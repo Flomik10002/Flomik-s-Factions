@@ -23,7 +23,12 @@ public class JoinCommandHandler {
 
     public boolean handleCommand(Player player, String[] args) {
         if (args.length > 1) {
-            String clanName = args[1].toLowerCase();
+            String clanName = args[1].trim().toLowerCase(); // Убираем лишние пробелы и приводим к нижнему регистру
+            if (clanName.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "Название клана не может быть пустым.");
+                return true;
+            }
+
             Clan invitedClan = clanManager.getClan(clanName);
 
             if (invitedClan == null) {
@@ -38,13 +43,16 @@ public class JoinCommandHandler {
                 // Принимаем приглашение
                 try {
                     clanManager.joinClan(clanName, invitedPlayer);
+
                     invites.remove(clanName); // Удаляем приглашение после успешного присоединения
                     if (invites.isEmpty()) {
                         pendingInvites.remove(invitedPlayer); // Удаляем игрока из карты, если у него больше нет приглашений
                     } else {
                         pendingInvites.put(invitedPlayer, invites); // Обновляем список приглашений
                     }
-                    clanManager.sendClanMessage(invitedClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " присоединился к вашему клану " + ChatColor.YELLOW + clanName + ChatColor.GREEN + "!");
+                    clanManager.saveInvitations();
+
+                    clanManager.sendClanMessage(invitedClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " присоединился к вашему клану " + ChatColor.YELLOW + invitedClan.getName() + ChatColor.GREEN + "!");
                 } catch (IllegalArgumentException e) {
                     player.sendMessage(ChatColor.RED + e.getMessage());
                 }
@@ -52,6 +60,7 @@ public class JoinCommandHandler {
                 player.sendMessage(ChatColor.RED + "Вы не получили приглашение в этот клан.");
             }
         } else {
+            // Если недостаточно аргументов, выводим сообщение с подсказкой
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
             TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan join <название>");
             clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join "));

@@ -93,7 +93,7 @@ public class AllyCommandHandler {
 
                     // Удаляем предложение после принятия
                     pendingAllies.get(allyClan.getName()).remove(playerClanName);
-                    Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW +  ChatColor.GREEN + playerClan.getName() + " заключили союз.");
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN +" заключили союз.");
                 } else {
                     // Отправляем предложение о союзе
                     allies.add(allyClanName);
@@ -114,8 +114,8 @@ public class AllyCommandHandler {
                                 } else {
                                     pendingAllies.put(playerClanName, currentAllies);
                                 }
-                                player.sendMessage(ChatColor.RED + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClanName + ChatColor.RED + " истекло.");
-                                sendMessageToRole(allyClan, "Предложение о союзе от клана " + ChatColor.GOLD + playerClanName + ChatColor.RED + " истекло.");
+                                player.sendMessage(ChatColor.RED + "Предложение о союзе с кланом " + ChatColor.GOLD + allyClanName + ChatColor.RED + " истекло.");
+                                sendMessageToRole(allyClan, ChatColor.RED + "Предложение о союзе от клана " + ChatColor.GOLD + playerClanName + ChatColor.RED + " истекло.");
                             }
                         }
                     }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 20 * 60); // 5 минут * 60 секунд * 20 тиков

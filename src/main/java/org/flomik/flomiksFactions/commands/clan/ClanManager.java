@@ -157,7 +157,7 @@ public class ClanManager {
     }
 
     public Clan getClan(String name) {
-        return clans.get(name.toLowerCase()); // Приведение названия клана к нижнему регистру
+        return clans.get(name.toLowerCase()); // Приведение к нижнему регистру для поиска клана
     }
 
     public Clan getPlayerClan(String playerName) {
@@ -234,11 +234,10 @@ public class ClanManager {
             throw new IllegalArgumentException("Клан не существует.");
         }
 
-
-
+        // Удаляем клан из карты и конфигурации
         clans.remove(clanName);
-        config.set("clans." + clanName, null);
-        saveConfig(); // Сохраняем изменения
+        config.set("clans." + clanName, null); // Удаляем клан из конфигурации
+        saveConfig();
     }
 
 
@@ -251,7 +250,7 @@ public class ClanManager {
 
         // Проверка на попытку присоединиться к собственному клану
         Clan playerClan = getPlayerClan(playerName);
-        if (playerClan != null && playerClan.getName().equals(clanName)) {
+        if (playerClan != null && playerClan.getName().equalsIgnoreCase(clan.getName())) {
             throw new IllegalArgumentException("Вы уже состоите в этом клане.");
         }
 
@@ -272,7 +271,7 @@ public class ClanManager {
             saveClan(playerClan);
         }
 
-        // Проверка на максимальное количество участников в клане перед добавлением
+        // Проверка на максимальное количество участников в клане
         if (clan.isFull()) {
             throw new IllegalArgumentException("Клан уже достиг максимального количества участников.");
         }
@@ -288,15 +287,14 @@ public class ClanManager {
 
     // Обновление данных о клане
     public void updateClan(Clan clan) {
-        // Удаляем старое название клана из карты и конфигурации, если название изменилось
         String oldName = clan.getOldName();
-        if (oldName != null && !oldName.equals(clan.getName())) {
+        if (oldName != null && !oldName.equalsIgnoreCase(clan.getName())) {
             clans.remove(oldName.toLowerCase());
             config.set("clans." + oldName.toLowerCase(), null); // Удаляем старое название из конфигурации
         }
 
-        // Обновляем карту кланов с новым названием
-        clans.put(clan.getName(), clan);
+        // Обновляем карту кланов с новым названием (ключ — в нижнем регистре)
+        clans.put(clan.getName().toLowerCase(), clan);
 
         // Сохраняем обновленные данные о клане
         saveClan(clan);
@@ -309,6 +307,9 @@ public class ClanManager {
 
     public void saveClan(Clan clan) {
         String path = "clans." + clan.getName().toLowerCase(); // Приведение названия клана к нижнему регистру
+
+        // Сохранение реального названия клана с учетом регистра
+        config.set(path + ".name", clan.getName()); // Сохранение имени клана с регистром
 
         // Сохранение данных о клане
         config.set(path + ".owner", clan.getOwner()); // Сохранение владельца клана
@@ -353,6 +354,9 @@ public class ClanManager {
             for (String clanName : config.getConfigurationSection("clans").getKeys(false)) {
                 String lowerCaseClanName = clanName.toLowerCase(); // Приведение названия клана к нижнему регистру
 
+                // Загрузка названия клана с учетом регистра
+                String displayName = config.getString("clans." + lowerCaseClanName + ".name", clanName); // Используем имя с учетом регистра или default
+
                 // Загрузка владельца
                 String owner = config.getString("clans." + lowerCaseClanName + ".owner");
 
@@ -396,7 +400,7 @@ public class ClanManager {
 
                 // Создание объекта клана
                 Clan clan = new Clan(
-                        lowerCaseClanName, owner, memberSet, memberRoles, creationDate, description, alliances, level, land, strength, maxPower, chunks
+                        displayName, owner, memberSet, memberRoles, creationDate, description, alliances, level, land, strength, maxPower, chunks
                 );
                 clan.setHome(home);
                 clans.put(lowerCaseClanName, clan);
@@ -437,7 +441,7 @@ public class ClanManager {
         }
     }
 
-    private void loadInvitations() {
+    public void loadInvitations() {
         if (config.contains("invitations")) {
             for (String playerName : config.getConfigurationSection("invitations").getKeys(false)) {
                 List<String> invitationsList = config.getStringList("invitations." + playerName);
@@ -446,7 +450,7 @@ public class ClanManager {
         }
     }
 
-    private void saveInvitations() {
+    public void saveInvitations() {
         config.set("invitations", null); // Сначала очищаем старые данные
         for (Map.Entry<String, Set<String>> entry : invitations.entrySet()) {
             config.set("invitations." + entry.getKey(), new ArrayList<>(entry.getValue()));
