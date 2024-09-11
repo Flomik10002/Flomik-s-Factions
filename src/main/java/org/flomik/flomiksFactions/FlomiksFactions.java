@@ -1,6 +1,7 @@
 
 package org.flomik.flomiksFactions;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.flomik.flomiksFactions.commands.MenuCommand;
 import org.flomik.flomiksFactions.commands.chat.ChatCommandHandler;
@@ -40,6 +41,9 @@ public final class FlomiksFactions extends JavaPlugin {
         new StrengthTickTask(playerDataHandler).addStrength(this);
         new ClanPvPListener(this, clanManager);
         playerJoinListener.startPeriodicStatsUpdate(this);
+
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new MenuProtectionListener(), this);
     }
 
     @Override
