@@ -5,7 +5,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -87,7 +86,7 @@ public class UnclaimRegionCommandHandler {
 
                         // Проверяем, находится ли точка дома в одном из удаляемых приватов
                         Location homeLocation = clan.getHome();
-                        if (homeLocation != null && isHomeInRegion(clan, region, homeLocation)) {
+                        if (homeLocation != null && isHomeInRegion(region, homeLocation)) {
                             clan.removeHome();
                             clanManager.sendClanMessage(clan,ChatColor.YELLOW + "Точка дома была удалена, так как она находилась в одном из удалённых приватов.");
                         }
@@ -132,7 +131,7 @@ public class UnclaimRegionCommandHandler {
     }
 
     // Проверка, находится ли точка дома в удаляемом регионе
-    private boolean isHomeInRegion(Clan clan, ProtectedRegion region, Location homeLocation) {
+    private boolean isHomeInRegion(ProtectedRegion region, Location homeLocation) {
         String regionId = region.getId();
         String homeChunkId = getChunkId(homeLocation.getChunk());
         return regionId.contains(homeChunkId);
