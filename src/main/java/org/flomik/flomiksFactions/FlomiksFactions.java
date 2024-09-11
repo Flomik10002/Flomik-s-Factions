@@ -3,15 +3,15 @@ package org.flomik.flomiksFactions;
 
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.flomik.flomiksFactions.commands.MenuCommand;
+import org.flomik.flomiksFactions.commands.admin.SetStrengthCommand;
+import org.flomik.flomiksFactions.commands.chunkMenu.MenuCommand;
 import org.flomik.flomiksFactions.commands.chat.ChatCommandHandler;
-import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanCommand;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
 import org.flomik.flomiksFactions.events.*;
 import org.flomik.flomiksFactions.commands.player.PlayerCommand;
 import org.flomik.flomiksFactions.commands.player.PlayerDataHandler;
-import org.flomik.flomiksFactions.menu.chunkMenu.MenuManager;
+import org.flomik.flomiksFactions.commands.chunkMenu.MenuManager;
 
 public final class FlomiksFactions extends JavaPlugin {
 
@@ -37,6 +37,7 @@ public final class FlomiksFactions extends JavaPlugin {
         getCommand("clan").setExecutor(new ClanCommand(clanManager, playerDataHandler, this));
         getCommand("clanchat").setExecutor(new ChatCommandHandler(clanManager));
         getCommand("chunkmap").setExecutor(new MenuCommand(menuManager));
+        getCommand("setSt").setExecutor(new SetStrengthCommand(playerDataHandler));
 
         new StrengthTickTask(playerDataHandler).addStrength(this);
         new ClanPvPListener(this, clanManager);

@@ -1,4 +1,4 @@
-package org.flomik.flomiksFactions.menu.chunkMenu;
+package org.flomik.flomiksFactions.commands.chunkMenu;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -63,7 +63,7 @@ public class MenuManager {
                     // Обычные чанки вокруг игрока
                     if (clanName != null) {
                         Clan clan = clanManager.getClan(clanName.toLowerCase());
-                        item = new ItemStack(Material.BARRIER);
+                        item = new ItemStack(Material.RED_CONCRETE);
                         ItemMeta meta = item.getItemMeta();
                         meta.setDisplayName("§cЧанк (X: " + chunk.getX() + ", Z: " + chunk.getZ() + ")");
                         meta.setLore(Arrays.asList("§cТерритория клана: §e" + clanName, "§cЛидер: §e" + clan.getOwner()));

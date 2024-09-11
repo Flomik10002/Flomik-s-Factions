@@ -1,10 +1,9 @@
-package org.flomik.flomiksFactions.commands;
+package org.flomik.flomiksFactions.commands.chunkMenu;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.flomik.flomiksFactions.menu.chunkMenu.MenuManager;
 
 public class MenuCommand implements CommandExecutor {
 

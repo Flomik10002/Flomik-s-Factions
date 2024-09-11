@@ -82,6 +82,13 @@ public class PlayerDataHandler {
         saveConfig();
     }
 
+    public void addPlayerStrength(String playerName, int strength) {
+        int oldStrength = playersConfig.getInt(playerName + ".strength", 0);
+        strength = oldStrength + strength;
+        playersConfig.set(playerName + ".strength", strength);
+        saveConfig();
+    }
+
     // Получает максимальную силу игрока
     public int getPlayerMaxStrength(String playerName) {
         return playersConfig.getInt(playerName + ".maxStrength", 10); // по умолчанию 10

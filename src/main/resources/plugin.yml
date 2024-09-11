@@ -23,3 +23,10 @@ commands:
     description: Открыть меню Клановы
   chunkmap:
     description: Открыть карту чанков
+  setSt:
+    permission: setSt.op
+
+permissions:
+  setSt.op:
+    description: Allows setSt command
+    default: op
