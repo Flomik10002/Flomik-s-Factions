@@ -79,6 +79,13 @@ public class Clan {
         this.strength = totalStrength;
     }
 
+    public void removeAllianceByName(String clanName) {
+        alliances.remove(clanName); // Удаляем альянс по имени
+    }
+
+    public void addAllianceByName(String clanName) {
+        alliances.add(clanName); // Добавляем новый альянс по имени
+    }
 
     public void setDescription(String description) {
         this.description = description;

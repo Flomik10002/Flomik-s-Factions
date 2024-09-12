@@ -25,9 +25,11 @@ public class AllyCommandHandler {
 
     public boolean handleCommand(Player player, String[] args) {
         if (args.length > 1) {
-            String allyClanName = args[1].toLowerCase();
+            // Получаем имя клана в нижнем регистре для поиска в данных
+            String allyClanName = args[1].trim().toLowerCase();
+
             Clan playerClan = clanManager.getPlayerClan(player.getName());
-            Clan allyClan = clanManager.getClan(allyClanName);
+            Clan allyClan = clanManager.getClan(allyClanName); // Ищем клан по имени в нижнем регистре
 
             if (playerClan == null) {
                 player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
@@ -41,21 +43,25 @@ public class AllyCommandHandler {
                 return true;
             }
 
-            if (playerClan.getAlliances().size() == 3){
+            // Проверяем лимит альянсов для текущего клана
+            if (playerClan.getAlliances().size() == 3) {
                 player.sendMessage(ChatColor.RED + "У вас превышен лимит альянсов.");
                 return true;
             }
 
+            // Если клан не найден по имени
             if (allyClan == null) {
                 player.sendMessage(ChatColor.RED + "Клан с таким названием не существует.");
                 return true;
             }
 
-            if (allyClan.getAlliances().size() == 3){
+            // Проверяем лимит альянсов для целевого клана
+            if (allyClan.getAlliances().size() == 3) {
                 player.sendMessage(ChatColor.RED + "У желаемого клана превышен лимит альянсов.");
                 return true;
             }
 
+            // Проверяем, что кланы не одинаковы
             if (playerClan.getName().equals(allyClan.getName())) {
                 player.sendMessage(ChatColor.RED + "Вы не можете предложить союз своему же клану.");
                 return true;
@@ -69,22 +75,23 @@ public class AllyCommandHandler {
                 clanManager.updateClan(playerClan);
                 clanManager.updateClan(allyClan);
 
-                Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW +  ChatColor.GREEN + playerClan.getName() + " расторгли союз.");
+                Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " расторгли союз.");
                 return true;
             }
 
             String playerClanName = playerClan.getName();
-            List<String> allies = pendingAllies.getOrDefault(playerClanName, new ArrayList<>());
+            List<String> allies = pendingAllies.getOrDefault(playerClanName.toLowerCase(), new ArrayList<>());
 
+            // Проверяем, если предложение уже было отправлено
             if (allies.contains(allyClanName)) {
                 // Отзываем предложение о союзе
                 allies.remove(allyClanName);
-                pendingAllies.put(playerClanName, allies); // Обновляем список предложений
-                player.sendMessage(ChatColor.GREEN + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClanName + ChatColor.GREEN + " было отменено.");
-                sendMessageToRole(allyClan, "Предложение о союзе с кланом " + ChatColor.YELLOW + playerClanName + ChatColor.RED + " было отменено.");
+                pendingAllies.put(playerClanName.toLowerCase(), allies); // Обновляем список предложений
+                player.sendMessage(ChatColor.GREEN + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " было отменено.");
+                sendMessageToRole(allyClan, ChatColor.RED + "Предложение о союзе с кланом " + ChatColor.YELLOW + playerClan.getName() + ChatColor.RED + " было отменено.");
             } else {
                 // Проверяем, нет ли уже отправленного предложения от другого клана
-                if (pendingAllies.getOrDefault(allyClan.getName(), new ArrayList<>()).contains(playerClanName)) {
+                if (pendingAllies.getOrDefault(allyClan.getName().toLowerCase(), new ArrayList<>()).contains(playerClanName.toLowerCase())) {
                     // Принятие предложения о союзе
                     playerClan.addAlliances(allyClan);
                     allyClan.addAlliances(playerClan);
@@ -92,33 +99,33 @@ public class AllyCommandHandler {
                     clanManager.updateClan(allyClan);
 
                     // Удаляем предложение после принятия
-                    pendingAllies.get(allyClan.getName()).remove(playerClanName);
-                    Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN +" заключили союз.");
+                    pendingAllies.get(allyClan.getName().toLowerCase()).remove(playerClanName.toLowerCase());
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Кланы " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " и " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " заключили союз.");
                 } else {
                     // Отправляем предложение о союзе
                     allies.add(allyClanName);
-                    pendingAllies.put(playerClanName, allies); // Сохраняем обновлённый список предложений
-                    player.sendMessage(ChatColor.GREEN + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClanName + ChatColor.GREEN + " отправлено.");
+                    pendingAllies.put(playerClanName.toLowerCase(), allies); // Сохраняем обновлённый список предложений
+                    player.sendMessage(ChatColor.GREEN + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " отправлено.");
                     player.sendMessage(ChatColor.YELLOW + "Для отмены предложения о союзе повторите команду.");
-                    sendMessageToRole(allyClan,ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " предложил вам союз. Используйте " + ChatColor.YELLOW + "/clan ally " + playerClan.getName() + ChatColor.GREEN + " для принятия предложения.");
+                    sendMessageToRole(allyClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " предложил вам союз. Используйте " + ChatColor.YELLOW + "/clan ally " + playerClan.getName() + ChatColor.GREEN + " для принятия предложения.");
 
                     // Запускаем задачу для автоматического удаления предложения через 5 минут
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            List<String> currentAllies = pendingAllies.get(playerClanName);
+                            List<String> currentAllies = pendingAllies.get(playerClanName.toLowerCase());
                             if (currentAllies != null && currentAllies.contains(allyClanName)) {
                                 currentAllies.remove(allyClanName);
                                 if (currentAllies.isEmpty()) {
-                                    pendingAllies.remove(playerClanName);
+                                    pendingAllies.remove(playerClanName.toLowerCase());
                                 } else {
-                                    pendingAllies.put(playerClanName, currentAllies);
+                                    pendingAllies.put(playerClanName.toLowerCase(), currentAllies);
                                 }
-                                player.sendMessage(ChatColor.RED + "Предложение о союзе с кланом " + ChatColor.GOLD + allyClanName + ChatColor.RED + " истекло.");
-                                sendMessageToRole(allyClan, ChatColor.RED + "Предложение о союзе от клана " + ChatColor.GOLD + playerClanName + ChatColor.RED + " истекло.");
+                                player.sendMessage(ChatColor.RED + "Предложение о союзе с кланом " + ChatColor.GOLD + allyClan.getName() + ChatColor.RED + " истекло.");
+                                sendMessageToRole(allyClan, ChatColor.RED + "Предложение о союзе от клана " + ChatColor.GOLD + playerClan.getName() + ChatColor.RED + " истекло.");
                             }
                         }
-                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 20 * 60); // 5 минут * 60 секунд * 20 тиков
+                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 5 * 60 * 20); // 5 минут * 60 секунд * 20 тиков
                 }
             }
         } else {
@@ -132,19 +139,16 @@ public class AllyCommandHandler {
     }
 
     private void sendMessageToRole(Clan clan, String message) {
-        try {
-            // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
-            List<String> rolesToNotify = List.of("Лидер", "Заместитель");
-            for (String role : rolesToNotify) {
-                List<String> playersWithRole = clan.getPlayersWithRole(role);
-                for (String playerName : playersWithRole) {
-                    Player player = Bukkit.getPlayer(playerName);
-                    if (player != null) { // Проверяем, что игрок онлайн
-                        player.sendMessage(message);
-                    }
+        // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
+        List<String> rolesToNotify = List.of("Лидер", "Заместитель");
+        for (String role : rolesToNotify) {
+            List<String> playersWithRole = clan.getPlayersWithRole(role);
+            for (String playerName : playersWithRole) {
+                Player player = Bukkit.getPlayer(playerName);
+                if (player != null) { // Проверяем, что игрок онлайн
+                    player.sendMessage(message);
                 }
             }
-        } finally {
         }
     }
 }
