@@ -61,8 +61,8 @@ public class DescCommandHandler {
             return false;
         } else {
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan description <описание>");
-            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan description "));
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan desc <описание>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan desc "));
             usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
         }

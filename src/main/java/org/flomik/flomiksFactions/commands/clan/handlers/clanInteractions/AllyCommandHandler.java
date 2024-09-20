@@ -107,7 +107,13 @@ public class AllyCommandHandler {
                     pendingAllies.put(playerClanName.toLowerCase(), allies); // Сохраняем обновлённый список предложений
                     player.sendMessage(ChatColor.GREEN + "Предложение о союзе с кланом " + ChatColor.YELLOW + allyClan.getName() + ChatColor.GREEN + " отправлено.");
                     player.sendMessage(ChatColor.YELLOW + "Для отмены предложения о союзе повторите команду.");
-                    sendMessageToRole(allyClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " предложил вам союз. Используйте " + ChatColor.YELLOW + "/clan ally " + playerClan.getName() + ChatColor.GREEN + " для принятия предложения.");
+
+                    TextComponent allyMessage = new TextComponent(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " предложил вам союз. Используйте ");
+                    TextComponent allyCommand = new TextComponent(ChatColor.YELLOW + "/clan ally " + playerClan.getName());
+                    allyCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan ally " + playerClan.getName())); // Устанавливаем кликабельное действие
+                    allyMessage.addExtra(allyCommand);
+                    allyMessage.addExtra(new TextComponent(ChatColor.GREEN + " для принятия предложения."));
+                    sendMessageToRole(allyClan, allyMessage);
 
                     // Запускаем задачу для автоматического удаления предложения через 5 минут
                     new BukkitRunnable() {
@@ -138,15 +144,18 @@ public class AllyCommandHandler {
         return true;
     }
 
-    private void sendMessageToRole(Clan clan, String message) {
-        // Отправляем сообщение только игрокам с ролями Лидер и Заместитель
+    private void sendMessageToRole(Clan clan, Object message) {
         List<String> rolesToNotify = List.of("Лидер", "Заместитель");
         for (String role : rolesToNotify) {
             List<String> playersWithRole = clan.getPlayersWithRole(role);
             for (String playerName : playersWithRole) {
                 Player player = Bukkit.getPlayer(playerName);
                 if (player != null) { // Проверяем, что игрок онлайн
-                    player.sendMessage(message);
+                    if (message instanceof TextComponent) {
+                        player.spigot().sendMessage((TextComponent) message); // Отправляем кликабельное сообщение
+                    } else if (message instanceof String) {
+                        player.sendMessage((String) message); // Отправляем обычное сообщение
+                    }
                 }
             }
         }

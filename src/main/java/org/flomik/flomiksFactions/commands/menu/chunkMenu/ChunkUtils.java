@@ -1,4 +1,4 @@
-package org.flomik.flomiksFactions.commands.chunkMenu;
+package org.flomik.flomiksFactions.commands.menu.chunkMenu;
 
 import org.bukkit.Chunk;
 import org.flomik.flomiksFactions.commands.clan.Clan;

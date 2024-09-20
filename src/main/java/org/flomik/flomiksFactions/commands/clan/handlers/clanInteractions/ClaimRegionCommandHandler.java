@@ -61,7 +61,7 @@ public class ClaimRegionCommandHandler {
                         clan.addClaimedChunk(chunkId);
 
                         clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " захватил территорию клана " + ChatColor.YELLOW + oldClan.getName() + ChatColor.GREEN + "!");
-                        clanManager.sendClanMessage(oldClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " захватил вашу территорию!");
+                        clanManager.sendClanMessage(oldClan, ChatColor.RED + "Клан " + ChatColor.GOLD + clan.getName() + ChatColor.RED + " захватил один чанк вашей территории!");
                         return true;
                     }
                 }

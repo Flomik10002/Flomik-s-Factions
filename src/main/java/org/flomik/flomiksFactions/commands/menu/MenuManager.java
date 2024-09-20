@@ -1,4 +1,4 @@
-package org.flomik.flomiksFactions.commands.chunkMenu;
+package org.flomik.flomiksFactions.commands.menu;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 import org.flomik.flomiksFactions.FlomiksFactions;
 import org.flomik.flomiksFactions.commands.clan.Clan;
 import org.flomik.flomiksFactions.commands.clan.ClanManager;
+import org.flomik.flomiksFactions.commands.menu.chunkMenu.ChunkUtils;
 
 import java.util.Arrays;
 
@@ -24,7 +25,7 @@ public class MenuManager {
         this.clanManager = clanManager;
     }
 
-    public void openMenu(Player player) {
+    public void openChunkMenu(Player player) {
         // Создаем инвентарь 45 слотов (9x5)
         Inventory menu = Bukkit.createInventory(null, 45, "Карта чанков");
 
@@ -53,21 +54,32 @@ public class MenuManager {
 
                     if (clanName != null) {
                         Clan clan = clanManager.getClan(clanName.toLowerCase());
-                        meta.setLore(Arrays.asList("§cТерритория клана: §e" + clanName, "§cЛидер: §e" + clan.getOwner()));
+                        if (clan != null) {
+                            meta.setLore(Arrays.asList("§cТерритория клана: §e" + clanName, "§cЛидер: §e" + clan.getOwner()));
+                        } else {
+                            meta.setLore(Arrays.asList("§aЧанк без привата"));
+                        }
                     } else {
                         meta.setLore(Arrays.asList("§aЧанк без привата"));
                     }
                     item.setItemMeta(meta);
                 } else {
-
-                    // Обычные чанки вокруг игрока
                     if (clanName != null) {
                         Clan clan = clanManager.getClan(clanName.toLowerCase());
-                        item = new ItemStack(Material.RED_CONCRETE);
-                        ItemMeta meta = item.getItemMeta();
-                        meta.setDisplayName("§cЧанк (X: " + chunk.getX() + ", Z: " + chunk.getZ() + ")");
-                        meta.setLore(Arrays.asList("§cТерритория клана: §e" + clanName, "§cЛидер: §e" + clan.getOwner()));
-                        item.setItemMeta(meta);
+                        // Обычные чанки вокруг игрока
+                        if (clan != null) {
+                            item = new ItemStack(Material.RED_CONCRETE);
+                            ItemMeta meta = item.getItemMeta();
+                            meta.setDisplayName("§cЧанк (X: " + chunk.getX() + ", Z: " + chunk.getZ() + ")");
+                            meta.setLore(Arrays.asList("§cТерритория клана: §e" + clanName, "§cЛидер: §e" + clan.getOwner()));
+                            item.setItemMeta(meta);
+                        } else {
+                            item = new ItemStack(Material.GRASS_BLOCK);
+                            ItemMeta meta = item.getItemMeta();
+                            meta.setDisplayName("§aЧанк (X: " + chunk.getX() + ", Z: " + chunk.getZ() + ")");
+                            meta.setLore(Arrays.asList("§aЧанк без привата"));
+                            item.setItemMeta(meta);
+                        }
                     } else {
                         item = new ItemStack(Material.GRASS_BLOCK);
                         ItemMeta meta = item.getItemMeta();
@@ -140,5 +152,4 @@ public class MenuManager {
         // Общий индекс слота
         return rowIndex * 9 + colIndex; // 9 слотов в строке
     }
-
 }

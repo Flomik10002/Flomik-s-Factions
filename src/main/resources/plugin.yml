@@ -25,6 +25,8 @@ commands:
     description: Открыть карту чанков
   setSt:
     permission: setSt.op
+  clanchunks:
+    description: Показать все чанки, принадлежащие вашему клану
 
 permissions:
   setSt.op:

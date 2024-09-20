@@ -1,7 +1,6 @@
 package org.flomik.flomiksFactions.commands.clan;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.FlomiksFactions;
+import org.flomik.flomiksFactions.commands.menu.MenuManager;
 import org.flomik.flomiksFactions.commands.clan.handlers.*;
 import org.flomik.flomiksFactions.commands.clan.handlers.clanInteractions.*;
 import org.flomik.flomiksFactions.commands.clan.handlers.home.DelHomeCommandHandler;
@@ -53,8 +53,9 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final ClaimRegionCommandHandler claimRegionHandler;
     private final UnclaimRegionCommandHandler unclaimRegionHandler;
     private final HelpCommandHandler helpCommandHandler;
+    private final MapCommandHandler mapCommandHandler;
 
-    public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin) {
+    public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin, MenuManager menuManager) {
         this.plugin = plugin;
         this.clanManager = clanManager;
         this.playerDataHandler = playerDataHandler;
@@ -79,6 +80,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.unclaimRegionHandler = new UnclaimRegionCommandHandler(clanManager);
         this.claimRegionHandler = new ClaimRegionCommandHandler(clanManager, unclaimRegionHandler);
         this.helpCommandHandler = new HelpCommandHandler();
+        this.mapCommandHandler = new MapCommandHandler(menuManager);
     }
 
     @Override
@@ -138,6 +140,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     return unclaimRegionHandler.handleCommand(player, args);
                 case "help":
                     return helpCommandHandler.handleCommand(player, args);
+                case "map":
+                    return mapCommandHandler.handleCommand(player);
 
                 default:
                     TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Неизвестная подкоманда. Для списка команд: ");
@@ -190,7 +194,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
     private List<String> getSubCommandSuggestions(String input) {
         List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "sethome",
-                "delhome", "home", "info", "promote", "demote", "ally", "leader", "name", "desc", "moder", "unclaim", "claim");
+                "delhome", "home", "info", "promote", "demote", "ally", "leader", "name", "desc", "moder", "unclaim", "claim", "help", "map");
         return getSuggestions(input, subCommands);
     }
 
