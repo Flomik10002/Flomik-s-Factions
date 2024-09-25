@@ -7,28 +7,43 @@ authors: [ Flomik ]
 description: Factions plugin for 1.20.1
 website: https://flomik.xyz
 
+depend: [PlaceholderAPI]
+
 commands:
-  clan:
-    description: Основная команда для управления кланами.
-    aliases: [cl]
   player:
-    description: Информация о игроке
+    description: Команда игрока
     aliases: [p]
+  clan:
+    description: Команда клана
+    aliases: [cl]
   clanchat:
-    description: Написать сообщение в чат клана
+    description: Клановый чат
     aliases: [cc]
-  menu:
-    description: Открыть меню
-  clanmenu:
-    description: Открыть меню Клановы
   chunkmap:
-    description: Открыть карту чанков
+    description: Карта чанков
   setSt:
-    permission: setSt.op
+    description: Установить силу
+    permission: clan.op
   clanchunks:
-    description: Показать все чанки, принадлежащие вашему клану
+    description: Управление клановыми территориями
+  shrine:
+    description: Управление святилищами
+    permission: clan.op
+  donate:
+    description: Команды для доната
+    permission: clan.op
+  particles:
+    description: Управление партиклами
+  clansettingsaccess:
+    description: Управление кланом
+
+  menu:
+    description: Меню
+  clanmenu:
+    description: Меню
+  donatemenu:
+    description: Команды для доната
 
 permissions:
-  setSt.op:
-    description: Allows setSt command
+  clan.op:
     default: op

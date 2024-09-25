@@ -18,6 +18,12 @@ repositories {
     maven {
         url = "https://maven.enginehub.org/repo/"
     }
+    maven {
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+    maven {
+        url = 'https://jitpack.io'
+    }
 }
 
 dependencies {
@@ -28,6 +34,10 @@ dependencies {
 
     // Зависимость для WorldEdit (также необходима для WorldGuard)
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.15' // Используйте последнюю доступную версию
+
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7' // Vault API
 }
 
 def targetJavaVersion = 17
