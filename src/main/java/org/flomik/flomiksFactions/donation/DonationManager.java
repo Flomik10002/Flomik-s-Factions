@@ -13,7 +13,7 @@ public class DonationManager {
 
     private final FlomiksFactions plugin;
     private final PlayerDataHandler playerDataHandler;
-    private final Map<String, Color> availableColors; // Цвета для покупки по названию
+    private final Map<String, Color> availableColors;
 
     public DonationManager(FlomiksFactions plugin, PlayerDataHandler playerDataHandler) {
         this.plugin = plugin;
@@ -22,7 +22,6 @@ public class DonationManager {
         initializeAvailableColors();
     }
 
-    // Инициализация доступных цветов
     private void initializeAvailableColors() {
         availableColors.put("red", Color.RED);
         availableColors.put("blue", Color.BLUE);
@@ -36,22 +35,19 @@ public class DonationManager {
         availableColors.put("orange", Color.ORANGE);
     }
 
-    // Добавление дублонов игроку
     public void addDoubloons(Player player, int amount) {
         playerDataHandler.addDoubloons(player, amount);
-        player.sendMessage("Вам добавлено " + amount + " дублонов.");
     }
 
-    // Проверка, может ли игрок купить эффект
     public boolean canAfford(Player player, int price) {
         return playerDataHandler.getDoubloons(player.getName()) >= price;
     }
 
-    // Проверка, куплен ли цвет
     public boolean hasPurchasedColor(Player player, String colorName) {
         Set<String> purchasedColors = playerDataHandler.getPurchasedColors(player.getName());
         return purchasedColors != null && purchasedColors.contains(colorName.toLowerCase());
     }
+
     public boolean purchaseEffect(Player player, int price, String colorName) {
         Color color = availableColors.get(colorName.toLowerCase());
         if (color == null) {
@@ -59,19 +55,16 @@ public class DonationManager {
             return false;
         }
 
-        // Проверяем, куплен ли уже цвет
         if (hasPurchasedColor(player, colorName)) {
             player.sendMessage("Этот цвет уже был куплен.");
             return false;
         }
 
-        // Проверка на достаточное количество дублонов
         if (!canAfford(player, price)) {
             player.sendMessage("У вас недостаточно дублонов для покупки.");
             return false;
         }
 
-        // Списываем дублоны и сохраняем купленный цвет
         playerDataHandler.addDoubloons(player, -price);
         playerDataHandler.addPurchasedColor(player.getName(), colorName.toLowerCase());
         playerDataHandler.setPlayerEffectColor(player.getName(), color);
@@ -80,7 +73,6 @@ public class DonationManager {
         return true;
     }
 
-    // Получение доступных цветов
     public Map<String, Color> getAvailableColors() {
         return availableColors;
     }

@@ -34,7 +34,7 @@ public class ListCommandHandler {
             return false;
         }
 
-        int page = 1; // Номер страницы по умолчанию
+        int page = 1;
         if (args.length > 1) {
             try {
                 page = Integer.parseInt(args[1]);
@@ -44,7 +44,7 @@ public class ListCommandHandler {
             }
         }
 
-        int clansPerPage = 5; // Количество кланов на странице
+        int clansPerPage = 5;
         int totalClans = clanManager.getClans().size();
         int maxPages = (int) Math.ceil((double) totalClans / clansPerPage);
 
@@ -64,43 +64,43 @@ public class ListCommandHandler {
             int memberCount = clan.getMembers().size();
             int onlineMemberCount = getOnlineMembersCount(clan);
 
-            // Форматирование строки с параметрами клана
-            message.append(ChatColor.AQUA).append(clan.getName())  // Название клана
-                    .append(ChatColor.GOLD).append(" - Рейтинг: ").append(ChatColor.YELLOW).append("N/A") // Рейтинг
-                    .append(ChatColor.GOLD).append(" - Онлайн ").append(ChatColor.YELLOW).append(onlineMemberCount).append("/").append(memberCount) // Онлайн
-                    .append(ChatColor.GOLD).append(" - Земли/Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(clan.getLands()).append("/").append(clan.getStrength()).append("/").append(clan.getMembers().size() * 10).append("\n"); // Земли/Сила/Макс. Сила
+
+            message.append(ChatColor.AQUA).append(clan.getName())
+                    .append(ChatColor.GOLD).append(" - Рейтинг: ").append(ChatColor.YELLOW).append("N/A")
+                    .append(ChatColor.GOLD).append(" - Онлайн ").append(ChatColor.YELLOW).append(onlineMemberCount).append("/").append(memberCount)
+                    .append(ChatColor.GOLD).append(" - Земли/Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(clan.getLands()).append("/").append(clan.getStrength()).append("/").append(clan.getMembers().size() * 10).append("\n");
         }
 
-        // Создаем компоненты для навигации
+
         TextComponent prevPage = new TextComponent(ChatColor.GREEN + "[<< Пред]");
         TextComponent pageNumber = new TextComponent(ChatColor.YELLOW + " Страница " + page + "/" + maxPages + " ");
         TextComponent nextPage = new TextComponent(ChatColor.GREEN + "[След >>]");
 
-        // Устанавливаем кликабельные события для стрелочек
+
         if (page > 1) {
             prevPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan list " + (page - 1)));
         } else {
-            prevPage.setColor(net.md_5.bungee.api.ChatColor.GRAY); // Если нет предыдущей страницы, делаем текст серым
+            prevPage.setColor(net.md_5.bungee.api.ChatColor.GRAY);
         }
 
         if (page < maxPages) {
             nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan list " + (page + 1)));
         } else {
-            nextPage.setColor(net.md_5.bungee.api.ChatColor.GRAY); // Если нет следующей страницы, делаем текст серым
+            nextPage.setColor(net.md_5.bungee.api.ChatColor.GRAY);
         }
 
-        // Создаем основной компонент с текстом и навигацией
+
         TextComponent mainMessage = new TextComponent(TextComponent.fromLegacyText(message.toString()));
         mainMessage.addExtra(prevPage);
         mainMessage.addExtra(pageNumber);
         mainMessage.addExtra(nextPage);
 
-        // Отправляем сообщение игроку
+
         player.spigot().sendMessage(mainMessage);
         return true;
     }
 
-    // Метод для подсчета количества онлайн участников
+
     private int getOnlineMembersCount(Clan clan) {
         int onlineCount = 0;
         for (String member : clan.getMembers()) {

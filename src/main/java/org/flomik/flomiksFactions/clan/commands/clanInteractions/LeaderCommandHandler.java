@@ -29,14 +29,14 @@ public class LeaderCommandHandler {
                 return true;
             }
 
-            // Проверка, что игрок является Лидером клана
+
             String playerRole = playerClan.getRole(player.getName());
             if (!playerRole.equals("Лидер")) {
                 player.sendMessage(ChatColor.RED + "Только Лидер клана может передать права.");
                 return true;
             }
 
-            // Передача прав
+
             try {
                 playerClan.transferLeadership(newLeaderName);
                 clanManager.updateClan(playerClan);

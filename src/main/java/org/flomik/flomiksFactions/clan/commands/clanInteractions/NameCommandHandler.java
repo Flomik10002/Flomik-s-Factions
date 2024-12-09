@@ -22,13 +22,13 @@ public class NameCommandHandler {
 
             final int MAX_NAME_LENGTH = 14;
 
-            // Если имя клана слишком длинное, обрезаем его до 14 символов
+
             boolean wasTruncated = newClanName.length() > MAX_NAME_LENGTH;
             if (wasTruncated) {
                 newClanName = newClanName.substring(0, MAX_NAME_LENGTH);
             }
 
-            // Регулярное выражение для проверки, чтобы название содержало только буквы, цифры и допустимые символы .,!?:
+
             if (!newClanName.matches("[a-zA-Z0-9.!?]+")) {
                 player.sendMessage(ChatColor.RED + "Название клана может содержать только буквы, цифры и символы: .,!?");
                 return true;
@@ -39,27 +39,27 @@ public class NameCommandHandler {
                 return true;
             }
 
-            // Получаем текущий клан игрока
+
             Clan playerClan = clanManager.getPlayerClan(player.getName());
             if (playerClan == null) {
                 player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
                 return true;
             }
 
-            // Проверяем, является ли игрок Лидером клана
+
             String playerRole = playerClan.getRole(player.getName());
             if (!playerRole.equals("Лидер")) {
                 player.sendMessage(ChatColor.RED + "Только Лидер клана может переименовать клан.");
                 return true;
             }
 
-            // Проверка на допустимость нового имени
+
             if (newClanName == null || newClanName.isEmpty()) {
                 player.sendMessage(ChatColor.RED + "Название клана не может быть пустым.");
                 return true;
             }
 
-            // Проверяем, существует ли уже клан с таким названием
+
             for (Clan existingClan : clanManager.getAllClans()) {
                 if (existingClan.getName().equalsIgnoreCase(newClanName)) {
                     player.sendMessage(ChatColor.RED + "Клан с таким названием уже существует.");
@@ -67,19 +67,19 @@ public class NameCommandHandler {
                 }
             }
 
-            String oldClanName = playerClan.getName(); // Сохраняем оригинальное имя до переименования
+            String oldClanName = playerClan.getName();
 
-            // Обновляем альянсы после переименования
+
             updateAllianceNamesBeforeRename(oldClanName, newClanName);
 
-            // Переименовываем клан
-            playerClan.renameClan(newClanName);
-            clanManager.updateClan(playerClan); // Сохраняем изменения
 
-            // Обновляем альянсы до переименования
+            playerClan.renameClan(newClanName);
+            clanManager.updateClan(playerClan);
+
+
             updateAllianceNamesAfterRename(oldClanName);
 
-            // Отправляем сообщение о переименовании
+
             clanManager.sendClanMessage(playerClan, ChatColor.GREEN + "Клан " + ChatColor.YELLOW + oldClanName + ChatColor.GREEN + " был переименован в " + ChatColor.YELLOW + newClanName + ChatColor.GREEN + ".");
 
             if (wasTruncated) {
@@ -97,24 +97,24 @@ public class NameCommandHandler {
         return true;
     }
 
-    // Метод для удаления старого имени из альянсов до переименования
+
     private void updateAllianceNamesAfterRename(String oldClanName) {
-        // Проходим по всем кланам и ищем те, кто состоит в альянсе с переименовываемым кланом
+
         for (Clan clan : clanManager.getAllClans()) {
             if (clan.getAlliances().contains(oldClanName)) {
-                clan.removeAllianceByName(oldClanName); // Удаляем старое имя клана
-                clanManager.updateClan(clan); // Сохраняем изменения
+                clan.removeAllianceByName(oldClanName);
+                clanManager.updateClan(clan);
             }
         }
     }
 
-    // Метод для добавления нового имени в альянсы после переименования
+
     private void updateAllianceNamesBeforeRename(String oldClanName, String newClanName) {
-        // Проходим по всем кланам и обновляем альянсы с новым именем клана
+
         for (Clan clan : clanManager.getAllClans()) {
             if (clan.getAlliances().contains(oldClanName)) {
-                clan.addAllianceByName(newClanName); // Добавляем новое имя клана
-                clanManager.updateClan(clan); // Сохраняем изменения
+                clan.addAllianceByName(newClanName);
+                clanManager.updateClan(clan);
             }
         }
     }

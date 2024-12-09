@@ -41,10 +41,10 @@ public class ShrineEvent {
         this.shrineLocations = new ArrayList<>();
 
         loadShrinesFromFile();
-        startDailyEventScheduler(); // Запускаем ежедневный планировщик
+        startDailyEventScheduler();
     }
 
-    // Загрузка точек святилищ из файла shrines.yml
+
     public void loadShrinesFromFile() {
         if (shrineConfig.contains("shrines")) {
             List<?> locations = shrineConfig.getList("shrines");
@@ -56,7 +56,7 @@ public class ShrineEvent {
         }
     }
 
-    // Сохранение точек святилищ в файл shrines.yml
+
     public void saveShrinesToFile() {
         List<String> locationStrings = new ArrayList<>();
         for (Location loc : shrineLocations) {
@@ -71,12 +71,12 @@ public class ShrineEvent {
         }
     }
 
-    // Преобразование Location в строку для записи в файл
+
     private String locationToString(Location loc) {
         return loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
     }
 
-    // Преобразование строки в Location для загрузки из файла
+
     private Location stringToLocation(String locStr) {
         String[] parts = locStr.split(",");
         World world = Bukkit.getWorld(parts[0]);
@@ -86,25 +86,25 @@ public class ShrineEvent {
         return new Location(world, x, y, z);
     }
 
-    // Добавление новой точки святилища
+
     public void addShrineLocation(Player player) {
         Location loc = player.getLocation();
         shrineLocations.add(loc);
-        saveShrinesToFile(); // Сразу сохраняем после добавления
+        saveShrinesToFile();
 
-        // Строим святилище из блоков золота 3x3
+
         buildShrine(loc);
 
-        // Создаем регион через WorldGuard
+
         createWorldGuardRegion(player, loc);
 
         player.sendMessage("Точка Святилища Опыта добавлена в координатах: X=" + loc.getBlockX() + " Y=" + loc.getBlockY() + " Z=" + loc.getBlockZ());
     }
 
-    // Создание WorldGuard региона для защиты всего чанка, где находится святилище
+
     private void createWorldGuardRegion(Player player, Location location) {
         World world = location.getWorld();
-        Chunk chunk = location.getChunk(); // Получаем чанк по местоположению игрока или точки святилища
+        Chunk chunk = location.getChunk();
 
         String regionName = "shrine_" + chunk.getX() + "_" + chunk.getZ();
         WorldGuard wg = WorldGuard.getInstance();
@@ -112,26 +112,26 @@ public class ShrineEvent {
         RegionManager regions = container.get(BukkitAdapter.adapt(world));
 
         if (regions != null) {
-            // Устанавливаем границы чанка, начиная с минимальной точки до максимальной
-            BlockVector3 min = BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4);  // Левый нижний угол чанка (X,Z координаты чанка и Y = 0)
-            BlockVector3 max = BlockVector3.at((chunk.getX() << 4) + 15, world.getMaxHeight(), (chunk.getZ() << 4) + 15);  // Правый верхний угол чанка (X,Z = конец чанка, Y = максимальная высота мира)
 
-            // Создаем регион для всего чанка
+            BlockVector3 min = BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4);
+            BlockVector3 max = BlockVector3.at((chunk.getX() << 4) + 15, world.getMaxHeight(), (chunk.getZ() << 4) + 15);
+
+
             ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, min, max);
 
             try {
-                // Устанавливаем флаги для защиты чанка
-                region.setFlag(Flags.BLOCK_BREAK, StateFlag.State.DENY);   // Запрещаем ломать блоки
-                region.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);   // Запрещаем ставить блоки
-                region.setFlag(Flags.TNT, StateFlag.State.DENY);           // Запрещаем взрывы TNT
-                region.setFlag(Flags.CREEPER_EXPLOSION, StateFlag.State.DENY); // Запрещаем взрывы криперов
-                region.setFlag(Flags.MOB_SPAWNING, StateFlag.State.DENY);   // Запрещаем спавн мобов
-                region.setFlag(Flags.PVP, StateFlag.State.ALLOW);          // Разрешаем PvP (можно убрать, если не нужно)
 
-                // Добавляем регион в WorldGuard
+                region.setFlag(Flags.BLOCK_BREAK, StateFlag.State.DENY);
+                region.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);
+                region.setFlag(Flags.TNT, StateFlag.State.DENY);
+                region.setFlag(Flags.CREEPER_EXPLOSION, StateFlag.State.DENY);
+                region.setFlag(Flags.MOB_SPAWNING, StateFlag.State.DENY);
+                region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
+
+
                 regions.addRegion(region);
 
-                // Назначаем владельца региона
+
                 DefaultDomain owners = region.getOwners();
                 owners.addPlayer(player.getUniqueId());
                 region.setOwners(owners);
@@ -143,7 +143,7 @@ public class ShrineEvent {
         }
     }
 
-    // Строим платформу святилища (3x3 блока из золота)
+
     private void buildShrine(Location location) {
         World world = location.getWorld();
 
@@ -155,16 +155,16 @@ public class ShrineEvent {
         }
     }
 
-    // Деактивация активного святилища после захвата
+
     public void deactivateShrine() {
         if (activeShrineLocation != null) {
             activeShrineLocation = null;
         }
     }
 
-    // Завершение всех активных точек
+
     public void deleteAllSanctuaries() {
-        // Получаем WorldGuard и менеджер регионов для каждого мира
+
         WorldGuard wg = WorldGuard.getInstance();
         for (World world : Bukkit.getWorlds()) {
             RegionContainer container = wg.getPlatform().getRegionContainer();
@@ -173,14 +173,14 @@ public class ShrineEvent {
             if (regions != null) {
                 List<String> regionsToRemove = new ArrayList<>();
 
-                // Ищем все регионы, которые относятся к шрайнам
+
                 for (ProtectedRegion region : regions.getRegions().values()) {
                     if (region.getId().startsWith("shrine_")) {
                         regionsToRemove.add(region.getId());
                     }
                 }
 
-                // Удаляем найденные регионы
+
                 for (String regionId : regionsToRemove) {
                     try {
                         regions.removeRegion(regionId);
@@ -192,39 +192,39 @@ public class ShrineEvent {
             }
         }
 
-        // Очищаем все активные точки шрайнов
+
         shrineLocations.clear();
-        saveShrinesToFile(); // Сохраняем изменения в файл
+        saveShrinesToFile();
 
         Bukkit.broadcastMessage("Все точки Святилищ Опыта и приваты шрайнов были удалены.");
     }
 
 
-    // Возвращаем текущую активную точку святилища
+
     public Location getActiveShrineLocation() {
         return activeShrineLocation;
     }
 
-    // Отмена активного ивента Святилище
+
     public void cancelShrineEvent() {
         if (activeShrineLocation == null) {
             Bukkit.broadcastMessage("Нет активного ивента Святилище Опыта для отмены.");
             return;
         }
 
-        // Оповещаем игроков об отмене
+
         Bukkit.broadcastMessage("Ивент Святилище Опыта был отменен.");
 
-        // Деактивируем текущую точку
+
         activeShrineLocation = null;
     }
 
-    // Удаление точки, на которой стоит игрок
+
     public void removeShrineLocation(Player player) {
         Location playerLocation = player.getLocation();
         Location locationToRemove = null;
 
-        // Ищем точку с такими же координатами, как у игрока
+
         for (Location loc : shrineLocations) {
             if (loc.getBlockX() == playerLocation.getBlockX()
                     && loc.getBlockY() == playerLocation.getBlockY()
@@ -244,61 +244,61 @@ public class ShrineEvent {
         }
     }
 
-    // Запуск ивента: выбираем случайную точку святилища
+
     public void startShrineEvent() {
         if (shrineLocations.isEmpty()) {
             Bukkit.broadcastMessage("Нет доступных точек Святилища Опыта для запуска.");
             return;
         }
 
-        // Выбираем случайную активную точку
+
         Random random = new Random();
         activeShrineLocation = shrineLocations.get(random.nextInt(shrineLocations.size()));
 
-        // Строим святилище из блоков золота, если их еще нет
+
         buildShrine(activeShrineLocation);
 
-        // Оповещаем игроков о начале ивента
+
         Bukkit.broadcastMessage(ChatColor.GREEN + "Ивент Святилище Опыта начался! Координаты святилища: " +
                 "X: " + ChatColor.YELLOW + activeShrineLocation.getBlockX() + ChatColor.GREEN + ", Y: " + ChatColor.YELLOW + activeShrineLocation.getBlockY() + ChatColor.GREEN + ", Z: " + ChatColor.YELLOW + activeShrineLocation.getBlockZ());
 
-        // Начинаем захват святилища
+
         ShrineCaptureManager captureManager = new ShrineCaptureManager(this, plugin, plugin.clanManager);
         captureManager.startCaptureMechanism();
     }
 
-    // Планировщик для запуска ивента в случайное время с 16:00 до 18:00 по МСК
+
     private void startDailyEventScheduler() {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // Используем московский часовой пояс
+
                 ZoneId moscowZoneId = ZoneId.of("Europe/Moscow");
                 LocalTime currentTime = LocalTime.now(moscowZoneId);
                 LocalTime startTime = LocalTime.of(16, 0);
                 LocalTime endTime = LocalTime.of(18, 0);
 
-                // Проверка, что текущее время находится в промежутке 16:00 - 18:00 по МСК
-                if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
-                    // Определяем случайное время в этом промежутке
-                    Random random = new Random();
-                    int randomMinutes = random.nextInt(120 + 1); // Случайное число минут между 0 и 120 (2 часа)
 
-                    // Планируем запуск ивента через случайное количество минут
+                if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
+
+                    Random random = new Random();
+                    int randomMinutes = random.nextInt(120 + 1);
+
+
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             deactivateShrine();
                             startShrineEvent();
                         }
-                    }.runTaskLater(plugin, randomMinutes * 60L); // Переводим минуты в тики
-                    this.cancel(); // Останавливаем проверку на этот день после запуска планировщика
+                    }.runTaskLater(plugin, randomMinutes * 60L);
+                    this.cancel();
                 }
             }
-        }.runTaskTimer(plugin, 0L, 1200L); // Проверка каждую минуту (1200 тиков = 1 минута)
+        }.runTaskTimer(plugin, 0L, 1200L);
     }
 
     public List<Location> getShrineLocations() {
-        return new ArrayList<>(shrineLocations); // Возвращаем копию списка точек святилищ
+        return new ArrayList<>(shrineLocations);
     }
 }

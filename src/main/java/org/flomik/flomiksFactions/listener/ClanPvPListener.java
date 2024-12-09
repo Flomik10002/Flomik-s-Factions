@@ -20,24 +20,24 @@ public class ClanPvPListener implements Listener {
 
     @EventHandler
     public void onPlayerAttack(EntityDamageByEntityEvent event) {
-        // Проверяем, что оба существа являются игроками
+
         if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
             Player attacker = (Player) event.getDamager();
             Player defender = (Player) event.getEntity();
 
-            // Получаем кланы игроков
+
             Clan attackerClan = clanManager.getPlayerClan(attacker.getName());
             Clan defenderClan = clanManager.getPlayerClan(defender.getName());
 
             if (attackerClan != null && defenderClan != null) {
                 if (attackerClan.equals(defenderClan)) {
-                    event.setCancelled(true); // Отменяем событие драки
+                    event.setCancelled(true);
                     attacker.sendMessage(ChatColor.RED + "Вы состоите в одном клане с целью!");
                 }
-                // Проверяем, находятся ли кланы в альянсе
+
                 if (attackerClan.getAlliances().contains(defenderClan.getName()) ||
                         defenderClan.getAlliances().contains(attackerClan.getName())) {
-                    event.setCancelled(true); // Отменяем событие драки
+                    event.setCancelled(true);
                     attacker.sendMessage(ChatColor.RED + "Вы состоите в альянсе с целью!");
                 }
             }

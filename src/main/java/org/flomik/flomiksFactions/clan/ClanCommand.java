@@ -29,12 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClanCommand implements CommandExecutor, TabCompleter {
 
     private final ConcurrentHashMap<String, Long> pendingDisbands = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, List<String>> pendingInvites = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<String>> pendingAllies = new ConcurrentHashMap<>();
 
-    private final FlomiksFactions plugin;
     private final ClanManager clanManager;
-    private final PlayerDataHandler playerDataHandler;
     private final CreateCommandHandler createHandler;
     private final DisbandCommandHandler disbandHandler;
     private final PromoteCommandHandler promoteHandler;
@@ -59,15 +56,13 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final MapCommandHandler mapCommandHandler;
 
     public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin, MenuManager menuManager, ShrineEvent shrineEvent) {
-        this.plugin = plugin;
         this.clanManager = clanManager;
-        this.playerDataHandler = playerDataHandler;
         this.createHandler = new CreateCommandHandler(clanManager);
         this.disbandHandler = new DisbandCommandHandler(clanManager, pendingDisbands);
         this.promoteHandler = new PromoteCommandHandler(clanManager);
         this.demoteHandler = new DemoteCommandHandler(clanManager);
-        this.inviteHandler = new InviteCommandHandler(clanManager, pendingInvites);
-        this.joinHandler = new JoinCommandHandler(clanManager, pendingInvites);
+        this.inviteHandler = new InviteCommandHandler(clanManager);
+        this.joinHandler = new JoinCommandHandler(clanManager);
         this.kickHandler = new KickCommandHandler(clanManager);
         this.listHandler = new ListCommandHandler(clanManager);
         this.leaveHandler = new LeaveCommandHandler(clanManager, pendingDisbands);
@@ -160,7 +155,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    // Получение списка всех кланов
+
     private List<String> getClanNames() {
         List<String> clanNames = new ArrayList<>();
         for (Clan clan : clanManager.getClans().values()) {

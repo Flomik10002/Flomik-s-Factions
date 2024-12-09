@@ -9,12 +9,9 @@ public class MenuProtectionListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         String title = event.getView().getTitle();
 
-        // Проверяем, является ли инвентарь меню "Карта чанков" или меню выбора частиц
         if (title.equals("Карта чанков")) {
-            // Отменяем все клики, чтобы игроки не могли забирать предметы
             event.setCancelled(true);
         }
     }
 }
-//|| title.equals("§6Выберите цвет частиц")
-//§
+

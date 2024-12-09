@@ -21,7 +21,6 @@ public class ChatPrefixListener implements Listener {
         String playerName = player.getName();
         Clan playerClan = null;
 
-        // Поиск клана, к которому принадлежит игрок
         for (Clan clan : clanManager.getClans().values()) {
             if (clan.getMembers().contains(playerName)) {
                 playerClan = clan;
@@ -30,14 +29,7 @@ public class ChatPrefixListener implements Listener {
         }
 
         if (playerClan != null) {
-            // Формирование префикса с названием клана
-//            String clanPrefix = ChatColor.GREEN + "[" + playerClan.getName() + "] " + ChatColor.RESET;
-//            // Изменение сообщения
-//            String message = event.getMessage();
-//            event.setFormat(clanPrefix + "<" + playerName + "> " + message);
-
             String clanPrefix = ChatColor.GREEN + "[" + playerClan.getName() + "] " + ChatColor.RESET;
-            // Изменение сообщения
             String message = event.getMessage();
             event.setFormat(clanPrefix + playerName + ": " + message);
         } else {

@@ -50,7 +50,7 @@ public class ClanTNTListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Clan clan = clanManager.getPlayerClan(player.getName()); // Метод для получения клана игрока
+        Clan clan = clanManager.getPlayerClan(player.getName());
         if (clan != null) {
             int onlineCount = getOnlineMembersCount(clan);
             Bukkit.getLogger().info("Player joined: " + player.getName() + ", Clan: " + clan.getName() + ", Online count: " + onlineCount);
@@ -67,7 +67,7 @@ public class ClanTNTListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Clan clan = clanManager.getPlayerClan(player.getName()); // Метод для получения клана игрока
+        Clan clan = clanManager.getPlayerClan(player.getName());
         if (clan != null) {
             int onlineCount = getOnlineMembersCount(clan) - 1;
             Bukkit.getLogger().info("Player quit: " + player.getName() + ", Clan: " + clan.getName() + ", Online count: " + onlineCount);
@@ -83,7 +83,7 @@ public class ClanTNTListener implements Listener {
                         }
                     }
                 };
-                task.runTaskLater(plugin, 20L * 60 * 15); // 15 минут в тиках
+                task.runTaskLater(plugin, 20L * 60 * 15);
                 clanTimers.put(clan, task);
             }
         }
@@ -100,7 +100,7 @@ public class ClanTNTListener implements Listener {
                 for (Map.Entry<String, ProtectedRegion> entry : regions.getRegions().entrySet()) {
                     ProtectedRegion region = entry.getValue();
 
-                    // Проверяем, является ли регион частью клана
+
                     if (region.getId().startsWith("clan_" + clan.getName())) {
                         region.setFlag(Flags.TNT, state);
                         Bukkit.getLogger().info("Set TNT flag to " + state + " for region: " + region.getId());

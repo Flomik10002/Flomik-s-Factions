@@ -34,19 +34,19 @@ public class LeaveCommandHandler {
         }
 
         if (clan.getOwner().equals(player.getName())) {
-            // Если Лидер клана и в нем больше одного участника (не только Лидер)
+
             if (clan.getMembers().size() > 1) {
                 player.sendMessage(ChatColor.RED + "Лидер клана не может покинуть клан, пока в нем есть другие участники. Передайте руководство или распустите клан.");
                 return true;
             } else {
-                // Подтверждение удаления только если Лидер и в клане только он один
+
                 if (pendingDisbands.containsKey(player.getName())) {
-                    // Выполняем удаление клана
+
                     try {
                         for (Clan otherClan : clanManager.getAllClans()) {
                             if (otherClan.getAlliances().contains(clan.getName())) {
-                                otherClan.removeAlliance(clan); // Удаляем альянс
-                                clanManager.updateClan(otherClan); // Обновляем данные о клане
+                                otherClan.removeAlliance(clan);
+                                clanManager.updateClan(otherClan);
                             }
                         }
                         clanManager.disbandClan(clan.getName());
@@ -77,7 +77,7 @@ public class LeaveCommandHandler {
                         player.sendMessage(ChatColor.RED + e.getMessage());
                     }
                 } else {
-                    // Запрашиваем подтверждение
+
                     pendingDisbands.put(player.getName(), System.currentTimeMillis());
                     player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 15 секунд для подтверждения.");
                     new BukkitRunnable() {
@@ -88,11 +88,11 @@ public class LeaveCommandHandler {
                                 pendingDisbands.remove(player.getName());
                             }
                         }
-                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 300L); // 300L = 15 секунд
+                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 300L);
                 }
             }
         } else {
-            // Игрок не является владельцем
+
             try {
                 clanManager.leaveClan(player.getName());
                 clanManager.removePlayerFromClanRegions(player, clan);

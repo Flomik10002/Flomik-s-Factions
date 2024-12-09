@@ -26,26 +26,26 @@ public class ClanChunksCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        // Получаем клан игрока
+
         Clan playerClan = clanManager.getPlayerClan(player.getName());
         if (playerClan == null) {
             player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
             return true;
         }
 
-        // Получаем список всех чанков клана
+
         List<String> claimedChunks = playerClan.getRegionNames();
         if (claimedChunks.isEmpty()) {
             player.sendMessage(ChatColor.RED + "Ваш клан не владеет никакими чанками.");
             return true;
         }
 
-        // Выводим заголовок в чат
+
         player.sendMessage(ChatColor.GREEN + "Чанки, принадлежащие вашему клану " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + ":");
 
-        // Проходим по каждому чанку и выводим информацию в чат
+
         for (String chunkId : claimedChunks) {
-            // Пример: world_12_34
+
             String[] parts = chunkId.split("_");
             if (parts.length < 3) continue;
 
@@ -53,7 +53,7 @@ public class ClanChunksCommand implements CommandExecutor {
             int chunkX = Integer.parseInt(parts[1]);
             int chunkZ = Integer.parseInt(parts[2]);
 
-            // Формируем сообщение для каждого чанка
+
             player.sendMessage(ChatColor.GREEN + "Мир: " + ChatColor.YELLOW + worldName + ChatColor.GREEN + " Координаты чанка: X: " + ChatColor.YELLOW + chunkX + ChatColor.GREEN + " Z: " + ChatColor.YELLOW + chunkZ);
         }
 

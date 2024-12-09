@@ -20,7 +20,7 @@ public class ClaimRegionCommandHandler {
 
     private final ClanManager clanManager;
     private final UnclaimRegionCommandHandler unclaimRegionCommandHandler;
-    private final ShrineEvent shrineEvent; // Добавляем ссылку на ShrineEvent
+    private final ShrineEvent shrineEvent;
 
     public ClaimRegionCommandHandler(ClanManager clanManager, UnclaimRegionCommandHandler unclaimRegionCommandHandler, ShrineEvent shrineEvent) {
         this.clanManager = clanManager;
@@ -73,16 +73,16 @@ public class ClaimRegionCommandHandler {
             }
         }
 
-        // Проверка, не занят ли чанк другим кланом
+
         if (isChunkClaimedByAnotherClan(chunkId, clan)) {
             player.sendMessage(ChatColor.RED + "Этот чанк уже занят кланом.");
             return true;
         }
 
-        // Добавляем регион WorldGuard
+
         addWorldGuardRegion(chunk, clan.getName(), player);
 
-        // Добавляем чанк к клану
+
         clan.addClaimedChunk(chunkId);
         clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " заприватил территорию!");
 
@@ -102,7 +102,7 @@ public class ClaimRegionCommandHandler {
     }
 
     private String getChunkId(Chunk chunk) {
-        // Используем подчеркивания вместо двоеточий
+
         return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
     }
 
@@ -130,14 +130,14 @@ public class ClaimRegionCommandHandler {
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager regions = container.get(BukkitAdapter.adapt(chunk.getWorld()));
 
-        // Изменяем формат идентификатора региона, убираем двоеточие и используем подчеркивания
+
         String regionId = "clan_" + clanName + "_" + chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
 
         BlockVector3 min = BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4);
         BlockVector3 max = BlockVector3.at((chunk.getX() << 4) + 15, chunk.getWorld().getMaxHeight(), (chunk.getZ() << 4) + 15);
         ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionId, min, max);
 
-        // Устанавливаем флаги региона
+
         region.setFlag(Flags.INTERACT, StateFlag.State.ALLOW);
         region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
         region.setFlag(Flags.TNT, StateFlag.State.ALLOW);
@@ -156,53 +156,53 @@ public class ClaimRegionCommandHandler {
             Player player = Bukkit.getPlayerExact(member);
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(member);
 
-            // Убедимся, что игрок существует и онлайн
+
             if (player != null && (playerRole.equals("Лидер") || playerRole.equals("Заместитель"))) {
-                // Проверка на наличие в текущих владельцах
+
                 if (!region.getOwners().contains(player.getUniqueId())) {
-                    // Получаем текущих владельцев
+
                     DefaultDomain owners = region.getOwners();
 
-                    // Добавляем нового владельца
+
                     owners.addPlayer(player.getUniqueId());
 
-                    // Устанавливаем обновленный список владельцев
+
                     region.setOwners(owners);
                 }
             } if (player != null &&  playerRole.equals("Воин")) {
-                // Проверка на наличие в текущих владельцах
+
                 if (!region.getMembers().contains(player.getUniqueId())) {
-                    // Получаем текущих владельцев
+
                     DefaultDomain members = region.getMembers();
 
-                    // Добавляем нового владельца
+
                     members.addPlayer(player.getUniqueId());
 
-                    // Устанавливаем обновленный список владельцев
+
                     region.setMembers(members);
                 }
             } if (offlinePlayer != null && (playerRole.equals("Лидер") || playerRole.equals("Заместитель"))) {
-                // Проверка на наличие в текущих владельцах
+
                 if (!region.getOwners().contains(offlinePlayer.getUniqueId())) {
-                    // Получаем текущих владельцев
+
                     DefaultDomain owners = region.getOwners();
 
-                    // Добавляем нового владельца
+
                     owners.addPlayer(offlinePlayer.getUniqueId());
 
-                    // Устанавливаем обновленный список владельцев
+
                     region.setOwners(owners);
                 }
             } if (offlinePlayer != null && playerRole.equals("Воин")) {
-                // Проверка на наличие в текущих владельцах
+
                 if (!region.getMembers().contains(offlinePlayer.getUniqueId())) {
-                    // Получаем текущих владельцев
+
                     DefaultDomain members = region.getMembers();
 
-                    // Добавляем нового владельца
+
                     members.addPlayer(offlinePlayer.getUniqueId());
 
-                    // Устанавливаем обновленный список владельцев
+
                     region.setMembers(members);
                 }
             }
@@ -219,14 +219,14 @@ public class ClaimRegionCommandHandler {
             return false;
         }
 
-        // Получаем все регионы
+
         for (ProtectedRegion region : regions.getRegions().values()) {
-            // Проверяем только регионы, относящиеся к шрайнам
+
             if (region.getId().startsWith("shrine_")) {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
 
-                // Проверяем, пересекается ли чанк с регионом
+
                 int chunkMinX = chunk.getX() << 4;
                 int chunkMinZ = chunk.getZ() << 4;
                 int chunkMaxX = chunkMinX + 15;
@@ -234,7 +234,7 @@ public class ClaimRegionCommandHandler {
 
                 if (min.getX() <= chunkMaxX && max.getX() >= chunkMinX &&
                         min.getZ() <= chunkMaxZ && max.getZ() >= chunkMinZ) {
-                    return true; // Чанк пересекается с регионом шрайна
+                    return true;
                 }
             }
         }

@@ -2,55 +2,45 @@ package org.flomik.flomiksFactions.clan.commands.playerInteractions;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.flomiksFactions.clan.Clan;
 import org.flomik.flomiksFactions.clan.ClanManager;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 public class JoinCommandHandler {
 
     private final ClanManager clanManager;
-    private final ConcurrentHashMap<String, List<String>> pendingInvites;
 
-    public JoinCommandHandler(ClanManager clanManager, ConcurrentHashMap<String, List<String>> pendingInvites) {
+    public JoinCommandHandler(ClanManager clanManager) {
         this.clanManager = clanManager;
-        this.pendingInvites = pendingInvites;
     }
 
     public boolean handleCommand(Player player, String[] args) {
         if (args.length > 1) {
-            String clanName = args[1].trim().toLowerCase(); // Убираем лишние пробелы и приводим к нижнему регистру
+            String clanName = args[1].trim().toLowerCase();
             if (clanName.isEmpty()) {
                 player.sendMessage(ChatColor.RED + "Название клана не может быть пустым.");
                 return true;
             }
 
             Clan invitedClan = clanManager.getClan(clanName);
-
             if (invitedClan == null) {
                 player.sendMessage(ChatColor.RED + "Клан с таким названием не существует.");
                 return true;
             }
 
             String invitedPlayer = player.getName();
-            List<String> invites = pendingInvites.get(invitedPlayer);
+            // Получаем приглашения игрока из БД
+            Set<String> invites = clanManager.getInvitationDao().getInvitationsForPlayer(invitedPlayer);
 
-            if (invites != null && invites.contains(clanName)) {
-                // Принимаем приглашение
+            if (invites.contains(clanName)) {
+                // Игрок имеет приглашение в этот клан
                 try {
                     clanManager.joinClan(clanName, invitedPlayer);
-
-                    invites.remove(clanName); // Удаляем приглашение после успешного присоединения
-                    if (invites.isEmpty()) {
-                        pendingInvites.remove(invitedPlayer); // Удаляем игрока из карты, если у него больше нет приглашений
-                    } else {
-                        pendingInvites.put(invitedPlayer, invites); // Обновляем список приглашений
-                    }
-                    clanManager.saveInvitations();
+                    // Удаляем приглашение из базы
+                    clanManager.getInvitationDao().removeInvitation(invitedPlayer, clanName);
 
                     clanManager.sendClanMessage(invitedClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " присоединился к вашему клану " + ChatColor.YELLOW + invitedClan.getName() + ChatColor.GREEN + "!");
                 } catch (IllegalArgumentException e) {
@@ -60,7 +50,6 @@ public class JoinCommandHandler {
                 player.sendMessage(ChatColor.RED + "Вы не получили приглашение в этот клан.");
             }
         } else {
-            // Если недостаточно аргументов, выводим сообщение с подсказкой
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
             TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan join <название>");
             clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join "));

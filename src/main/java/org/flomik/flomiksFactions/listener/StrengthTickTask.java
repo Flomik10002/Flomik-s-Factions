@@ -20,7 +20,7 @@ public class StrengthTickTask {
                 for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
                     String playerName = player.getName();
 
-                    // Получаем текущую силу игрока
+
                     int currentStrength = playerDataHandler.getPlayerStrength(playerName);
                     if (currentStrength < 10) {
                         int newStrength = currentStrength + 1;
@@ -28,6 +28,6 @@ public class StrengthTickTask {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0L, 20L * 60 * 15); // 18000 тиков = 15 минут
+        }.runTaskTimer(plugin, 0L, 20L * 60 * 15);
     }
 }

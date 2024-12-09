@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 
 public class HelpCommandHandler {
 
-    // Основной обработчик команды
-    public boolean handleCommand(Player player, String[] args) {
-        int page = 1; // Страница по умолчанию
 
-        // Проверка, есть ли аргумент, и попытка его преобразовать в число
+    public boolean handleCommand(Player player, String[] args) {
+        int page = 1;
+
+
         if (args.length > 1) {
             try {
                 page = Integer.parseInt(args[1]);
@@ -24,7 +24,7 @@ public class HelpCommandHandler {
         return showCommands(player, page);
     }
 
-    // Метод для отображения команд с постраничной навигацией
+
     private boolean showCommands(Player player, int page) {
         String[][] commands = {
                 {"/menu", "Открыть главное меню"},
@@ -55,12 +55,12 @@ public class HelpCommandHandler {
                 {"/сlanchunks ", "Список чанков клана"}
         };
 
-        // Определяем количество команд на странице
+
         int commandsPerPage = 15;
         int totalCommands = commands.length;
         int totalPages = (int) Math.ceil((double) totalCommands / commandsPerPage);
 
-        // Проверяем корректность номера страницы
+
         if (page > totalPages || page <= 0) {
             player.sendMessage(ChatColor.RED + "Страница не найдена. Введите число от 1 до " + totalPages + ".");
             return false;
@@ -68,49 +68,49 @@ public class HelpCommandHandler {
 
         TextComponent commandsInfo = new TextComponent(ChatColor.GREEN + "**** " + ChatColor.WHITE + "Доступные команды" + ChatColor.GREEN + " ****");
 
-        // Определяем начальный и конечный индекс команд на текущей странице
+
         int startIndex = (page - 1) * commandsPerPage;
         int endIndex = Math.min(startIndex + commandsPerPage, totalCommands);
 
-        // Добавляем команды текущей страницы
+
         for (int i = startIndex; i < endIndex; i++) {
-            // Убираем всё, что в угловых скобках
+
             String cleanCommand = commands[i][0].replaceAll("<.*?>", "");
             addCommand(commandsInfo, commands[i][0], cleanCommand, commands[i][1]);
         }
 
-        // Добавляем навигацию по страницам
+
         TextComponent navigation = new TextComponent("\n");
         TextComponent prevPage = new TextComponent(ChatColor.GREEN + "[<< Пред]");
         TextComponent pageNumber = new TextComponent(ChatColor.RESET + " Страница " + page + "/" + totalPages + " ");
         TextComponent nextPage = new TextComponent(ChatColor.GREEN + "[След >>]");
 
-        // Настройка событий для навигации
+
         if (page > 1) {
             prevPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan help " + (page - 1)));
         } else {
-            prevPage.setColor(net.md_5.bungee.api.ChatColor.GRAY); // Если страница первая, стрелка неактивна
+            prevPage.setColor(net.md_5.bungee.api.ChatColor.GRAY);
         }
 
         if (page < totalPages) {
             nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan help " + (page + 1)));
         } else {
-            nextPage.setColor(net.md_5.bungee.api.ChatColor.GRAY); // Если последняя страница, стрелка неактивна
+            nextPage.setColor(net.md_5.bungee.api.ChatColor.GRAY);
         }
 
         navigation.addExtra(prevPage);
         navigation.addExtra(pageNumber);
         navigation.addExtra(nextPage);
 
-        // Отправляем сообщение игроку
+
         player.spigot().sendMessage(new ComponentBuilder(commandsInfo).append(navigation).create());
         return true;
     }
 
-    // Метод добавления команды с описанием
+
     void addCommand(TextComponent parent, String commandText, String cleanCommand, String description) {
         TextComponent cmdComponent = new TextComponent("\n" + ChatColor.YELLOW + commandText);
-        cmdComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cleanCommand)); // Убираем всё, что в <>
+        cmdComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cleanCommand));
         TextComponent descComponent = new TextComponent(ChatColor.WHITE + " - " + description);
         parent.addExtra(cmdComponent);
         parent.addExtra(descComponent);

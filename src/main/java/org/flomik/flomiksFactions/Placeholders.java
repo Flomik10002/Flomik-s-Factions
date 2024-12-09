@@ -57,7 +57,7 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public String getIdentifier() {
-        return "flomiksfactions"; // Уникальный идентификатор для твоих плейсхолдеров
+        return "flomiksfactions";
     }
 
     @Override
@@ -80,13 +80,11 @@ public class Placeholders extends PlaceholderExpansion {
             return "Ошибка: ClanManager не инициализирован";
         }
 
-        // Плейсхолдер для клана игрока
         if (identifier.equals("clan_name")) {
             Clan clan = clanManager.getPlayerClan(player.getName());
             return clan != null ? clan.getName() : "Нет клана";
         }
 
-        // Плейсхолдер для роли игрока
         if (identifier.equals("clan_role")) {
             Clan clan = clanManager.getPlayerClan(player.getName());
             return (clan != null) ? clan.getRole(player.getName()) : "Нет";
@@ -116,36 +114,36 @@ public class Placeholders extends PlaceholderExpansion {
             return String.valueOf(onlineClanMembers);
         }
 
-        // Плейсхолдер для уровня игрока
+
         if (identifier.equals("player_level")) {
             int level = playerDataHandler.getPlayerLevel(player.getName());
             return String.valueOf(level);
         }
 
-        // Плейсхолдер для убийств
+
         if (identifier.equals("kills")) {
             int kills = playerDataHandler.getKills(player);
             return String.valueOf(kills);
         }
 
-        // Плейсхолдер для смертей
+
         if (identifier.equals("deaths")) {
             int deaths = playerDataHandler.getDeaths(player);
             return String.valueOf(deaths);
         }
 
-        // Плейсхолдер для баланса через Vault
+
         if (identifier.equals("balance")) {
             double balance = getBalance(player);
             return String.format("%,.2f", balance);
         }
 
-        // Плейсхолдер для дублонов
+
         if (identifier.equals("doubloons")) {
             int doubloons = playerDataHandler.getDoubloons(player.getName());
             return String.valueOf(doubloons);
         }
 
-        return null; // Если плейсхолдер не найден
+        return null;
     }
 }

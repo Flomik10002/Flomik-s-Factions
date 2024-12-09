@@ -16,17 +16,14 @@ public class ChunkMenuCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Проверяем, является ли отправитель команды игроком
+
         if (!(sender instanceof Player)) {
             sender.sendMessage("Эту команду может использовать только игрок.");
             return true;
         }
 
         Player player = (Player) sender;
-
-        // Открываем меню для игрока
         menuManager.openChunkMenu(player);
-
         return true;
     }
 }

@@ -28,14 +28,11 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         String playerName = event.getPlayer().getName();
 
-        // Проверяем, есть ли дата первого захода у игрока
         if (!playerDataHandler.hasFirstJoinDate(playerName)) {
-            // Если нет, сохраняем текущую дату
             LocalDate currentDate = LocalDate.now();
             playerDataHandler.setFirstJoinDate(playerName, currentDate);
         }
 
-        // Обновляем статистику игрока при входе
         updatePlayerStatistics(event.getPlayer().getName());
     }
 
@@ -45,13 +42,9 @@ public class PlayerJoinListener implements Listener {
         updatePlayerStatistics(playerName);
     }
 
-    // Метод для обновления статистики игрока
     private void updatePlayerStatistics(String playerName) {
-        // Получаем время игры в тиках и сохраняем его
         int ticksPlayed = Bukkit.getPlayer(playerName).getStatistic(Statistic.PLAY_ONE_MINUTE);
         playerDataHandler.setPlayTime(playerName, ticksPlayed);
-
-        // Обновляем данные об уровне, силе и максимальной силе
         int level = playerDataHandler.getPlayerLevel(playerName);
         int strength = playerDataHandler.getPlayerStrength(playerName);
         int maxStrength = playerDataHandler.getPlayerMaxStrength(playerName);
@@ -59,7 +52,6 @@ public class PlayerJoinListener implements Listener {
         clanManager.updateStrengthForPlayer(playerName, playerDataHandler);
     }
 
-    // Метод для запуска периодического обновления статистики всех игроков
     public void startPeriodicStatsUpdate(FlomiksFactions plugin) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {

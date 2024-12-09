@@ -40,19 +40,19 @@ public class DisbandCommandHandler  {
         }
 
         if (pendingDisbands.containsKey(player.getName())) {
-            // Удаляем клан
+
             for (Clan otherClan : clanManager.getAllClans()) {
                 if (otherClan.getAlliances().contains(clan.getName())) {
-                    otherClan.removeAlliance(clan); // Удаляем альянс
-                    clanManager.updateClan(otherClan); // Обновляем данные о клане
+                    otherClan.removeAlliance(clan);
+                    clanManager.updateClan(otherClan);
                 }
             }
-            pendingDisbands.remove(player.getName()); // Сначала удаляем игрока из карты ожидания
+            pendingDisbands.remove(player.getName());
             clanManager.disbandClan(clan.getName().toLowerCase());
 
             Bukkit.broadcastMessage(ChatColor.GREEN + "Клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " был успешно распущен.");
 
-            // Удаляем регионы WorldGuard, если это необходимо
+
             com.sk89q.worldedit.entity.Player wgPlayer = BukkitAdapter.adapt(player);
             if (wgPlayer == null) {
                 player.sendMessage(ChatColor.RED + "Ошибка при взаимодействии с WorldGuard.");
@@ -74,11 +74,11 @@ public class DisbandCommandHandler  {
                 }
             }
         } else {
-            // Запрашиваем подтверждение
+
             pendingDisbands.put(player.getName(), System.currentTimeMillis());
             player.sendMessage(ChatColor.YELLOW + "Вы действительно хотите распустить клан? Повторите команду в течении 15 секунд для подтверждения.");
 
-            // Таймер на 15 секунд
+
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -87,7 +87,7 @@ public class DisbandCommandHandler  {
                         pendingDisbands.remove(player.getName());
                     }
                 }
-            }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 300L); // 300L = 15 секунд
+            }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 300L);
         }
         return true;
     }

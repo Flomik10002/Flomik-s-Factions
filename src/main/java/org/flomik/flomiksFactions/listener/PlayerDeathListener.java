@@ -16,14 +16,8 @@ public class PlayerDeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         String playerName = event.getEntity().getName();
-
-        // Получаем текущую силу игрока
         int currentStrength = playerDataHandler.getPlayerStrength(playerName);
-
-        // Уменьшаем силу на 4
-        int newStrength = Math.max(currentStrength - 4, -5); // Убедитесь, что сила не становится < -5
-
-        // Сохраняем обновленную силу
+        int newStrength = Math.max(currentStrength - 4, -5);
         playerDataHandler.savePlayerAttributes(playerName, playerDataHandler.getPlayerLevel(playerName), newStrength, playerDataHandler.getPlayerMaxStrength(playerName));
     }
 }

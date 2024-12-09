@@ -39,7 +39,7 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
             String subCommand = args[0].toLowerCase();
             switch (subCommand) {
                 case "info":
-                    String arg = args.length > 1 ? args[1] : ""; // Получаем аргумент команды, если он есть
+                    String arg = args.length > 1 ? args[1] : "";
                     String playerName = "";
                     Clan curClan = null;
                     String firstJoinDate = null;
@@ -62,17 +62,14 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                         }
                     }
 
-                    // Конвертируем тики в секунды
                     int secondsPlayed = ticksPlayed / 20;
 
-                    // Конвертируем секунды в дни, часы и минуты (убираем секунды)
-                    int days = secondsPlayed / 86400; // Количество секунд в дне
+                    int days = secondsPlayed / 86400;
                     int hours = (secondsPlayed % 86400) / 3600;
                     int minutes = (secondsPlayed % 3600) / 60;
 
-                    // Формируем сообщение
                     String playTimeMessage = String.format(
-                            "%dд, %dч, %dм.", // Убрали отображение секунд
+                            "%dд, %dч, %dм.",
                             days, hours, minutes
                     );
 
@@ -82,22 +79,13 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
                     info.append(ChatColor.GOLD).append("Онлайн: ").append(ChatColor.YELLOW).append(playTimeMessage).append("\n");
                     info.append(ChatColor.GOLD).append("Сила/Макс. Сила: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerStrength(playerName)).append("/").append(playerDataHandler.getPlayerMaxStrength(playerName)).append("\n");
                     info.append(ChatColor.GOLD).append("Уровень: ").append(ChatColor.YELLOW).append(playerDataHandler.getPlayerLevel(playerName)).append("\n");
-//                    if (curClan != null) {
-//                        info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(playerName)).append(ChatColor.GOLD).append(" в ").append(ChatColor.GRAY).append("[").append(ChatColor.YELLOW).append("-").append(ChatColor.GRAY).append("] ").append(ChatColor.YELLOW).append(curClan.getName()).append(ChatColor.GOLD).append(" (").append(ChatColor.GREEN).append(getOnlineMembersCount(curClan)).append(ChatColor.GRAY).append("/").append(ChatColor.YELLOW).append(curClan.getMembers().size()).append(ChatColor.GOLD).append(")\n");
-//                    } else {
-//                        info.append(ChatColor.GOLD).append("Не состоит в клане.");
-//                    }
-//
-//                    player.sendMessage(info.toString());
 
                     if (curClan != null) {
-                        // Создаем кликабельный текст для клана
                         TextComponent clanInfoComponent = new TextComponent();
                         clanInfoComponent.setText(ChatColor.GRAY + "[" + ChatColor.YELLOW + "-" + ChatColor.GRAY + "] " + ChatColor.YELLOW + curClan.getName());
                         clanInfoComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan info " + curClan.getName()));
                         clanInfoComponent.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new Text("Нажмите, чтобы узнать больше о клане")));
 
-                        // Добавляем информацию о клане
                         info.append(ChatColor.GOLD).append("Клан: ").append(ChatColor.YELLOW).append(curClan.getRole(playerName)).append(ChatColor.GOLD).append(" в ");
                         player.spigot().sendMessage(new ComponentBuilder(info.toString()).append(clanInfoComponent).append(ChatColor.GOLD + " (" + ChatColor.GREEN + getOnlineMembersCount(curClan) + ChatColor.GRAY + "/" + ChatColor.YELLOW + curClan.getMembers().size() + ChatColor.GOLD + ")").create());
                     } else {
@@ -120,7 +108,6 @@ public class PlayerCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    // Метод для подсчета количества онлайн участников
     private int getOnlineMembersCount(Clan clan) {
         int onlineCount = 0;
         for (String member : clan.getMembers()) {

@@ -32,31 +32,33 @@ public class DonationCommand implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Эту команду могут использовать только игроки.");
-            return false;
+        Player player = null;
+        if ((sender instanceof Player)) {
+            player = (Player) sender;
         }
-
-        Player player = (Player) sender;
 
         switch (args[0].toLowerCase()) {
             case "balance":
-                // Проверка баланса дублонов
                 int balance = playerDataHandler.getDoubloons(player.getName());
                 player.sendMessage(ChatColor.GREEN + "Ваш баланс дублонов: " + ChatColor.GOLD + balance);
                 break;
 
             case "add":
-                if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Использование: /donate add <количество>");
+                if (args.length < 3) {
+                    return false;
+                }
+                String playerName = args[1];
+                System.out.println(args[0] + args[1] + args[2]);
+                Player donatePlayer = Bukkit.getPlayer(playerName);
+
+                if (donatePlayer == null) {
                     return false;
                 }
                 try {
-                    int amount = Integer.parseInt(args[1]);
-                    donationManager.addDoubloons(player, amount);
-                    player.sendMessage(ChatColor.GREEN + "Вам добавлено " + amount + " дублонов.");
+                    int amount = Integer.parseInt(args[2]);
+                    donationManager.addDoubloons(donatePlayer, amount);
+                    donatePlayer.sendMessage(ChatColor.GREEN + "Вам добавлено " + ChatColor.GOLD + amount + " \uD83E\uDE99");
                 } catch (NumberFormatException e) {
-                    player.sendMessage(ChatColor.RED + "Введите корректное количество дублонов.");
                 }
                 break;
 
@@ -73,42 +75,30 @@ public class DonationCommand implements CommandExecutor, Listener {
     }
 
     private void openParticlePurchaseMenu(Player player) {
-        // Создаем меню с 18 слотами
+
         Inventory particleMenu = Bukkit.createInventory(null, 18, ChatColor.GOLD + "§6Купить цвет частиц");
-
-        // Получаем список всех доступных цветов
         Map<String, Color> availableColors = donationManager.getAvailableColors();
-
-        // Разделяем на купленные и некупленные цвета
         Set<String> purchasedColors = playerDataHandler.getPurchasedColors(player.getName());
-
-        // Сортируем купленные по алфавиту
         List<String> purchasedSorted = purchasedColors.stream().sorted().toList();
-
-        // Сортируем некупленные по алфавиту
         List<String> notPurchasedSorted = availableColors.keySet().stream()
                 .filter(color -> !purchasedColors.contains(color))
                 .sorted().toList();
 
-        // Добавляем в меню купленные цвета (стеклянные панели)
         int slot = 0;
 
-        // Добавляем в меню некупленные цвета (бетонные блоки)
         for (String colorName : notPurchasedSorted) {
-            ItemStack item = createConcreteBlock(colorName); // Некупленный цвет - бетонный блок
+            ItemStack item = createConcreteBlock(colorName);
             particleMenu.setItem(slot++, item);
         }
 
         for (String colorName : purchasedSorted) {
-            ItemStack item = createGlass(colorName); // Купленный цвет - стеклянная панель
+            ItemStack item = createGlass(colorName);
             particleMenu.setItem(slot++, item);
         }
 
-        // Открываем меню для игрока
         player.openInventory(particleMenu);
     }
 
-    // Метод для создания стеклянной панели для купленного цвета
     private ItemStack createGlass(String colorName) {
         Material glassPaneMaterial = Material.valueOf(colorName.toUpperCase() + "_STAINED_GLASS");
         ItemStack glassPane = new ItemStack(glassPaneMaterial);
@@ -121,7 +111,7 @@ public class DonationCommand implements CommandExecutor, Listener {
         return glassPane;
     }
 
-    // Метод для создания бетонного блока для некупленного цвета
+
     private ItemStack createConcreteBlock(String colorName) {
         Material concreteMaterial = Material.valueOf(colorName.toUpperCase() + "_CONCRETE");
         ItemStack concreteBlock = new ItemStack(concreteMaterial);
@@ -141,23 +131,22 @@ public class DonationCommand implements CommandExecutor, Listener {
         Player player = (Player) event.getWhoClicked();
         Inventory inventory = event.getClickedInventory();
 
-        // Проверяем, что это наше меню
+
         if (inventory == null || !event.getView().getTitle().equals(ChatColor.GOLD + "§6Купить цвет частиц")) {
             return;
         }
 
-        event.setCancelled(true); // Запрещаем забирать предметы из инвентаря
+        event.setCancelled(true);
 
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || !clickedItem.hasItemMeta()) return;
 
         String colorName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()).replace("Куплен: ", "").replace("Не куплен: ", "").toLowerCase();
 
-        // Проверяем, куплен ли цвет
         if (playerDataHandler.getPurchasedColors(player.getName()).contains(colorName)) {
             player.sendMessage(ChatColor.RED + "Этот цвет уже куплен.");
         } else {
-            // Попытка покупки
+
             if (donationManager.purchaseEffect(player, 200, colorName)) {
                 player.sendMessage(ChatColor.GREEN + "Вы успешно купили цвет " + colorName + "!");
                 player.closeInventory();

@@ -40,14 +40,12 @@ public class OnPlayerMoveListener implements Listener {
             }
         }
 
-        // Если игрок покидает территорию клана
         if (!isInClanTerritory) {
             if (playerInClanTerritory.getOrDefault(player, false)) {
                 clearActionBar(player);
             }
         }
 
-        // Обновляем состояние игрока
         playerInClanTerritory.put(player, isInClanTerritory);
     }
 

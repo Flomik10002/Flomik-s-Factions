@@ -50,12 +50,12 @@ public class ParticleCommand implements CommandExecutor, Listener {
 
         switch (args[0].toLowerCase()) {
             case "enable":
-                // Открытие меню для выбора частиц
+
                 openParticleSelectionMenu(player);
                 return true;
 
             case "disable":
-                // Отключение частиц
+
                 if (particleEffectHandler.areParticlesEnabled(player)) {
                     particleEffectHandler.disableParticlesForPlayer(player);
                     player.sendMessage(ChatColor.YELLOW + "Частицы отключены.");
@@ -73,41 +73,41 @@ public class ParticleCommand implements CommandExecutor, Listener {
     }
 
     private void openParticleSelectionMenu(Player player) {
-        // Создаем меню с 18 слотами
+
         Inventory particleMenu = Bukkit.createInventory(null, 18, ChatColor.GOLD + "§6Выберите цвет частиц");
 
-        // Получаем список всех доступных цветов
+
         Map<String, Color> availableColors = donationManager.getAvailableColors();
 
-        // Разделяем на купленные и некупленные цвета
+
         Set<String> purchasedColors = playerDataHandler.getPurchasedColors(player.getName());
 
-        // Сортируем купленные по алфавиту
+
         List<String> purchasedSorted = purchasedColors.stream().sorted().toList();
 
-        // Сортируем некупленные по алфавиту
+
         List<String> notPurchasedSorted = availableColors.keySet().stream()
                 .filter(color -> !purchasedColors.contains(color))
                 .sorted().toList();
 
-        // Добавляем в меню купленные цвета (бетонные блоки)
+
         int slot = 0;
         for (String colorName : purchasedSorted) {
-            ItemStack item = createConcreteBlock(colorName); // true - цвет куплен
+            ItemStack item = createConcreteBlock(colorName);
             particleMenu.setItem(slot++, item);
         }
 
-        // Добавляем в меню некупленные цвета (стеклянные панели)
+
         for (String colorName : notPurchasedSorted) {
-            ItemStack item = createGlass(colorName); // false - цвет не куплен
+            ItemStack item = createGlass(colorName);
             particleMenu.setItem(slot++, item);
         }
 
-        // Открываем меню для игрока
+
         player.openInventory(particleMenu);
     }
 
-    // Метод для создания блока бетона для купленного цвета
+
     private ItemStack createConcreteBlock(String colorName) {
         Material concreteMaterial = Material.valueOf(colorName.toUpperCase() + "_CONCRETE");
         ItemStack concreteBlock = new ItemStack(concreteMaterial);
@@ -120,7 +120,7 @@ public class ParticleCommand implements CommandExecutor, Listener {
         return concreteBlock;
     }
 
-    // Метод для создания стеклянной панели для некупленного цвета
+
     private ItemStack createGlass(String colorName) {
         Material glassPaneMaterial = Material.valueOf(colorName.toUpperCase() + "_STAINED_GLASS");
         ItemStack glassPane = new ItemStack(glassPaneMaterial);
@@ -140,19 +140,19 @@ public class ParticleCommand implements CommandExecutor, Listener {
         Player player = (Player) event.getWhoClicked();
         Inventory inventory = event.getClickedInventory();
 
-        // Проверяем, что это наше меню
+
         if (inventory == null || !event.getView().getTitle().equals(ChatColor.GOLD + "§6Выберите цвет частиц")) {
             return;
         }
 
-        event.setCancelled(true); // Запрещаем забирать предметы из инвентаря
+        event.setCancelled(true);
 
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || !clickedItem.hasItemMeta()) return;
 
         String colorName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()).replace("Куплен: ", "").replace("Не куплен: ", "").toLowerCase();
 
-        // Проверяем, куплен ли цвет
+
         if (playerDataHandler.getPurchasedColors(player.getName()).contains(colorName)) {
             particleEffectHandler.disableParticlesForPlayer(player);
             particleEffectHandler.enableParticlesForPlayer(player, donationManager.getAvailableColors().get(colorName));

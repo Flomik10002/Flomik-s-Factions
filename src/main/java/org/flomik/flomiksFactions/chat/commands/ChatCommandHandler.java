@@ -27,7 +27,7 @@ public class ChatCommandHandler implements CommandExecutor {
         String playerName = player.getName();
         Clan playerClan = null;
 
-        // Поиск клана, к которому принадлежит игрок
+
         for (Clan clan : clanManager.getClans().values()) {
             if (clan.getMembers().contains(playerName)) {
                 playerClan = clan;
@@ -47,7 +47,7 @@ public class ChatCommandHandler implements CommandExecutor {
 
         String message = String.join(" ", args);
 
-        // Отправка сообщения всем членам клана
+
         for (String member : playerClan.getMembers()) {
             Player clanMember = Bukkit.getPlayer(member);
             if (clanMember != null && clanMember.isOnline()) {

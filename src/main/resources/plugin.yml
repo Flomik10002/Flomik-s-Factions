@@ -23,26 +23,29 @@ commands:
     description: Карта чанков
   setSt:
     description: Установить силу
-    permission: clan.op
+    permission: op
   clanchunks:
     description: Управление клановыми территориями
   shrine:
     description: Управление святилищами
-    permission: clan.op
+    permission: op
   donate:
     description: Команды для доната
-    permission: clan.op
+    permission: op
   particles:
     description: Управление партиклами
   clansettingsaccess:
     description: Управление кланом
-
   menu:
     description: Меню
   clanmenu:
     description: Меню
   donatemenu:
     description: Команды для доната
+  openinventory:
+    description: Команды для доната
+  event:
+    description: Менеджер рандомных ивентов
 
 permissions:
   clan.op:

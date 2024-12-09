@@ -27,23 +27,23 @@ public class SetHomeCommandHandler {
             return false;
         }
 
-        // Проверка роли игрока
+
         String playerRole = clan.getRole(player.getName());
         if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
             player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель может установить точку дома.");
             return false;
         }
 
-        // Получение местоположения игрока
+
         Location playerLocation = player.getLocation();
 
-        // Проверка привата через WorldGuard
+
         if (!isInPlayerRegion(player, playerLocation)) {
             player.sendMessage(ChatColor.RED + "Вы не находитесь в своем привате или не являетесь владельцем.");
             return false;
         }
 
-        // Установка дома клана
+
         clan.setHome(playerLocation);
         clanManager.saveClan(clan);
         player.sendMessage(ChatColor.GREEN + "Точка дома клана установлена.");
@@ -56,16 +56,16 @@ public class SetHomeCommandHandler {
         RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
 
         if (regions == null) {
-            return false; // Если нет регионов на этом мире
+            return false;
         }
 
         ApplicableRegionSet regionSet = regions.getApplicableRegions(BukkitAdapter.asBlockVector(location));
         for (ProtectedRegion region : regionSet) {
             if (region.isOwner(WorldGuardPlugin.inst().wrapPlayer(player)) || region.isMember(WorldGuardPlugin.inst().wrapPlayer(player))) {
-                return true; // Если игрок владелец или участник привата
+                return true;
             }
         }
 
-        return false; // Игрок не владелец и не участник
+        return false;
     }
 }

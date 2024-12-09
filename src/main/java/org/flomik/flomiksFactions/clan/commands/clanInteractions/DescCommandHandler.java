@@ -35,7 +35,7 @@ public class DescCommandHandler {
                 return true;
             }
 
-            // Проверка, что игрок является владельцем клана
+
             String playerRole = playerClan.getRole(player.getName());
             if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) {
                 player.sendMessage(ChatColor.RED + "Только Лидер и Заместитель клана могут переименовать клан.");
@@ -47,11 +47,11 @@ public class DescCommandHandler {
                 return true;
             }
 
-            // Переименовываем клан
+
             playerClan.setDescription(newDescription);
             clanManager.updateClan(playerClan);
 
-            // Опционально, можно уведомить всех членов клана о смене имени
+
             clanManager.sendClanMessage(playerClan, ChatColor.GREEN + "Описание клана успешно обновлено!");
 
             if (wasTruncated) {

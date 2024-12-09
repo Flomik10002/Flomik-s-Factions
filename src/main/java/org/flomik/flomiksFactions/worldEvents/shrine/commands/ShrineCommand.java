@@ -50,12 +50,12 @@ public class ShrineCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
                     Player playerAdd = (Player) sender;
-                    shrineEvent.addShrineLocation(playerAdd); // Добавляем новую точку
+                    shrineEvent.addShrineLocation(playerAdd);
                     playerAdd.sendMessage("Новая точка святилища была добавлена.");
                     break;
 
                 case "deleteall":
-                    shrineEvent.deleteAllSanctuaries(); // Завершаем все точки
+                    shrineEvent.deleteAllSanctuaries();
                     sender.sendMessage("Все активные святилища были завершены.");
                     break;
 
@@ -73,7 +73,7 @@ public class ShrineCommand implements CommandExecutor, TabCompleter {
                     break;
 
                 case "list":
-                    // Проверяем, что отправитель — игрок
+
                     if (!(sender instanceof Player)) {
                         sender.sendMessage("Команду может использовать только игрок.");
                         return true;
@@ -91,7 +91,7 @@ public class ShrineCommand implements CommandExecutor, TabCompleter {
                         }
                     }
                     break;
-    
+
                 default:
                     sender.sendMessage("Неизвестная подкоманда. Используйте: /shrine <start | cancel | add | remove | deleteall | list>");
                     break;
@@ -101,7 +101,7 @@ public class ShrineCommand implements CommandExecutor, TabCompleter {
         return false;
     }
 
-    // Метод для отправки кликабельного сообщения с координатами шрайна
+
     private void sendShrineLocation(Player player, Location location) {
         String coordinates = String.format("%d, %d, %d", location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
