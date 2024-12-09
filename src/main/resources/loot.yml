@@ -1,0 +1,19 @@
+# Плагин разработан студией румайна DemStudios
+# Заказать/купить плагин, сборку, что угодно - vk.com/demstudios
+
+IRON_INGOT:
+  material: IRON_INGOT
+  amount: 5
+  chance: 0.5
+DIAMOND_SWORD:
+  material: DIAMOND_SWORD
+  amount: 1
+  chance: 0.5
+GOLD_INGOT:
+  material: GOLD_INGOT
+  amount: 3
+  chance: 0.5
+GRASS_BLOCK:
+  material: GRASS_BLOCK
+  amount: 1
+  chance: 0.5

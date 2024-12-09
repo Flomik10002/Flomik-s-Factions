@@ -1,8 +1,8 @@
 name: FlomiksFactions
 version: '1.0'
-main: org.flomik.flomiksFactions.FlomiksFactions
+main: org.flomik.FlomiksFactions.FlomiksFactions
 api-version: '1.20'
-prefix: flomiksFactions
+prefix: FlomiksFactions
 authors: [ Flomik ]
 description: Factions plugin for 1.20.1
 website: https://flomik.xyz
@@ -26,26 +26,23 @@ commands:
     permission: op
   clanchunks:
     description: Управление клановыми территориями
-  shrine:
-    description: Управление святилищами
-    permission: op
   donate:
     description: Команды для доната
     permission: op
   particles:
     description: Управление партиклами
-  clansettingsaccess:
-    description: Управление кланом
-  menu:
-    description: Меню
-  clanmenu:
-    description: Меню
   donatemenu:
     description: Команды для доната
-  openinventory:
-    description: Команды для доната
+
+  shrine:
+    description: Управление святилищами
+    permission: op
   event:
     description: Менеджер рандомных ивентов
+    permission: op
+  castle:
+    description: Управление замком
+    permission: op
 
 permissions:
   clan.op:
