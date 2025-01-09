@@ -6,7 +6,6 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.FlomiksFactions;
-import org.flomik.FlomiksFactions.worldEvents.randomEvents.RandomEvent;
 
 import java.util.HashMap;
 import java.util.List;

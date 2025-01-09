@@ -1,14 +1,12 @@
 package org.flomik.FlomiksFactions.player;
 
-import org.bukkit.Color;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.FlomiksFactions;
-import org.flomik.FlomiksFactions.databases.PlayerDataDao;
-import org.flomik.FlomiksFactions.databases.PlayerDatabaseManager;
+import org.flomik.FlomiksFactions.database.PlayerDataDao;
+import org.flomik.FlomiksFactions.database.PlayerDatabaseManager;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 public class PlayerDataHandler {
     private final FlomiksFactions plugin;
@@ -23,26 +21,6 @@ public class PlayerDataHandler {
         playerDatabaseManager.createTables();
 
         this.playerDataDao = new PlayerDataDao(playerDatabaseManager);
-    }
-
-    public Set<String> getPurchasedColors(String playerName) {
-        return playerDataDao.getPurchasedColors(playerName);
-    }
-
-    public void setPlayerEffectColor(String playerName, Color color) {
-        playerDataDao.setPlayerEffectColor(playerName, color);
-    }
-
-    public void addPurchasedColor(String playerName, String colorName) {
-        playerDataDao.addPurchasedColor(playerName, colorName);
-    }
-
-    public Color getPlayerEffectColor(String playerName) {
-        return playerDataDao.getPlayerEffectColor(playerName);
-    }
-
-    public boolean hasPurchasedParticles(String playerName) {
-        return playerDataDao.hasPurchasedParticles(playerName);
     }
 
     public boolean hasFirstJoinDate(String playerName) {

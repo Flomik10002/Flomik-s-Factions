@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.flomik.FlomiksFactions.clan.Clan;
-import org.flomik.FlomiksFactions.clan.ClanManager;
+import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 
 public class ClanPvPListener implements Listener {
 

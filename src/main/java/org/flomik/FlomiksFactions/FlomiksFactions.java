@@ -1,36 +1,35 @@
-
 package org.flomik.FlomiksFactions;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.flomik.FlomiksFactions.databases.ClanDao;
-import org.flomik.FlomiksFactions.databases.ClanDatabaseManager;
-import org.flomik.FlomiksFactions.databases.InvitationDao;
-import org.flomik.FlomiksFactions.databases.PlayerDatabaseManager;
-import org.flomik.FlomiksFactions.donation.DonationManager;
-import org.flomik.FlomiksFactions.donation.effects.ParticleEffectHandler;
+import org.flomik.FlomiksFactions.database.ClanDao;
+import org.flomik.FlomiksFactions.database.ClanDatabaseManager;
+import org.flomik.FlomiksFactions.database.InvitationDao;
+import org.flomik.FlomiksFactions.database.PlayerDatabaseManager;
 import org.flomik.FlomiksFactions.register.CommandRegistrar;
 import org.flomik.FlomiksFactions.register.EventRegistrar;
-import org.flomik.FlomiksFactions.worldEvents.castle.*;
-import org.flomik.FlomiksFactions.worldEvents.randomEvents.EventScheduler;
-import org.flomik.FlomiksFactions.worldEvents.randomEvents.RandomEventManager;
-import org.flomik.FlomiksFactions.clan.ClanManager;
+import org.flomik.FlomiksFactions.utils.Placeholders;
+import org.flomik.FlomiksFactions.worldEvents.castle.config.CastleConfigManager;
+import org.flomik.FlomiksFactions.worldEvents.castle.events.CastleEvent;
+import org.flomik.FlomiksFactions.worldEvents.castle.managers.CastleLootManager;
+import org.flomik.FlomiksFactions.worldEvents.castle.managers.HeadsManager;
+import org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.EventScheduler;
+import org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.RandomEventManager;
+import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 import org.flomik.FlomiksFactions.listener.*;
 import org.flomik.FlomiksFactions.player.PlayerDataHandler;
-import org.flomik.FlomiksFactions.menu.MenuManager;
-import org.flomik.FlomiksFactions.worldEvents.shrine.ShrineEvent;
-import org.flomik.FlomiksFactions.worldGuard.TNTManager;
+import org.flomik.FlomiksFactions.clan.managers.ChunkMenuManager;
+import org.flomik.FlomiksFactions.worldEvents.shrine.config.ShrineConfigManager;
+import org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent;
+import org.flomik.FlomiksFactions.clan.managers.TNTManager;
 
 public final class FlomiksFactions extends JavaPlugin {
-
     private ClanManager clanManager;
-    private MenuManager menuManager;
+    private ChunkMenuManager chunkMenuManager;
     private PlayerDataHandler playerDataHandler;
     private ShrineEvent shrineEvent;
     private CastleEvent castleEvent;
-    private DonationManager donationManager;
-    private ParticleEffectHandler particleEffectHandler;
     private RandomEventManager eventManager;
     private Economy economy;
     private EventScheduler eventScheduler;
@@ -40,6 +39,7 @@ public final class FlomiksFactions extends JavaPlugin {
     private PlayerDatabaseManager playerDatabaseManager;
     private CastleLootManager lootManager;
     private HeadsManager headsManager;
+    private ShrineConfigManager shrineConfigManager;
 
     @Override
     public void onEnable() {
@@ -84,6 +84,11 @@ public final class FlomiksFactions extends JavaPlugin {
         CastleConfigManager.loadConfig();
         CastleConfigManager.get().options().copyDefaults(true);
         CastleConfigManager.save();
+
+        ShrineConfigManager.setup(this);
+        ShrineConfigManager.loadConfig();
+        ShrineConfigManager.get().options().copyDefaults(true);
+        ShrineConfigManager.save();
     }
 
     private void setupDatabase() {
@@ -117,15 +122,13 @@ public final class FlomiksFactions extends JavaPlugin {
         this.playerDataHandler = new PlayerDataHandler(this);
         this.eventManager = new RandomEventManager(this);
         this.eventScheduler = new EventScheduler(this, eventManager);
-        this.donationManager = new DonationManager(this, playerDataHandler);
-        this.menuManager = new MenuManager(this, clanManager);
-        this.shrineEvent = new ShrineEvent(this);
+        this.chunkMenuManager = new ChunkMenuManager(this, clanManager);
+        this.shrineEvent = new ShrineEvent(this, shrineConfigManager);
         this.castleEvent = new CastleEvent(this, headsManager);
-        this.particleEffectHandler = new ParticleEffectHandler(this);
     }
 
     private void startSchedulers() {
-        new StrengthTickTask(playerDataHandler).addStrength(this);
+        new StrengthTickListener(playerDataHandler).addStrength(this);
         new ClanPvPListener(this, clanManager);
         new Placeholders(this, playerDataHandler, clanManager).register();
 
@@ -161,8 +164,8 @@ public final class FlomiksFactions extends JavaPlugin {
         return clanManager;
     }
 
-    public MenuManager getMenuManager() {
-        return menuManager;
+    public ChunkMenuManager getMenuManager() {
+        return chunkMenuManager;
     }
 
     public PlayerDataHandler getPlayerDataHandler() {
@@ -175,14 +178,6 @@ public final class FlomiksFactions extends JavaPlugin {
 
     public CastleLootManager getLootManager() {
         return lootManager;
-    }
-
-    public DonationManager getDonationManager() {
-        return donationManager;
-    }
-
-    public ParticleEffectHandler getParticleEffectHandler() {
-        return particleEffectHandler;
     }
 
     public RandomEventManager getEventManager() {
@@ -203,5 +198,9 @@ public final class FlomiksFactions extends JavaPlugin {
 
     public PlayerDatabaseManager getPlayerDatabaseManager() {
         return playerDatabaseManager;
+    }
+
+    public ShrineConfigManager getShrineConfigManager() {
+        return shrineConfigManager;
     }
 }

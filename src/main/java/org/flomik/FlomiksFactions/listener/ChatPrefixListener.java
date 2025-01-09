@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.flomik.FlomiksFactions.clan.Clan;
-import org.flomik.FlomiksFactions.clan.ClanManager;
+import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 
 public class ChatPrefixListener implements Listener {
     private final ClanManager clanManager;

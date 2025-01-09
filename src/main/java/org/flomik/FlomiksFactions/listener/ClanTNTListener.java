@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.flomik.FlomiksFactions.FlomiksFactions;
 import org.flomik.FlomiksFactions.clan.Clan;
-import org.flomik.FlomiksFactions.clan.ClanManager;
+import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,7 +99,6 @@ public class ClanTNTListener implements Listener {
             if (regions != null) {
                 for (Map.Entry<String, ProtectedRegion> entry : regions.getRegions().entrySet()) {
                     ProtectedRegion region = entry.getValue();
-
 
                     if (region.getId().startsWith("clan_" + clan.getName())) {
                         region.setFlag(Flags.TNT, state);

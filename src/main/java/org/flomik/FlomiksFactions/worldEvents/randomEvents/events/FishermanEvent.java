@@ -9,7 +9,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.flomik.FlomiksFactions.FlomiksFactions;
-import org.flomik.FlomiksFactions.worldEvents.randomEvents.RandomEvent;
 
 import java.util.List;
 

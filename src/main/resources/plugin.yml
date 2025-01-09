@@ -26,13 +26,6 @@ commands:
     permission: op
   clanchunks:
     description: Управление клановыми территориями
-  donate:
-    description: Команды для доната
-    permission: op
-  particles:
-    description: Управление партиклами
-  donatemenu:
-    description: Команды для доната
 
   shrine:
     description: Управление святилищами
