@@ -21,6 +21,7 @@ public class Clan {
     private final List<String> alliances;
     private int level;
     private int clanXp;
+    private double balance;
     private int lands;
     private int strength;
     private final int maxPower;
@@ -29,7 +30,7 @@ public class Clan {
 
     public Clan(String name, String owner, Set<String> members, Map<String, String> memberRoles,
                 Date creationDate, String description, List<String> alliances, int level,
-                int clanXp, int lands, int strength, int maxPower, List<String> claimedChunks) {
+                int clanXp, double balance, int lands, int strength, int maxPower, List<String> claimedChunks) {
         this.name = name;
         this.oldName = null;
         this.owner = owner;
@@ -40,10 +41,39 @@ public class Clan {
         this.alliances = new ArrayList<>(alliances);
         this.level = level;
         this.clanXp = clanXp;
+        this.balance = 0.0;
         this.lands = lands;
         this.strength = strength;
         this.maxPower = maxPower;
         this.claimedChunks = new ArrayList<>(claimedChunks);
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double newBalance) {
+        if (newBalance < 0) {
+            throw new IllegalArgumentException("Баланс не может быть меньше 0!");
+        }
+        this.balance = newBalance;
+    }
+
+    public void deposit(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Сумма должна быть больше 0.");
+        }
+        this.balance += amount;
+    }
+
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Сумма должна быть больше 0.");
+        }
+        if (this.balance < amount) {
+            throw new IllegalArgumentException("Недостаточно средств в казне клана.");
+        }
+        this.balance -= amount;
     }
 
     public int getRequiredXpForNextLevel(int currentLevel) {

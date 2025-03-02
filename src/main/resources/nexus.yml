@@ -1,0 +1,5 @@
+capture-time: 180     # Time in seconds for the final auto-capture countdown
+tnt-radius: 5         # Radius in blocks for TNT to damage the nexus
+max-hp: 5             # Default HP of a newly placed beacon
+bossbar-color: RED    # e.g. color for your capture bar
+zero-hp-check-interval: 100

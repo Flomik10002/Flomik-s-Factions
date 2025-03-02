@@ -11,134 +11,115 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.flomik.FlomiksFactions.clan.Beacon;
 import org.flomik.FlomiksFactions.clan.Clan;
-import org.flomik.FlomiksFactions.clan.managers.BeaconManager;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
-import org.flomik.FlomiksFactions.database.BeaconDao;
 import org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ClaimRegionHandler {
+public class ClaimRegionHandlerSave {
 
     private final ClanManager clanManager;
     private final UnclaimRegionHandler unclaimRegionCommandHandler;
     private final ShrineEvent shrineEvent;
-    private final BeaconDao beaconDao;
-    private final BeaconManager beaconManager;
 
-    public ClaimRegionHandler(ClanManager clanManager, UnclaimRegionHandler unclaimRegionCommandHandler, ShrineEvent shrineEvent,
-                              BeaconDao beaconDao, BeaconManager beaconManager) {
+    public ClaimRegionHandlerSave(ClanManager clanManager, UnclaimRegionHandler unclaimRegionCommandHandler, ShrineEvent shrineEvent) {
         this.clanManager = clanManager;
         this.unclaimRegionCommandHandler = unclaimRegionCommandHandler;
         this.shrineEvent = shrineEvent;
-        this.beaconDao = beaconDao;
-        this.beaconManager = beaconManager;
     }
 
-    public boolean handleCommand(Player sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Эту команду может выполнить только игрок.");
-            return true;
-        }
-
-        if (args.length < 1 || !args[0].equalsIgnoreCase("claim")) {
-            sender.sendMessage(ChatColor.RED + "Использование: /c claim");
-            return true;
-        }
-
-        Player player = (Player) sender;
+    public boolean handleCommand(Player player) {
         Clan clan = clanManager.getPlayerClan(player.getName());
-        if (clan == null) {
-            player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
-            return true;
-        }
-        if (!clan.getRole(player.getName()).equalsIgnoreCase("Лидер")) {
-            player.sendMessage(ChatColor.RED + "Только лидер клана может использовать эту команду.");
+
+        if (clan == null || !isLeaderOrDeputy(player, clan)) {
+            player.sendMessage(ChatColor.RED + "У вас нет прав для выполнения этой команды.");
             return true;
         }
 
-        ItemStack nexusBeacon = new ItemStack(Material.BEACON, 1);
-        ItemMeta meta = nexusBeacon.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(ChatColor.GREEN + "Нексус");
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Приватит чанк клана");
-            lore.add(ChatColor.GRAY + "Имеет 5 'hp' против взрывов");
-            meta.setLore(lore);
-
-            meta.setCustomModelData(12345);
-            nexusBeacon.setItemMeta(meta);
-        }
-
-        player.getInventory().addItem(nexusBeacon);
-        player.sendMessage(ChatColor.GREEN + "Вы получили Маяк-нексус!");
-        return true;
-    }
-
-    public boolean claimChunkWithBeacon(Player player, Block beaconBlock) {
-        Clan clan = clanManager.getPlayerClan(player.getName());
-        if (clan == null) {
-            player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
-            return false;
-        }
-
-        Chunk chunk = beaconBlock.getChunk();
+        Chunk chunk = player.getLocation().getChunk();
         String chunkId = getChunkId(chunk);
 
         if (isShrineChunk(chunk)) {
             player.sendMessage(ChatColor.RED + "Этот чанк является точкой Святилища и не может быть приватизирован.");
-            return false;
+            return true;
         }
 
         if (isChunkClaimed(chunkId, clan)) {
-            player.sendMessage(ChatColor.YELLOW + "Этот чанк уже принадлежит вашему клану.");
-            return false;
+            player.sendMessage(ChatColor.YELLOW + "Этот чанк уже занят вашим кланом.");
+            return true;
         }
 
         if (isNotEnoughStrength(clan)) {
-            player.sendMessage(ChatColor.YELLOW + "У вашего клана недостаточно силы для привата.");
-            return false;
+            player.sendMessage(ChatColor.YELLOW + "У вашего клана недостаточно силы.");
+            return true;
         }
 
         if (isChunkClaimedByAnotherClan(chunkId, clan)) {
             for (Clan oldClan : clanManager.clans.values()) {
                 if (!oldClan.equals(clan) && oldClan.hasClaimedChunk(chunkId)) {
-                    if (oldClan.getLands() > oldClan.getStrength()) {
+                    if (oldClan.getLands() > oldClan.getStrength())
+                    {
                         oldClan.removeClaimedChunk(chunkId);
                         unclaimRegionCommandHandler.removeWorldGuardRegion(chunk, oldClan.getName());
 
-                        addWorldGuardRegion(chunk, clan.getName(), player, beaconBlock);
+                        addWorldGuardRegion(chunk, clan.getName(), player);
                         clan.addClaimedChunk(chunkId);
 
-                        clanManager.sendClanMessage(clan,
-                                ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN
-                                        + " захватил территорию клана " + ChatColor.YELLOW + oldClan.getName() + ChatColor.GREEN + "!");
-                        clanManager.sendClanMessage(oldClan,
-                                ChatColor.RED + "Клан " + ChatColor.GOLD + clan.getName() + ChatColor.RED
-                                        + " захватил один чанк вашей территории!");
+                        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " захватил территорию клана " + ChatColor.YELLOW + oldClan.getName() + ChatColor.GREEN + "!");
+                        clanManager.sendClanMessage(oldClan, ChatColor.RED + "Клан " + ChatColor.GOLD + clan.getName() + ChatColor.RED + " захватил один чанк вашей территории!");
                         return true;
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Этот чанк уже занят кланом " + oldClan.getName() + ".");
-                        return false;
                     }
                 }
             }
-            return false;
         }
 
-        addWorldGuardRegion(chunk, clan.getName(), player, beaconBlock);
+        if (isChunkClaimedByAnotherClan(chunkId, clan)) {
+            player.sendMessage(ChatColor.RED + "Этот чанк уже занят кланом.");
+            return true;
+        }
+
+        addWorldGuardRegion(chunk, clan.getName(), player);
+        clan.addClaimedChunk(chunkId);
+        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " заприватил территорию!");
+
         return true;
     }
 
-    private void addWorldGuardRegion(Chunk chunk, String clanName, Player player, Block beaconBlock) {
-        String chunkId = getChunkId(chunk);
+    private boolean isNotEnoughStrength(Clan clan) {
+        if (clan.getStrength() <= clan.getLands()){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isLeaderOrDeputy(Player player, Clan clan) {
+        String playerRole = clan.getRole(player.getName());
+        return playerRole.equals("Лидер") || playerRole.equals("Заместитель");
+    }
+
+    private String getChunkId(Chunk chunk) {
+        return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
+    }
+
+    private boolean isChunkClaimedByAnotherClan(String chunkId, Clan currentClan) {
+        for (Clan clan : clanManager.clans.values()) {
+            if (!clan.equals(currentClan) && clan.hasClaimedChunk(chunkId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isChunkClaimed(String chunkId, Clan currentClan) {
+        for (Clan clan : clanManager.clans.values()) {
+            if (clan.equals(currentClan) && clan.hasClaimedChunk(chunkId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addWorldGuardRegion(Chunk chunk, String clanName, Player player) {
         Clan clan = clanManager.getPlayerClan(player.getName());
         WorldGuard wg = WorldGuard.getInstance();
         RegionContainer container = wg.getPlatform().getRegionContainer();
@@ -160,32 +141,6 @@ public class ClaimRegionHandler {
             regions.addRegion(region);
             addMembers(clan, region);
         }
-
-        clan.addClaimedChunk(chunkId);
-
-        beaconDao.insertBeacon(clan, beaconBlock.getLocation(), regionId, 5);
-        Beacon beacon = new Beacon(clan.getName(), beaconBlock.getLocation(), 5, regionId);
-        beaconManager.addBeacon(beacon);
-    }
-
-    private String getChunkId(Chunk chunk) {
-        return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
-    }
-
-    private boolean isNotEnoughStrength(Clan clan) {
-        if (clan.getStrength() <= clan.getLands()){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isChunkClaimed(String chunkId, Clan currentClan) {
-        for (Clan clan : clanManager.clans.values()) {
-            if (clan.equals(currentClan) && clan.hasClaimedChunk(chunkId)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void addMembers(Clan clan, ProtectedRegion region) {
@@ -222,16 +177,6 @@ public class ClaimRegionHandler {
         }
     }
 
-    private boolean isChunkClaimedByAnotherClan(String chunkId, Clan currentClan) {
-        for (Clan clan : clanManager.clans.values()) {
-            if (!clan.equals(currentClan) && clan.hasClaimedChunk(chunkId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Пример проверки, является ли чанк точкой святилища.
     private boolean isShrineChunk(Chunk chunk) {
         World world = chunk.getWorld();
         WorldGuard wg = WorldGuard.getInstance();

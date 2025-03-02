@@ -92,13 +92,13 @@ public class ChunkMenuManager {
         double angle = Math.toDegrees(Math.atan2(direction.getX(), direction.getZ()));
 
         if (angle >= -45 && angle <= 45) {
-            return "SOUTH";
+            return "NORTH";
         } else if (angle >= 45 && angle <= 135) {
             return "WEST";
         } else if (angle >= -135 && angle <= -45) {
             return "EAST";
         } else {
-            return "NORTH";
+            return "SOUTH";
         }
     }
 
@@ -129,10 +129,12 @@ public class ChunkMenuManager {
     }
 
     private int getSlotForChunk(int rowOffset, int colOffset) {
-        int rowIndex = 2 + rowOffset;
+        // Вместо 2 + rowOffset → 2 - rowOffset
+        int rowIndex = 2 - rowOffset;
         int colIndex = 4 + colOffset;
         return rowIndex * 9 + colIndex;
     }
+
 
     private static String getChunkOwner(Chunk chunk, ClanManager clanManager) {
         String chunkId = getChunkId(chunk);

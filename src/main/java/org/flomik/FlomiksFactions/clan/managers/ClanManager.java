@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.FlomiksFactions;
 import org.flomik.FlomiksFactions.clan.Clan;
@@ -113,13 +114,14 @@ public class ClanManager {
         int land = 0;
         int strength = 0;
         int maxPower = 10;
+        double balance = 0;
         Set<String> members = new HashSet<>();
         Map<String, String> memberRoles = new HashMap<>();
         List<String> claimedChunks = new ArrayList<>();
         members.add(owner);
         memberRoles.put(owner, "Лидер");
 
-        Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, clanXp, land, strength, maxPower, claimedChunks);
+        Clan clan = new Clan(name, owner, members, memberRoles, creationDate, description, alliances, level, clanXp, balance, land, strength, maxPower, claimedChunks);
         clans.put(name.toLowerCase(), clan);
         clanDao.insertClan(clan);
     }
@@ -135,6 +137,84 @@ public class ClanManager {
             }
         }
         return null;
+    }
+
+    public Clan getClanByChunk(Chunk chunk) {
+        String chunkKey = chunk.getWorld().getName() + ":" + chunk.getX() + ":" + chunk.getZ();
+
+        for (Clan c : clans.values()) {
+            if (c.getRegionNames().contains(chunkKey)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public boolean isEnemyTerritory(Player player, Block block) {
+        Clan blockClan = getClanByChunk(block.getChunk());
+        if (blockClan == null) {
+            return false;
+        }
+
+        Clan playerClan = getPlayerClan(player.getName());
+        if (playerClan == null) {
+            return true;
+        }
+
+        if (playerClan.equals(blockClan)) {
+            return false;
+        }
+
+        boolean isAllied = (playerClan.getAlliances() != null && playerClan.getAlliances().contains(blockClan.getName())) ||
+                (blockClan.getAlliances() != null && blockClan.getAlliances().contains(playerClan.getName()));
+
+        return !isAllied;
+    }
+
+    public boolean isEnemyPlayers(Player p1, Player p2) {
+        Clan c1 = getPlayerClan(p1.getName());
+        Clan c2 = getPlayerClan(p2.getName());
+
+        if (c1 == null && c2 == null) {
+            return false;
+        }
+
+        if (c1 == null || c2 == null) {
+            return true;
+        }
+
+        if (c1.equals(c2)) {
+            return false;
+        }
+
+        if (c1.getAlliances().contains(c2.getName())
+                || c2.getAlliances().contains(c1.getName())) {
+            return false;
+        }
+
+    /*
+      5) (Дополнительно, если нужно искать «глубинные» союзы)
+         Проверяем, нет ли у c1 в списке allied-кланов,
+         в которых состоит p2. Т. е. c1 дружит с некоторым allyClan,
+         а allyClan == c2 или в allyClan есть p2.
+
+         Примерно так (если хотите расширенную логику):
+    */
+        // for (String allyName : c1.getAlliances()) {
+        //     Clan allyClan = getClan(allyName);
+        //     if (allyClan != null) {
+        //         // Если allyClan == c2 => уже covered выше, но можно повторить
+        //         // Или если allyClan.getMembers().contains(p2.getName()) => значит p2 состоит в союзном клане
+        //         if (allyClan.getMembers().contains(p2.getName())) {
+        //             return false;
+        //         }
+        //     }
+        // }
+        //
+        // Аналогично для c2: проверить все его союзные кланы, не содержит ли там p1.
+
+        // Если ни одна проверка не говорит «друзья» — значит враги
+        return true;
     }
 
     public void sendClanMessage(Clan clan, String message) {

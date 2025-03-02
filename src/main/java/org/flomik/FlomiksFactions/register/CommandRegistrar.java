@@ -14,7 +14,7 @@ import org.flomik.FlomiksFactions.commands.ShrineCommand;
 public class CommandRegistrar {
     public static void registerCommands(FlomiksFactions plugin) {
         plugin.getCommand("player").setExecutor(new PlayerCommand(plugin.getPlayerDataHandler(), plugin.getClanManager()));
-        plugin.getCommand("clan").setExecutor(new ClanCommand(plugin.getClanManager(), plugin.getPlayerDataHandler(), plugin, plugin.getMenuManager(), plugin.getShrineEvent()));
+        plugin.getCommand("clan").setExecutor(new ClanCommand(plugin.getClanManager(), plugin.getPlayerDataHandler(), plugin, plugin.getMenuManager(), plugin.getShrineEvent(), plugin.getBeaconDao(), plugin.getBeaconManager()));
         plugin.getCommand("clanchat").setExecutor(new ChatHandler(plugin.getClanManager()));
         plugin.getCommand("chunkmap").setExecutor(new ChunkMenuCommand(plugin.getMenuManager()));
         plugin.getCommand("setSt").setExecutor(new SetStrengthCommand(plugin.getPlayerDataHandler()));

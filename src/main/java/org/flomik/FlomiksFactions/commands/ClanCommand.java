@@ -11,6 +11,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.FlomiksFactions;
 import org.flomik.FlomiksFactions.clan.Clan;
+import org.flomik.FlomiksFactions.clan.managers.BeaconManager;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 import org.flomik.FlomiksFactions.commands.handlers.playerInteractions.HelpHandler;
 import org.flomik.FlomiksFactions.commands.handlers.playerInteractions.InfoHandler;
@@ -21,6 +22,7 @@ import org.flomik.FlomiksFactions.commands.handlers.home.DelHomeHandler;
 import org.flomik.FlomiksFactions.commands.handlers.home.HomeHandler;
 import org.flomik.FlomiksFactions.commands.handlers.home.SetHomeHandler;
 import org.flomik.FlomiksFactions.commands.handlers.playerInteractions.*;
+import org.flomik.FlomiksFactions.database.BeaconDao;
 import org.flomik.FlomiksFactions.player.PlayerDataHandler;
 import org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent;
 
@@ -34,6 +36,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final ConcurrentHashMap<String, List<String>> pendingAllies = new ConcurrentHashMap<>();
 
     private final ClanManager clanManager;
+    private final BeaconManager beaconManager;
+    private final BeaconDao beaconDao;
     private final CreateHandler createHandler;
     private final DisbandHandler disbandHandler;
     private final PromoteHandler promoteHandler;
@@ -49,16 +53,20 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private final HomeHandler homeHandler;
     private final AllyHandler allyHandler;
     private final LeaderHandler leaderHandler;
-    private final NameHandler nameHanler;
+    private final NameHandler renameHanler;
     private final DescriptionHandler descriptionHanler;
     private final ModerHandler moderHanler;
     private final ClaimRegionHandler claimRegionHandler;
     private final UnclaimRegionHandler unclaimRegionHandler;
     private final HelpHandler helpHandler;
     private final MapHandler mapHandler;
+    private final BankCommandHandler bankCommandHandler;
 
-    public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin, ChunkMenuManager chunkMenuManager, ShrineEvent shrineEvent) {
+    public ClanCommand(ClanManager clanManager, PlayerDataHandler playerDataHandler, FlomiksFactions plugin,
+                       ChunkMenuManager chunkMenuManager, ShrineEvent shrineEvent, BeaconDao beaconDao, BeaconManager beaconManager) {
         this.clanManager = clanManager;
+        this.beaconManager = beaconManager;
+        this.beaconDao = beaconDao;
         this.createHandler = new CreateHandler(clanManager);
         this.disbandHandler = new DisbandHandler(clanManager, pendingDisbands);
         this.promoteHandler = new PromoteHandler(clanManager);
@@ -74,13 +82,14 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         this.homeHandler = new HomeHandler(clanManager, plugin);
         this.allyHandler = new AllyHandler(clanManager, pendingAllies);
         this.leaderHandler = new LeaderHandler(clanManager);
-        this.nameHanler = new NameHandler(clanManager);
+        this.renameHanler = new NameHandler(clanManager);
         this.descriptionHanler = new DescriptionHandler(clanManager);
         this.moderHanler = new ModerHandler(clanManager);
-        this.unclaimRegionHandler = new UnclaimRegionHandler(clanManager);
-        this.claimRegionHandler = new ClaimRegionHandler(clanManager, unclaimRegionHandler, shrineEvent);
+        this.unclaimRegionHandler = new UnclaimRegionHandler(clanManager, beaconDao, beaconManager);
+        this.claimRegionHandler = new ClaimRegionHandler(clanManager, unclaimRegionHandler, shrineEvent, beaconDao, beaconManager);
         this.helpHandler = new HelpHandler();
         this.mapHandler = new MapHandler(chunkMenuManager);
+        this.bankCommandHandler = new BankCommandHandler(clanManager, plugin.getEconomy());
     }
 
     @Override
@@ -128,16 +137,18 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     return allyHandler.handleCommand(player, args);
                 case "leader":
                     return leaderHandler.handleCommand(player, args);
-                case "name":
-                    return nameHanler.handleCommand(player, args);
+                case "rename":
+                    return renameHanler.handleCommand(player, args);
                 case "desc":
                     return descriptionHanler.handleCommand(player, args);
                 case "moder":
                     return moderHanler.handleCommand(player, args);
                 case "claim":
-                    return claimRegionHandler.handleCommand(player);
+                    return claimRegionHandler.handleCommand(player, args);
                 case "unclaim":
                     return unclaimRegionHandler.handleCommand(player, args);
+                case "bank":
+                    return bankCommandHandler.handleCommand(player, args);
                 case "help":
                     return helpHandler.handleCommand(player, args);
                 case "map":
@@ -188,13 +199,15 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return getPlayerSuggestions(args[1]);
         }else if (args.length == 2 && args[0].equalsIgnoreCase("moder")) {
             return getPlayerSuggestions(args[1]);
+        }else if (args.length == 2 && args[0].equalsIgnoreCase("bank")) {
+            return getSuggestions(args[1], Arrays.asList("deposit", "withdraw"));
         }
         return new ArrayList<>();
     }
 
     private List<String> getSubCommandSuggestions(String input) {
-        List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "sethome",
-                "delhome", "home", "info", "promote", "demote", "ally", "leader", "name", "desc", "moder", "unclaim", "claim", "help", "map");
+        List<String> subCommands = Arrays.asList("create", "invite", "join", "list", "disband", "leave", "kick", "bank", "sethome",
+                "delhome", "home", "info", "promote", "demote", "ally", "leader", "rename", "desc", "moder", "unclaim", "claim", "help", "map");
         return getSuggestions(input, subCommands);
     }
 

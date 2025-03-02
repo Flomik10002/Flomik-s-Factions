@@ -51,8 +51,8 @@ public class ClanDao {
     }
 
     public void insertClan(Clan clan) {
-        String sql = "INSERT INTO clans (name, owner, creation_date, description, land, strength, level, clan_xp, max_power, home_world, home_x, home_y, home_z, home_yaw, home_pitch) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clans (name, owner, creation_date, description, land, strength, level, clan_xp, balance, max_power, home_world, home_x, home_y, home_z, home_yaw, home_pitch) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = clanDatabaseManager.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -64,21 +64,22 @@ public class ClanDao {
                 ps.setInt(6, clan.getStrength());
                 ps.setInt(7, clan.getLevel());
                 ps.setInt(8, clan.getClanXp());
-                ps.setInt(9, clan.getMaxPower());
+                ps.setDouble(9, clan.getBalance());
+                ps.setInt(10, clan.getMaxPower());
                 if (clan.hasHome()) {
-                    ps.setString(10, clan.getHome().getWorld().getName());
-                    ps.setDouble(11, clan.getHome().getX());
-                    ps.setDouble(12, clan.getHome().getY());
-                    ps.setDouble(13, clan.getHome().getZ());
-                    ps.setFloat(14, clan.getHome().getYaw());
-                    ps.setFloat(15, clan.getHome().getPitch());
+                    ps.setString(11, clan.getHome().getWorld().getName());
+                    ps.setDouble(12, clan.getHome().getX());
+                    ps.setDouble(13, clan.getHome().getY());
+                    ps.setDouble(14, clan.getHome().getZ());
+                    ps.setFloat(15, clan.getHome().getYaw());
+                    ps.setFloat(16, clan.getHome().getPitch());
                 } else {
-                    ps.setNull(10, Types.VARCHAR);
-                    ps.setNull(11, Types.DOUBLE);
+                    ps.setNull(11, Types.VARCHAR);
                     ps.setNull(12, Types.DOUBLE);
                     ps.setNull(13, Types.DOUBLE);
-                    ps.setNull(14, Types.FLOAT);
+                    ps.setNull(14, Types.DOUBLE);
                     ps.setNull(15, Types.FLOAT);
+                    ps.setNull(16, Types.FLOAT);
                 }
                 ps.executeUpdate();
                 int clanId;
@@ -102,7 +103,7 @@ public class ClanDao {
     }
 
     public void updateClan(Clan clan) {
-        String sql = "UPDATE clans SET owner = ?, creation_date = ?, description = ?, land = ?, strength = ?, level = ?, clan_xp = ?, max_power = ?, home_world = ?, home_x = ?, home_y = ?, home_z = ?, home_yaw = ?, home_pitch = ? " +
+        String sql = "UPDATE clans SET owner = ?, creation_date = ?, description = ?, land = ?, strength = ?, level = ?, clan_xp = ?, balance = ?, max_power = ?, home_world = ?, home_x = ?, home_y = ?, home_z = ?, home_yaw = ?, home_pitch = ? " +
                 "WHERE LOWER(name) = ?";
         try (Connection conn = clanDatabaseManager.getConnection()) {
             conn.setAutoCommit(false);
@@ -114,23 +115,24 @@ public class ClanDao {
                 ps.setInt(5, clan.getStrength());
                 ps.setInt(6, clan.getLevel());
                 ps.setInt(7, clan.getClanXp());
-                ps.setInt(8, clan.getMaxPower());
+                ps.setDouble(8, clan.getBalance());
+                ps.setInt(9, clan.getMaxPower());
                 if (clan.hasHome()) {
-                    ps.setString(9, clan.getHome().getWorld().getName());
-                    ps.setDouble(10, clan.getHome().getX());
-                    ps.setDouble(11, clan.getHome().getY());
-                    ps.setDouble(12, clan.getHome().getZ());
-                    ps.setFloat(13, clan.getHome().getYaw());
-                    ps.setFloat(14, clan.getHome().getPitch());
+                    ps.setString(10, clan.getHome().getWorld().getName());
+                    ps.setDouble(11, clan.getHome().getX());
+                    ps.setDouble(12, clan.getHome().getY());
+                    ps.setDouble(13, clan.getHome().getZ());
+                    ps.setFloat(14, clan.getHome().getYaw());
+                    ps.setFloat(15, clan.getHome().getPitch());
                 } else {
-                    ps.setNull(9, Types.VARCHAR);
-                    ps.setNull(10, Types.DOUBLE);
+                    ps.setNull(10, Types.VARCHAR);
                     ps.setNull(11, Types.DOUBLE);
                     ps.setNull(12, Types.DOUBLE);
-                    ps.setNull(13, Types.FLOAT);
+                    ps.setNull(13, Types.DOUBLE);
                     ps.setNull(14, Types.FLOAT);
+                    ps.setNull(15, Types.FLOAT);
                 }
-                ps.setString(15, clan.getName().toLowerCase());
+                ps.setString(16, clan.getName().toLowerCase());
                 ps.executeUpdate();
 
                 int clanId = getClanIdByName(conn, clan.getName());
@@ -246,6 +248,7 @@ public class ClanDao {
         int strength = rs.getInt("strength");
         int level = rs.getInt("level");
         int clanXp = rs.getInt("clan_xp");
+        double balance = rs.getDouble("balance");
         int maxPower = rs.getInt("max_power");
 
         String homeWorld = rs.getString("home_world");
@@ -270,8 +273,9 @@ public class ClanDao {
         List<String> alliances = loadAlliances(conn, clanId);
         List<String> chunks = loadChunks(conn, clanId);
 
-        Clan clan = new Clan(name, owner, members, roles, creationDate, description, alliances, level, clanXp, land, strength, maxPower, chunks);
+        Clan clan = new Clan(name, owner, members, roles, creationDate, description, alliances, level, clanXp, balance, land, strength, maxPower, chunks);
         clan.setHome(home);
+        clan.setBalance(balance);
         return clan;
     }
 

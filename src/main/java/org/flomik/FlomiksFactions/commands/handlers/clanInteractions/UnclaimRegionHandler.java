@@ -11,16 +11,22 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
+import org.flomik.FlomiksFactions.clan.managers.BeaconManager;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.database.BeaconDao;
 
 import java.util.Map;
 
 public class UnclaimRegionHandler {
 
     private final ClanManager clanManager;
+    private final BeaconDao beaconDao;
+    private final BeaconManager beaconManager;
 
-    public UnclaimRegionHandler(ClanManager clanManager) {
+    public UnclaimRegionHandler(ClanManager clanManager, BeaconDao beaconDao, BeaconManager beaconManager) {
         this.clanManager = clanManager;
+        this.beaconDao = beaconDao;
+        this.beaconManager = beaconManager;
     }
 
 
@@ -57,6 +63,10 @@ public class UnclaimRegionHandler {
 
         removeWorldGuardRegion(chunk, clan.getName());
 
+        String regionId = "clan_" + clan.getName() + "_" + chunkId;
+        beaconDao.deleteBeaconByRegionId(regionId);
+        beaconManager.removeBeacon(regionId);
+
 
         if (isHomeInChunk(clan, chunk)) {
             clan.removeHome();
@@ -66,6 +76,16 @@ public class UnclaimRegionHandler {
 
         clan.removeClaimedChunk(chunkId);
         clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " убрал приват с чанка!");
+    }
+
+    public void removeRegionById(World world, String regionId) {
+        WorldGuard wg = WorldGuard.getInstance();
+        RegionContainer container = wg.getPlatform().getRegionContainer();
+        RegionManager regions = container.get(BukkitAdapter.adapt(world));
+
+        if (regions != null) {
+            regions.removeRegion(regionId);
+        }
     }
 
 
@@ -83,7 +103,6 @@ public class UnclaimRegionHandler {
 
                     if (region.getId().startsWith("clan_" + clan.getName()) && isLeaderOrDeputy(player, clan)) {
                         regions.removeRegion(region.getId());
-
 
                         Location homeLocation = clan.getHome();
                         if (homeLocation != null && isHomeInRegion(region, homeLocation)) {

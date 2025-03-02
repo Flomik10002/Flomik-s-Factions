@@ -1,12 +1,13 @@
 package org.flomik.FlomiksFactions;
 
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.flomik.FlomiksFactions.database.ClanDao;
-import org.flomik.FlomiksFactions.database.ClanDatabaseManager;
-import org.flomik.FlomiksFactions.database.InvitationDao;
-import org.flomik.FlomiksFactions.database.PlayerDatabaseManager;
+import org.flomik.FlomiksFactions.clan.managers.*;
+import org.flomik.FlomiksFactions.commands.handlers.clanInteractions.ClaimRegionHandler;
+import org.flomik.FlomiksFactions.commands.handlers.clanInteractions.UnclaimRegionHandler;
+import org.flomik.FlomiksFactions.database.*;
 import org.flomik.FlomiksFactions.register.CommandRegistrar;
 import org.flomik.FlomiksFactions.register.EventRegistrar;
 import org.flomik.FlomiksFactions.utils.Placeholders;
@@ -16,16 +17,18 @@ import org.flomik.FlomiksFactions.worldEvents.castle.managers.CastleLootManager;
 import org.flomik.FlomiksFactions.worldEvents.castle.managers.HeadsManager;
 import org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.EventScheduler;
 import org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.RandomEventManager;
-import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 import org.flomik.FlomiksFactions.listener.*;
 import org.flomik.FlomiksFactions.player.PlayerDataHandler;
-import org.flomik.FlomiksFactions.clan.managers.ChunkMenuManager;
 import org.flomik.FlomiksFactions.worldEvents.shrine.config.ShrineConfigManager;
 import org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent;
-import org.flomik.FlomiksFactions.clan.managers.TNTManager;
 
 public final class FlomiksFactions extends JavaPlugin {
     private ClanManager clanManager;
+    private BeaconDao beaconDao;
+    private ClaimRegionHandler claimRegionHandler;
+    private UnclaimRegionHandler unclaimRegionHandler;
+    private BeaconManager beaconManager;
+    private BeaconDatabaseManager beaconDatabaseManager;
     private ChunkMenuManager chunkMenuManager;
     private PlayerDataHandler playerDataHandler;
     private ShrineEvent shrineEvent;
@@ -89,6 +92,11 @@ public final class FlomiksFactions extends JavaPlugin {
         ShrineConfigManager.loadConfig();
         ShrineConfigManager.get().options().copyDefaults(true);
         ShrineConfigManager.save();
+
+        NexusConfigManager.setup(this);
+        NexusConfigManager.loadConfig();
+        NexusConfigManager.get().options().copyDefaults(true);
+        NexusConfigManager.save();
     }
 
     private void setupDatabase() {
@@ -103,6 +111,13 @@ public final class FlomiksFactions extends JavaPlugin {
             this.playerDatabaseManager = new PlayerDatabaseManager();
             playerDatabaseManager.initDatabase(this);
             playerDatabaseManager.createTables();
+
+            this.beaconDatabaseManager = new BeaconDatabaseManager();
+            beaconDatabaseManager.initDatabase(this);
+            beaconDatabaseManager.createTables();
+
+            this.beaconDao = new BeaconDao(clanDatabaseManager);
+
         } catch (Exception e) {
             getLogger().severe("Ошибка при настройке базы данных: " + e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
@@ -117,6 +132,7 @@ public final class FlomiksFactions extends JavaPlugin {
         }
 
         this.clanManager = new ClanManager(this, clanDao, invitationDao);
+        this.beaconManager = new BeaconManager();
         this.lootManager = new CastleLootManager(this);
         this.headsManager = new HeadsManager(this);
         this.playerDataHandler = new PlayerDataHandler(this);
@@ -125,6 +141,16 @@ public final class FlomiksFactions extends JavaPlugin {
         this.chunkMenuManager = new ChunkMenuManager(this, clanManager);
         this.shrineEvent = new ShrineEvent(this, shrineConfigManager);
         this.castleEvent = new CastleEvent(this, headsManager);
+        this.unclaimRegionHandler = new UnclaimRegionHandler(clanManager, beaconDao,
+                beaconManager);
+        this.claimRegionHandler = new ClaimRegionHandler(
+                clanManager,
+                unclaimRegionHandler,
+                shrineEvent,
+                beaconDao,
+                beaconManager
+        );
+
     }
 
     private void startSchedulers() {
@@ -134,6 +160,29 @@ public final class FlomiksFactions extends JavaPlugin {
 
         eventScheduler.start();
     }
+
+    private void startZeroHpCheck() {
+        // how often we check, in ticks (default 100 = every 5 seconds)
+        int checkInterval = NexusConfigManager.getInt("zero-hp-check-interval");
+        if (checkInterval < 1) {
+            checkInterval = 100; // fallback
+        }
+
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            beaconManager.getAllBeacons().forEach(beacon -> {
+                if (beacon.getHealth() <= 0) {
+                    // Here is where you handle "zero HP" logic.
+                    // For example, you might mark this beacon as "vulnerable" or auto-start a capture event.
+
+                    // Simple example: log it
+                    getLogger().info("Beacon " + beacon.getRegionId()
+                            + " (clan " + beacon.getClanName()
+                            + ") is at 0 HP and can be captured!");
+                }
+            });
+        }, 0L, checkInterval);
+    }
+
 
     public boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -164,6 +213,14 @@ public final class FlomiksFactions extends JavaPlugin {
         return clanManager;
     }
 
+    public BeaconManager getBeaconManager () {
+        return beaconManager;
+    }
+
+    public BeaconDao getBeaconDao () {
+        return beaconDao;
+    }
+
     public ChunkMenuManager getMenuManager() {
         return chunkMenuManager;
     }
@@ -190,6 +247,10 @@ public final class FlomiksFactions extends JavaPlugin {
 
     public ClanDao getClanDao() {
         return clanDao;
+    }
+
+    public ClaimRegionHandler getClaimRegionHandler() {
+        return claimRegionHandler;
     }
 
     public InvitationDao getInvitationDao() {

@@ -53,12 +53,12 @@ public class ClanTNTListener implements Listener {
         Clan clan = clanManager.getPlayerClan(player.getName());
         if (clan != null) {
             int onlineCount = getOnlineMembersCount(clan);
-            Bukkit.getLogger().info("[FlomikFactions] Player joined: " + player.getName() + ", Clan: " + clan.getName() + ", Online count: " + onlineCount);
+            Bukkit.getLogger().info("[FlomiksFactions] Player joined: " + player.getName() + ", Clan: " + clan.getName() + ", Online count: " + onlineCount);
             if (onlineCount > 0 && clanTimers.containsKey(clan)) {
                 clanTimers.get(clan).cancel();
                 clanTimers.remove(clan);
-                Bukkit.getLogger().info("[FlomikFactions] Cancelled TNT disable timer for clan: " + clan.getName());
-                Bukkit.getLogger().info("[FlomikFactions] TNT allowed for clan: " + clan.getName());
+                Bukkit.getLogger().info("[FlomiksFactions] Cancelled TNT disable timer for clan: " + clan.getName());
+                Bukkit.getLogger().info("[FlomiksFactions] TNT allowed for clan: " + clan.getName());
                 setClanFlags(clan, StateFlag.State.ALLOW);
             }
         }
@@ -70,16 +70,16 @@ public class ClanTNTListener implements Listener {
         Clan clan = clanManager.getPlayerClan(player.getName());
         if (clan != null) {
             int onlineCount = getOnlineMembersCount(clan) - 1;
-            Bukkit.getLogger().info("[FlomikFactions] Player quit: " + player.getName() + ", Clan: " + clan.getName() + ", Online count: " + onlineCount);
+            Bukkit.getLogger().info("[FlomiksFactions] Player quit: " + player.getName() + ", Clan: " + clan.getName() + ", Online count: " + onlineCount);
             if (onlineCount == 0) {
                 lastLogoutTimes.put(clan, System.currentTimeMillis());
-                Bukkit.getLogger().info("[FlomikFactions] No players online in clan: " + clan.getName() + ", scheduling TNT disable");
+                Bukkit.getLogger().info("[FlomiksFactions] No players online in clan: " + clan.getName() + ", scheduling TNT disable");
                 BukkitRunnable task = new BukkitRunnable() {
                     @Override
                     public void run() {
                         if (getOnlineMembersCount(clan) == 0) {
                             setClanFlags(clan, StateFlag.State.DENY);
-                            Bukkit.getLogger().info("[FlomikFactions] TNT denied for clan: " + clan.getName());
+                            Bukkit.getLogger().info("[FlomiksFactions] TNT denied for clan: " + clan.getName());
                         }
                     }
                 };
@@ -102,7 +102,7 @@ public class ClanTNTListener implements Listener {
 
                     if (region.getId().startsWith("clan_" + clan.getName())) {
                         region.setFlag(Flags.TNT, state);
-                        Bukkit.getLogger().info("[FlomikFactions] Set TNT flag to " + state + " for region: " + region.getId());
+                        Bukkit.getLogger().info("[FlomiksFactions] Set TNT flag to " + state + " for region: " + region.getId());
                     }
                 }
             }

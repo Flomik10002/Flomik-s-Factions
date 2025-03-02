@@ -40,12 +40,12 @@ public class EventScheduler {
                     int randomDelayMinutes = random.nextInt(120);
                     LocalDateTime eventTime = LocalDateTime.now().plusMinutes(randomDelayMinutes);
 
-                    Bukkit.getLogger().info("[FlomikFactions] Следующий ивент начнется через " + randomDelayMinutes + " минут (" + eventTime + ").");
+                    Bukkit.getLogger().info("[FlomiksFactions] Следующий ивент начнется через " + randomDelayMinutes + " минут (" + eventTime + ").");
 
                     scheduleEventAfterDelay(randomDelayMinutes * 60L);
                 } else {
                     long initialDelay = calculateInitialDelay();
-                    Bukkit.getLogger().info("[FlomikFactions] Не в активном периоде. Ждем " + (initialDelay / 60) + " минут до следующего активного периода.");
+                    Bukkit.getLogger().info("[FlomiksFactions] Не в активном периоде. Ждем " + (initialDelay / 60) + " минут до следующего активного периода.");
                     scheduleNextEventWithDelay(initialDelay);
                 }
             }
@@ -59,12 +59,12 @@ public class EventScheduler {
                 String randomEvent = getRandomEvent();
                 eventManager.startEvent(randomEvent);
 
-                Bukkit.getLogger().info("[FlomikFactions] Ивент " + randomEvent + " запущен!");
+                Bukkit.getLogger().info("[FlomiksFactions] Ивент " + randomEvent + " запущен!");
 
                 int nextDelayMinutes = MIN_DELAY_MINUTES + random.nextInt(MAX_DELAY_MINUTES - MIN_DELAY_MINUTES + 1);
                 LocalDateTime nextEventTime = LocalDateTime.now().plusMinutes(nextDelayMinutes);
 
-                Bukkit.getLogger().info("[FlomikFactions] Следующий ивент будет запущен через " + nextDelayMinutes + " минут (" + nextEventTime + ").");
+                Bukkit.getLogger().info("[FlomiksFactions] Следующий ивент будет запущен через " + nextDelayMinutes + " минут (" + nextEventTime + ").");
                 scheduleNextEventWithDelay(nextDelayMinutes * 60L);
             }
         }.runTaskLater(plugin, delaySeconds * 20L);

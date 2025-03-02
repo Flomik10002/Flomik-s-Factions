@@ -40,6 +40,7 @@ public class KickHandler {
 
             if (clan.getMembers().contains(targetPlayerName)) {
                 clan.removeMember(targetPlayerName);
+                clanManager.saveClan(clan);
                 clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN +" исключен из клана.");
                 clanManager.removePlayerFromClanRegions(targetPlayer, clan);
                 if (targetPlayer != null) {

@@ -88,8 +88,8 @@ public class NameHandler {
             return false;
         } else {
             TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: ");
-            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan name <название>");
-            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan name "));
+            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan rename <название>");
+            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan rename "));
             usageMessage.addExtra(clickCommand);
             player.spigot().sendMessage(usageMessage);
         }
