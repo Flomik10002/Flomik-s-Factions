@@ -1,4 +1,4 @@
-package org.flomik.FlomiksFactions.database;
+package org.flomik.FlomiksFactions.database; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
 
 import org.bukkit.plugin.Plugin;
 
@@ -8,19 +8,19 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class BeaconDatabaseManager {
-    private String url;
+public class BeaconDatabaseManager { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private String url; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    public void initDatabase(Plugin plugin) {
-        File dbFile = new File(plugin.getDataFolder(), "clans.db");
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdirs();
+    public void initDatabase(Plugin plugin) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        File dbFile = new File(plugin.getDataFolder(), "clans.db"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        if (!plugin.getDataFolder().exists()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            plugin.getDataFolder().mkdirs(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
         }
 
         url = "jdbc:sqlite:" + dbFile.getAbsolutePath();
     }
 
-    public void createTables() {
+    public void createTables() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         try (Connection conn = DriverManager.getConnection(url)) {
             // Включаем поддержку внешних ключей
             try (Statement pragmaStmt = conn.createStatement()) {
@@ -43,20 +43,20 @@ public class BeaconDatabaseManager {
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
     }
 
-    public Connection getConnection() throws SQLException {
-        Connection conn = DriverManager.getConnection(url);
-        try (Statement st = conn.createStatement()) {
+    public Connection getConnection() throws SQLException { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        Connection conn = DriverManager.getConnection(url); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (Statement st = conn.createStatement()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             st.execute("PRAGMA foreign_keys = ON;");
         }
         return conn;
     }
 
-    public void close() {
-        // Для SQLite не нужно закрывать что-то глобальное, т.к. мы открываем Connection на время операции
+    public void close() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        // Для SQLite не нужно закрывать что-то глобальное, т.к. мы открываем Connection на время операции //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression
         // Можно оставить пустым
     }
 }

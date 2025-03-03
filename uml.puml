@@ -1,0 +1,1172 @@
+@startuml
+class org.flomik.FlomiksFactions.database.InvitationDao {
+- ClanDatabaseManager clanDatabaseManager
++ <<Create>> InvitationDao(ClanDatabaseManager)
++ Set<String> getInvitationsForPlayer(String)
++ void saveInvitation(String,String)
++ void removeInvitation(String,String)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.ListHandler {
+- ClanManager clanManager
++ <<Create>> ListHandler(ClanManager)
++ boolean handleCommand(CommandSender,String[])
+- int getOnlineMembersCount(Clan)
+}
+
+
+class org.flomik.FlomiksFactions.listener.PlayerDeathStrengthListener {
+- PlayerDataHandler playerDataHandler
++ <<Create>> PlayerDeathStrengthListener(PlayerDataHandler)
++ void onPlayerDeath(PlayerDeathEvent)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.shrine.config.ShrineConfigManager {
+- {static} FileConfiguration customFile
+- {static} File file
+- {static} FlomiksFactions plugin
++ {static} void setup(FlomiksFactions)
++ {static} void loadConfig()
++ {static} FileConfiguration get()
++ {static} void save()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.ShrineCommand {
+- ShrineEvent shrineEvent
++ <<Create>> ShrineCommand(ShrineEvent)
++ boolean onCommand(CommandSender,Command,String,String[])
+- void sendShrineLocation(Player,Location)
++ List<String> onTabComplete(CommandSender,Command,String,String[])
+- List<String> getSubCommandSuggestions(String)
+- List<String> getSuggestions(String,List<String>)
+}
+
+
+class org.flomik.FlomiksFactions.clan.Clan {
+- {static} int MAX_MEMBERS
+- {static} List<String> ROLE_ORDER
+- Map<String,String> memberRoles
+- String name
+- String oldName
+- String owner
+- Set<String> members
+- Date creationDate
+- String description
+- List<String> alliances
+- int level
+- int clanXp
+- double balance
+- int lands
+- int strength
+- int maxPower
+- List<String> claimedChunks
+- Location home
++ <<Create>> Clan(String,String,Set<String>,Map<String,String>,Date,String,List<String>,int,int,double,int,int,int,List<String>)
++ double getBalance()
++ void setBalance(double)
++ void deposit(double)
++ void withdraw(double)
++ int getRequiredXpForNextLevel(int)
++ void addClanXp(int)
++ int getClanXp()
++ boolean hasClaimedChunk(String)
++ void addClaimedChunk(String)
++ void removeClaimedChunk(String)
++ void clearClaimedChunks()
++ void updateStrength(PlayerDataHandler)
++ void removeAllianceByName(String)
++ void addAllianceByName(String)
++ void setDescription(String)
++ String getOwner()
++ void renameClan(String)
++ String getOldName()
++ void resetOldName()
++ void transferLeadership(String)
++ List<String> getPlayersWithRole(String)
++ String getRole(String)
++ void setRole(String,String)
++ void promoteMember(String,String)
++ void moderMember(String,String)
++ void demoteMember(String,String)
++ List<String> getRegionNames()
++ List<String> getAlliances()
++ void addAlliances(Clan)
++ void removeAlliance(Clan)
++ Location getHome()
++ void setHome(Location)
++ void removeHome()
++ boolean hasHome()
++ void removeMember(String)
++ String getName()
++ Set<String> getMembers()
++ void addMember(String)
++ boolean isFull()
++ int getMaxPower()
++ Date getCreationDate()
++ String getDescription()
++ int getLevel()
++ int getLands()
++ void setLands(int)
++ void updateLands()
++ int getStrength()
++ void setStrength(int)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.DemoteHandler {
+- ClanManager clanManager
++ <<Create>> DemoteHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.PromoteHandler {
+- ClanManager clanManager
++ <<Create>> PromoteHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.LeaveHandler {
+- ClanManager clanManager
+- ConcurrentHashMap<String,Long> pendingDisbands
++ <<Create>> LeaveHandler(ClanManager,ConcurrentHashMap<String,Long>)
++ boolean handleCommand(Player)
+}
+
+
+class org.flomik.FlomiksFactions.clan.managers.BeaconCaptureManager {
+- FlomiksFactions plugin
+- BeaconManager beaconManager
+- ClanManager clanManager
+- BeaconDao beaconDao
+- UnclaimRegionHandler unclaimHandler
+~ int captureTime
+~ BarColor barColor
+- Map<String,CaptureSession> activeCaptures
++ <<Create>> BeaconCaptureManager(FlomiksFactions,BeaconManager,ClanManager,BeaconDao,UnclaimRegionHandler)
++ void checkForAutoCaptures()
+- Clan findAttackingClanInChunk(Chunk,Clan)
+- void startCapture(Beacon,Clan,Clan)
+- boolean attackerStillInChunk(Beacon,Clan)
+- void finalizeCapture(Beacon,Clan,Clan)
+- String getChunkId(Chunk)
+- void broadcastCaptureResult(Clan,Clan)
+}
+
+note left of org.flomik.FlomiksFactions.clan.managers.BeaconCaptureManager::checkForAutoCaptures()
+ Called periodically
+end note
+
+class org.flomik.FlomiksFactions.listener.CastleInteractListener {
+- CastleEvent eventManager
+- CastleLootManager lootManager
++ <<Create>> CastleInteractListener(CastleEvent,CastleLootManager)
++ void onPlayerInteract(PlayerInteractEvent)
++ void onInventoryClose(InventoryCloseEvent)
+- ItemStack getRandomLoot()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.UnclaimRegionHandler {
+- ClanManager clanManager
+- BeaconDao beaconDao
+- BeaconManager beaconManager
++ <<Create>> UnclaimRegionHandler(ClanManager,BeaconDao,BeaconManager)
++ boolean handleCommand(Player,String[])
+- void unclaimCurrentChunk(Player,Clan)
++ void removeRegionById(World,String)
+- void unclaimAllRegionsForClan(Player,Clan)
+- boolean isLeaderOrDeputy(Player,Clan)
+- String getChunkId(Chunk)
++ void removeWorldGuardRegion(Chunk,String)
+- boolean isHomeInChunk(Clan,Chunk)
+- boolean isHomeInRegion(ProtectedRegion,Location)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.RandomEventManager {
+- FlomiksFactions plugin
+- RandomEvent currentEvent
++ <<Create>> RandomEventManager(FlomiksFactions)
++ boolean isRunning()
++ void startEvent(String)
++ RandomEvent getCurrentEvent()
++ void stopEvent()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.SetStrengthCommand {
+- PlayerDataHandler playerDataHandler
++ <<Create>> SetStrengthCommand(PlayerDataHandler)
++ boolean onCommand(CommandSender,Command,String,String[])
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.PlayerCommand {
+- PlayerDataHandler playerDataHandler
+- ClanManager clanManager
++ <<Create>> PlayerCommand(PlayerDataHandler,ClanManager)
++ boolean onCommand(CommandSender,Command,String,String[])
+- int getOnlineMembersCount(Clan)
+- void showCommands(Player)
++ List<String> onTabComplete(CommandSender,Command,String,String[])
+- List<String> getSubCommandSuggestions(String)
+- List<String> getPlayerSuggestions(String)
+- List<String> getSuggestions(String,List<String>)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.randomEvents.events.FishermanEvent {
+- String EventName
+- String description
+- int remainingTime
++ <<Create>> FishermanEvent(FlomiksFactions)
++ void start()
++ void stop()
++ void onPlayerFish(PlayerFishEvent)
++ void onTick()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.CastleCommand {
+- CastleLootManager lootManager
++ <<Create>> CastleCommand(CastleLootManager)
++ boolean onCommand(CommandSender,Command,String,String[])
++ List<String> onTabComplete(CommandSender,Command,String,String[])
+- List<String> getSubCommandSuggestions(String)
+- List<String> getSuggestions(String,List<String>)
+}
+
+
+class org.flomik.FlomiksFactions.utils.Placeholders {
+- PlayerDataHandler playerDataHandler
+- ClanManager clanManager
++ <<Create>> Placeholders(FlomiksFactions,PlayerDataHandler,ClanManager)
+- int getOnlineClanMembersCount(Clan)
++ boolean canRegister()
++ String getIdentifier()
++ String getAuthor()
++ String getVersion()
++ String onPlaceholderRequest(Player,String)
+}
+
+
+class org.flomik.FlomiksFactions.database.BeaconDao {
+- ClanDatabaseManager dbManager
++ <<Create>> BeaconDao(ClanDatabaseManager)
+- int fetchClanIdByName(String)
++ void insertBeacon(Clan,Location,String,int)
++ void deleteBeaconByRegionId(String)
++ Location getBeaconLocationByRegionId(String)
++ void updateBeaconHp(String,int)
++ int getBeaconHp(String)
++ boolean beaconExists(String)
+}
+note top of org.flomik.FlomiksFactions.database.BeaconDao
+
+ * DAO для хранения и управления данными маяка (блока привата).
+ * В таблице clan_beacons должны быть следующие поля:
+ * - clan_id (VARCHAR)
+ * - world (VARCHAR)
+ * - x (INT)
+ * - y (INT)
+ * - z (INT)
+ * - region_id (VARCHAR)
+ * - hp (INT)
+ 
+end note
+
+
+note left of org.flomik.FlomiksFactions.database.BeaconDao::fetchClanIdByName(String)
+
+     * Looks up the integer `id` from the `clans` table by the clan's name.
+     * @return the integer ID if found, or -1 if not found
+     
+end note
+note right of org.flomik.FlomiksFactions.database.BeaconDao::insertBeacon(Clan,Location,String,int)
+
+     * Сохранение нового маяка в БД.
+     *
+     * @param clan    объект Clan (хранит имя клана), которому принадлежит маяк
+     * @param loc     локация, где установлен маяк
+     * @param regionId идентификатор WorldGuard-региона, связанного с маяком
+     * @param hp      текущее здоровье маяка (изначально 5)
+     
+end note
+note left of org.flomik.FlomiksFactions.database.BeaconDao::deleteBeaconByRegionId(String)
+
+     * Удаление маяка из БД по regionId.
+     *
+     * @param regionId идентификатор региона, связанного с маяком
+     
+end note
+note right of org.flomik.FlomiksFactions.database.BeaconDao::getBeaconLocationByRegionId(String)
+
+     * Получение локации маяка по regionId.
+     *
+     * @param regionId идентификатор региона, связанного с маяком
+     * @return объект Location, если запись найдена, иначе null
+     
+end note
+note left of org.flomik.FlomiksFactions.database.BeaconDao::updateBeaconHp(String,int)
+
+     * Обновление текущего хп маяка.
+     *
+     * @param regionId идентификатор региона, связанного с маяком
+     * @param hp       новое значение хп
+     
+end note
+note right of org.flomik.FlomiksFactions.database.BeaconDao::getBeaconHp(String)
+
+     * Получение текущего хп маяка по regionId.
+     *
+     * @param regionId идентификатор региона, связанного с маяком
+     * @return значение хп, если запись найдена, иначе -1
+     
+end note
+note left of org.flomik.FlomiksFactions.database.BeaconDao::beaconExists(String)
+
+     * Проверка существования маяка в БД по regionId.
+     *
+     * @param regionId идентификатор региона, связанного с маяком
+     * @return true, если запись найдена, иначе false
+     
+end note
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.home.SetHomeHandler {
+- ClanManager clanManager
++ <<Create>> SetHomeHandler(ClanManager)
++ boolean handleCommand(Player)
+- boolean isInPlayerRegion(Player,Location)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.castle.managers.HeadsManager {
+- Set<Location> spawnedHeads
+- FlomiksFactions plugin
+- List<Location> availableLocations
++ <<Create>> HeadsManager(FlomiksFactions)
++ List<Location> loadHeadLocations()
++ void spawnRandomHeads(int)
++ void spawnHead(Location)
++ void despawnAllHeads()
+}
+
+
+class org.flomik.FlomiksFactions.listener.ClanPvPListener {
+- ClanManager clanManager
++ <<Create>> ClanPvPListener(JavaPlugin,ClanManager)
++ void onPlayerAttack(EntityDamageByEntityEvent)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.NameHandler {
+- ClanManager clanManager
++ <<Create>> NameHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+- void updateAllianceNamesAfterRename(String)
+- void updateAllianceNamesBeforeRename(String,String)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.DisbandHandler {
+- ClanManager clanManager
+- ConcurrentHashMap<String,Long> pendingDisbands
++ <<Create>> DisbandHandler(ClanManager,ConcurrentHashMap<String,Long>)
++ boolean handleCommand(Player)
+}
+
+
+class org.flomik.FlomiksFactions.listener.NexusBlockListener {
+- ClaimRegionHandler claimRegionHandler
+- ClanManager clanManager
++ <<Create>> NexusBlockListener(ClaimRegionHandler,ClanManager)
++ void onBlockPlace(BlockPlaceEvent)
+}
+
+
+class org.flomik.FlomiksFactions.listener.BeaconExplosionListener {
+- BeaconManager beaconManager
+- BeaconDao beaconDao
+- int tntDamageRadius
++ <<Create>> BeaconExplosionListener(BeaconManager,BeaconDao,int)
++ void onEntityExplode(EntityExplodeEvent)
+}
+
+
+class org.flomik.FlomiksFactions.clan.managers.NexusConfigManager {
+- {static} FileConfiguration customFile
+- {static} File file
+- {static} FlomiksFactions plugin
++ {static} void setup(FlomiksFactions)
++ {static} void loadConfig()
++ {static} void save()
++ {static} FileConfiguration get()
++ {static} BarColor getColor(String)
++ {static} String getString(String)
++ {static} int getInt(String)
+}
+
+note left of org.flomik.FlomiksFactions.clan.managers.NexusConfigManager::setup(FlomiksFactions)
+
+     * Create or load 'nexus.yml' in the plugin's data folder
+     
+end note
+note right of org.flomik.FlomiksFactions.clan.managers.NexusConfigManager::save()
+
+     * Save changes in memory to disk
+     
+end note
+note left of org.flomik.FlomiksFactions.clan.managers.NexusConfigManager::get()
+
+     * Get the FileConfiguration object for direct reads/writes
+     
+end note
+note right of org.flomik.FlomiksFactions.clan.managers.NexusConfigManager::getColor(String)
+
+     * Get a bar color from path, defaults to WHITE if missing or invalid
+     
+end note
+note left of org.flomik.FlomiksFactions.clan.managers.NexusConfigManager::getString(String)
+
+     * Get a translated string (supports color codes)
+     
+end note
+note right of org.flomik.FlomiksFactions.clan.managers.NexusConfigManager::getInt(String)
+
+     * Get an integer from the config
+     
+end note
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.home.HomeHandler {
+- ClanManager clanManager
+- FlomiksFactions plugin
++ <<Create>> HomeHandler(ClanManager,FlomiksFactions)
++ boolean handleCommand(Player)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.randomEvents.events.RunnerEvent {
+- Map<Player,Location> lastLocations
+- String EventName
+- String description
+- int remainingTime
++ <<Create>> RunnerEvent(FlomiksFactions)
++ void start()
++ void stop()
++ void onTick()
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.EventScheduler {
+- RandomEventManager eventManager
+- JavaPlugin plugin
+- Random random
+- {static} List<int[]> ACTIVE_PERIODS
+- {static} int MIN_DELAY_MINUTES
+- {static} int MAX_DELAY_MINUTES
++ <<Create>> EventScheduler(JavaPlugin,RandomEventManager)
++ void start()
+- void scheduleNextEvent()
+- void scheduleEventAfterDelay(long)
+- void scheduleNextEventWithDelay(long)
+- boolean isActivePeriod()
+- long calculateInitialDelay()
+- String getRandomEvent()
+}
+note left of org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.EventScheduler::MIN_DELAY_MINUTES
+ 2 часа
+end note
+note right of org.flomik.FlomiksFactions.worldEvents.randomEvents.managers.EventScheduler::MAX_DELAY_MINUTES
+ 3 часа
+end note
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.InfoHandler {
+- ClanManager clanManager
+- PlayerDataHandler playerDataHandler
++ <<Create>> InfoHandler(ClanManager,PlayerDataHandler)
++ boolean handleCommand(Player,String[])
+- int getOnlineMembersCount(Clan)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.HelpHandler {
++ boolean handleCommand(Player,String[])
+- boolean showCommands(Player,int)
+~ void addCommand(TextComponent,String,String,String)
+}
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.ClaimRegionHandler {
+- ClanManager clanManager
+- UnclaimRegionHandler unclaimRegionCommandHandler
+- ShrineEvent shrineEvent
+- BeaconDao beaconDao
+- BeaconManager beaconManager
++ <<Create>> ClaimRegionHandler(ClanManager,UnclaimRegionHandler,ShrineEvent,BeaconDao,BeaconManager)
++ boolean handleCommand(Player,String[])
++ boolean claimChunkWithBeacon(Player,Block)
+- void addWorldGuardRegion(Chunk,String,Player,Block)
+- String getChunkId(Chunk)
+- boolean isNotEnoughStrength(Clan)
+- boolean isChunkClaimed(String,Clan)
++ void addMembers(Clan,ProtectedRegion)
+- boolean isChunkClaimedByAnotherClan(String,Clan)
+- boolean isShrineChunk(Chunk)
+}
+
+note left of org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.ClaimRegionHandler::isShrineChunk(Chunk)
+ Пример проверки, является ли чанк точкой святилища.
+end note
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.ModerHandler {
+- ClanManager clanManager
++ <<Create>> ModerHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.clan.managers.ClanManager {
+- ClanDao clanDao
+- InvitationDao invitationDao
++ Map<String,Clan> clans
++ <<Create>> ClanManager(FlomiksFactions,ClanDao,InvitationDao)
++ InvitationDao getInvitationDao()
++ ClanDao getClanDao()
++ void addPlayerToClanRegionsAsMember(Player,Clan)
++ void addPlayerToClanRegionsAsOwner(Player,Clan)
++ void removePlayerFromClanRegions(Player,Clan)
++ void createClan(String,String)
++ Clan getClan(String)
++ Clan getPlayerClan(String)
++ Clan getClanByChunk(Chunk)
++ boolean isEnemyTerritory(Player,Block)
++ boolean isEnemyPlayers(Player,Player)
++ void sendClanMessage(Clan,String)
++ void invitePlayer(String,String)
++ Clan getClanByPlayer(String)
++ void updateStrengthForPlayer(String,PlayerDataHandler)
++ void disbandClan(String)
++ void joinClan(String,String)
++ Collection<Clan> getAllClans()
++ void updateClan(Clan)
++ Map<String,Clan> getClans()
++ void saveClan(Clan)
++ void loadClans()
++ void leaveClan(String)
++ void saveAllClans()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.JoinHandler {
+- ClanManager clanManager
++ <<Create>> JoinHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.listener.MenuProtectionListener {
++ void onInventoryClick(InventoryClickEvent)
+}
+
+abstract class org.flomik.FlomiksFactions.worldEvents.randomEvents.events.RandomEvent {
+# FlomiksFactions plugin
+# int duration
+# List<Integer> rewards
+# Map<Player,Integer> scores
+# BossBar bossBar
+# boolean running
+- boolean finished
++ <<Create>> RandomEvent(FlomiksFactions,int,List<Integer>)
++ {abstract}void start()
++ {abstract}void stop()
++ {abstract}void onTick()
++ boolean isRunning()
++ BossBar getBossBar()
+# void updateBossBarProgress(int,String)
+# void announceEventStart(String,String)
+# void announceResults(String,String,String)
+}
+
+
+class org.flomik.FlomiksFactions.database.BeaconDatabaseManager {
+- String url
++ void initDatabase(Plugin)
++ void createTables()
++ Connection getConnection()
++ void close()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.ChatHandler {
+- ClanManager clanManager
++ <<Create>> ChatHandler(ClanManager)
++ boolean onCommand(CommandSender,Command,String,String[])
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.castle.events.CastleEvent {
+- FlomiksFactions plugin
+- HeadsManager headsManager
+- BossBar bossBar
+- boolean eventActive
+- int wave
++ <<Create>> CastleEvent(FlomiksFactions,HeadsManager)
++ void start()
++ void spawnWave()
++ void endEvent()
++ boolean isEventActive()
+}
+
+
+class org.flomik.FlomiksFactions.player.PlayerDataHandler {
+- FlomiksFactions plugin
+- PlayerDatabaseManager playerDatabaseManager
+- PlayerDataDao playerDataDao
++ <<Create>> PlayerDataHandler(FlomiksFactions)
++ boolean hasFirstJoinDate(String)
++ void setFirstJoinDate(String,LocalDate)
++ boolean hasPlayerData(String)
++ int getDeaths(Player)
++ int getKills(Player)
++ void savePlayerAttributes(String,int,int,int)
++ String getFirstJoinDate(String)
++ int getPlayerLevel(String)
++ void setPlayerLevel(String,int)
++ int getPlayerStrength(String)
++ void setPlayerStrength(String,int)
++ void addPlayerStrength(String,int)
++ int getPlayerMaxStrength(String)
++ void setPlayTime(String,int)
++ int getPlayTime(String)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.LeaderHandler {
+- ClanManager clanManager
++ <<Create>> LeaderHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.database.PlayerDatabaseManager {
+- String url
++ void initDatabase(Plugin)
++ void createTables()
++ Connection getConnection()
++ void close()
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.randomEvents.events.DiverEvent {
+- String EventName
+- String description
+- int remainingTime
++ <<Create>> DiverEvent(FlomiksFactions)
++ void start()
++ void stop()
++ void onTick()
+- boolean isPlayerUnderwater(Player)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.BankCommandHandler {
+- ClanManager clanManager
+- Economy economy
++ <<Create>> BankCommandHandler(ClanManager,Economy)
++ boolean handleCommand(Player,String[])
+}
+note left of org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.BankCommandHandler::economy
+ из Vault
+end note
+
+
+class org.flomik.FlomiksFactions.clan.CaptureSession {
+- String regionId
+- BossBar bossBar
+- Clan defendingClan
+- Clan attackingClan
++ <<Create>> CaptureSession(String,BossBar,Clan,Clan)
++ String getRegionId()
++ BossBar getBossBar()
++ Clan getDefendingClan()
++ Clan getAttackingClan()
+}
+
+
+class org.flomik.FlomiksFactions.database.ClanDao {
+- ClanDatabaseManager clanDatabaseManager
++ <<Create>> ClanDao(ClanDatabaseManager)
++ Clan getClanByName(String)
++ List<Clan> getAllClans()
++ void insertClan(Clan)
++ void updateClan(Clan)
++ void deleteClan(String)
+- int getClanIdByName(Connection,String)
+- void saveMembers(Connection,int,Clan)
+- void saveAlliances(Connection,int,List<String>)
+- void saveChunks(Connection,int,List<String>)
+- void clearMembers(Connection,int)
+- void clearAlliances(Connection,int)
+- void clearChunks(Connection,int)
+- Clan mapRowToClan(Connection,ResultSet)
+- Set<String> loadMembers(Connection,int)
+- Map<String,String> loadRoles(Connection,int)
+- List<String> loadAlliances(Connection,int)
+- List<String> loadChunks(Connection,int)
+}
+
+
+class org.flomik.FlomiksFactions.clan.managers.BeaconManager {
+- Map<String,Beacon> beacons
++ void addBeacon(Beacon)
++ Beacon getBeaconByLocation(Location)
++ Collection<Beacon> getAllBeacons()
++ Beacon getBeaconByRegionId(String)
++ void removeBeacon(String)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.castle.config.CastleConfigManager {
+- {static} FileConfiguration customFile
+- {static} File file
+- {static} FlomiksFactions plugin
++ {static} void setup(FlomiksFactions)
++ {static} void loadConfig()
++ {static} FileConfiguration get()
++ {static} void save()
++ {static} BarColor getColor(String)
++ {static} void reload()
++ {static} String getString(String)
++ {static} int getInt(String)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.KickHandler {
+- ClanManager clanManager
++ <<Create>> KickHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.FlomiksFactions {
+- ClanManager clanManager
+- BeaconDao beaconDao
+- ClaimRegionHandler claimRegionHandler
+- UnclaimRegionHandler unclaimRegionHandler
+- BeaconManager beaconManager
+- BeaconDatabaseManager beaconDatabaseManager
+- ChunkMenuManager chunkMenuManager
+- PlayerDataHandler playerDataHandler
+- ShrineEvent shrineEvent
+- CastleEvent castleEvent
+- RandomEventManager eventManager
+- Economy economy
+- EventScheduler eventScheduler
+- ClanDatabaseManager clanDatabaseManager
+- ClanDao clanDao
+- InvitationDao invitationDao
+- PlayerDatabaseManager playerDatabaseManager
+- CastleLootManager lootManager
+- HeadsManager headsManager
+- ShrineConfigManager shrineConfigManager
++ void onEnable()
++ void onDisable()
+- void saveData()
+- void closeDatabase()
+- void denyClanTNT()
+- void stopEvents()
+- void setupConfigs()
+- void setupDatabase()
+- void setupDependencies()
+- void startSchedulers()
+- void startZeroHpCheck()
++ boolean setupEconomy()
+- void registerCommandsAndEvents()
++ Economy getEconomy()
++ ShrineEvent getShrineEvent()
++ ClanManager getClanManager()
++ BeaconManager getBeaconManager()
++ BeaconDao getBeaconDao()
++ ChunkMenuManager getMenuManager()
++ PlayerDataHandler getPlayerDataHandler()
++ CastleEvent getCastleEvent()
++ CastleLootManager getLootManager()
++ RandomEventManager getEventManager()
++ ClanDatabaseManager getDatabaseManager()
++ ClanDao getClanDao()
++ ClaimRegionHandler getClaimRegionHandler()
++ InvitationDao getInvitationDao()
++ PlayerDatabaseManager getPlayerDatabaseManager()
++ ShrineConfigManager getShrineConfigManager()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.CreateHandler {
+- ClanManager clanManager
++ <<Create>> CreateHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.database.ClanDatabaseManager {
+- String url
++ void initDatabase(Plugin)
++ void createTables()
++ Connection getConnection()
++ void close()
+}
+
+
+class org.flomik.FlomiksFactions.register.EventRegistrar {
++ {static} void registerEvents(FlomiksFactions)
+}
+
+class org.flomik.FlomiksFactions.clan.commands.ClanChunksCommand {
+- FlomiksFactions plugin
+- ClanManager clanManager
++ <<Create>> ClanChunksCommand(FlomiksFactions,ClanManager)
++ boolean onCommand(CommandSender,Command,String,String[])
+}
+
+
+class org.flomik.FlomiksFactions.listener.ClanTNTListener {
+- ClanManager clanManager
+- FlomiksFactions plugin
+- Map<Clan,Long> lastLogoutTimes
+- Map<Clan,BukkitRunnable> clanTimers
++ <<Create>> ClanTNTListener(ClanManager,FlomiksFactions)
+- int getOnlineMembersCount(Clan)
++ void onPlayerJoin(PlayerJoinEvent)
++ void onPlayerQuit(PlayerQuitEvent)
+- void setClanFlags(Clan,StateFlag.State)
+}
+
+
+class org.flomik.FlomiksFactions.clan.managers.ChunkMenuManager {
+- {static} String MENU_TITLE
+- {static} int MENU_SIZE
+- FlomiksFactions plugin
+- ClanManager clanManager
++ <<Create>> ChunkMenuManager(FlomiksFactions,ClanManager)
++ void openChunkMenu(Player)
+- String getFacingDirection(Vector)
+- Chunk getRelativeChunk(Chunk,int,int,String)
+- int getSlotForChunk(int,int)
+- {static} String getChunkOwner(Chunk,ClanManager)
+- {static} String getChunkId(Chunk)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.InviteHandler {
+- ClanManager clanManager
++ <<Create>> InviteHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+- void sendMessageToRole(Clan,String)
+}
+
+
+class org.flomik.FlomiksFactions.utils.Utils {
++ {static} String hex(String)
+}
+
+class org.flomik.FlomiksFactions.clan.commands.EventCommand {
+- RandomEventManager eventManager
+- FlomiksFactions plugin
++ <<Create>> EventCommand(RandomEventManager,FlomiksFactions)
++ boolean onCommand(CommandSender,Command,String,String[])
+- void handleStartEvent(CommandSender,String)
+- void handleStopEvent(CommandSender,String)
++ List<String> onTabComplete(CommandSender,Command,String,String[])
+- List<String> getEventSuggestions(String)
+- List<String> getSubCommandSuggestions(String)
+- List<String> getSuggestions(String,List<String>)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.ChunkMenuCommand {
+- ChunkMenuManager chunkMenuManager
++ <<Create>> ChunkMenuCommand(ChunkMenuManager)
++ boolean onCommand(CommandSender,Command,String,String[])
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions.MapHandler {
+- ChunkMenuManager chunkMenuManager
++ <<Create>> MapHandler(ChunkMenuManager)
++ boolean handleCommand(Player)
+}
+
+
+class org.flomik.FlomiksFactions.database.PlayerDataDao {
+- PlayerDatabaseManager playerDatabaseManager
+- {static} DateTimeFormatter DATE_FORMATTER
++ <<Create>> PlayerDataDao(PlayerDatabaseManager)
+- void ensurePlayerExists(String)
++ boolean hasPlayerData(String)
++ boolean hasFirstJoinDate(String)
++ void setFirstJoinDate(String,LocalDate)
++ String getFirstJoinDate(String)
++ void savePlayerAttributes(String,int,int,int)
++ int getPlayerLevel(String)
++ void setPlayerLevel(String,int)
++ int getPlayerStrength(String)
++ void setPlayerStrength(String,int)
++ void addPlayerStrength(String,int)
++ int getPlayerMaxStrength(String)
++ void setPlayTime(String,int)
++ int getPlayTime(String)
+}
+
+note left of org.flomik.FlomiksFactions.database.PlayerDataDao::hasPlayerData(String)
+
+     * Проверка, есть ли данные о игроке.
+     
+end note
+note right of org.flomik.FlomiksFactions.database.PlayerDataDao::hasFirstJoinDate(String)
+
+     * Дата первого входа
+     
+end note
+note left of org.flomik.FlomiksFactions.database.PlayerDataDao::savePlayerAttributes(String,int,int,int)
+
+     * Уровень и сила (strength), а также maxStrength
+     
+end note
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.DescriptionHandler {
+- ClanManager clanManager
++ <<Create>> DescriptionHandler(ClanManager)
++ boolean handleCommand(Player,String[])
+}
+
+
+class org.flomik.FlomiksFactions.clan.Beacon {
+- String clanName
+- Location location
+- int health
+- String regionId
++ <<Create>> Beacon(String,Location,int,String)
++ String getClanName()
++ Location getLocation()
++ int getHealth()
++ void setHealth(int)
++ String getRegionId()
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.shrine.managers.ShrineEventManager {
+- ShrineEvent shrineEvent
+- FlomiksFactions plugin
+- ClanManager clanManager
+- BossBar captureBossBar
+- int captureTime
+- Set<Player> playersInZone
+- Clan capturingClan
++ <<Create>> ShrineEventManager(ShrineEvent,FlomiksFactions,ClanManager)
++ void startCaptureMechanism()
+- void checkPlayersOnShrine(Location)
+- void addNearbyPlayersToBossBar(Location)
+- void sendEnemyOnShrineMessage(Clan)
+- boolean isPlayerOnShrine(Player,Location)
+- void rewardPlayersInZone()
+- void onShrineCaptureSuccess()
+- void sendActionBar(Player,String)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.AllyHandler {
+- ClanManager clanManager
+- ConcurrentHashMap<String,List<String>> pendingAllies
++ <<Create>> AllyHandler(ClanManager,ConcurrentHashMap<String,List<String>>)
++ boolean handleCommand(Player,String[])
+- void sendMessageToRole(Clan,Object)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.ClaimRegionHandlerSave {
+- ClanManager clanManager
+- UnclaimRegionHandler unclaimRegionCommandHandler
+- ShrineEvent shrineEvent
++ <<Create>> ClaimRegionHandlerSave(ClanManager,UnclaimRegionHandler,ShrineEvent)
++ boolean handleCommand(Player)
+- boolean isNotEnoughStrength(Clan)
+- boolean isLeaderOrDeputy(Player,Clan)
+- String getChunkId(Chunk)
+- boolean isChunkClaimedByAnotherClan(String,Clan)
+- boolean isChunkClaimed(String,Clan)
+- void addWorldGuardRegion(Chunk,String,Player)
++ void addMembers(Clan,ProtectedRegion)
+- boolean isShrineChunk(Chunk)
+}
+
+
+class org.flomik.FlomiksFactions.listener.PlayerDataListener {
+- PlayerDataHandler playerDataHandler
+- ClanManager clanManager
+- FlomiksFactions plugin
++ <<Create>> PlayerDataListener(FlomiksFactions,PlayerDataHandler,ClanManager)
++ void onPlayerJoin(PlayerJoinEvent)
++ void onPlayerQuit(PlayerQuitEvent)
+- void updatePlayerStatistics(String)
++ void startPeriodicStatsUpdate(FlomiksFactions)
+}
+
+
+class org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent {
+- FlomiksFactions plugin
+- List<Location> shrineLocations
+- Location activeShrineLocation
+- ShrineConfigManager configManager
++ <<Create>> ShrineEvent(FlomiksFactions,ShrineConfigManager)
++ void loadShrinesFromFile()
++ void saveShrinesToFile()
+- String locationToString(Location)
+- Location stringToLocation(String)
++ void addShrineLocation(Player)
+- void createWorldGuardRegion(Player,Location)
+- void buildShrine(Location)
++ void deactivateShrine()
++ void deleteAllSanctuaries()
++ Location getActiveShrineLocation()
++ void cancelShrineEvent()
++ void removeShrineLocation(Player)
++ void startShrineEvent()
+- void startDailyEventScheduler()
++ List<Location> getShrineLocations()
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.ClanCommand {
+- ConcurrentHashMap<String,Long> pendingDisbands
+- ConcurrentHashMap<String,List<String>> pendingAllies
+- ClanManager clanManager
+- BeaconManager beaconManager
+- BeaconDao beaconDao
+- CreateHandler createHandler
+- DisbandHandler disbandHandler
+- PromoteHandler promoteHandler
+- DemoteHandler demoteHandler
+- InviteHandler inviteHandler
+- JoinHandler joinHandler
+- KickHandler kickHandler
+- ListHandler listHandler
+- LeaveHandler leaveHandler
+- InfoHandler infoHandler
+- SetHomeHandler setHomeHandler
+- DelHomeHandler delHomeHandler
+- HomeHandler homeHandler
+- AllyHandler allyHandler
+- LeaderHandler leaderHandler
+- NameHandler renameHanler
+- DescriptionHandler descriptionHanler
+- ModerHandler moderHanler
+- ClaimRegionHandler claimRegionHandler
+- UnclaimRegionHandler unclaimRegionHandler
+- HelpHandler helpHandler
+- MapHandler mapHandler
+- BankCommandHandler bankCommandHandler
++ <<Create>> ClanCommand(ClanManager,PlayerDataHandler,FlomiksFactions,ChunkMenuManager,ShrineEvent,BeaconDao,BeaconManager)
++ boolean onCommand(CommandSender,Command,String,String[])
+- List<String> getClanNames()
++ List<String> onTabComplete(CommandSender,Command,String,String[])
+- List<String> getSubCommandSuggestions(String)
+- List<String> getPlayerSuggestions(String)
+- List<String> getClanSuggestions(String)
+- List<String> getSuggestions(String,List<String>)
+}
+
+
+class org.flomik.FlomiksFactions.register.CommandRegistrar {
++ {static} void registerCommands(FlomiksFactions)
+}
+
+class org.flomik.FlomiksFactions.worldEvents.castle.managers.CastleLootManager {
+- FlomiksFactions plugin
+- Map<ItemStack,Double> lootTable
+- File lootFile
++ <<Create>> CastleLootManager(FlomiksFactions)
++ void updateLootTable(Map<ItemStack,Double>)
++ void loadLootTable()
++ void saveLootTable()
++ Map<ItemStack,Double> getLootTable()
+}
+
+
+class org.flomik.FlomiksFactions.listener.StrengthTickListener {
+- PlayerDataHandler playerDataHandler
++ <<Create>> StrengthTickListener(PlayerDataHandler)
++ void addStrength(FlomiksFactions)
+}
+
+
+class org.flomik.FlomiksFactions.clan.commands.handlers.home.DelHomeHandler {
+- ClanManager clanManager
++ <<Create>> DelHomeHandler(ClanManager)
++ boolean handleCommand(Player)
+}
+
+
+class org.flomik.FlomiksFactions.clan.managers.TNTManager {
+- ClanManager clanManager
++ <<Create>> TNTManager(ClanManager)
++ void denyTNTForAllClans()
+}
+
+
+class org.flomik.FlomiksFactions.listener.ChatPrefixListener {
+- ClanManager clanManager
++ <<Create>> ChatPrefixListener(ClanManager)
++ void onPlayerChat(AsyncPlayerChatEvent)
+}
+
+
+class org.flomik.FlomiksFactions.listener.playerClanTerritoryListener {
+- ClanManager clanManager
+- FlomiksFactions plugin
+- Map<Player,Boolean> playerInClanTerritory
++ <<Create>> playerClanTerritoryListener(ClanManager,FlomiksFactions)
++ void onPlayerMove(PlayerMoveEvent)
+- String getChunkId(Chunk)
+- void sendActionBar(Player,String)
+- void clearActionBar(Player)
+}
+
+
+
+
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.PlayerDeathStrengthListener
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.ShrineCommand
+org.bukkit.command.TabCompleter <|.. org.flomik.FlomiksFactions.clan.commands.ShrineCommand
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.CastleInteractListener
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.SetStrengthCommand
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.PlayerCommand
+org.bukkit.command.TabCompleter <|.. org.flomik.FlomiksFactions.clan.commands.PlayerCommand
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.worldEvents.randomEvents.events.FishermanEvent
+org.flomik.FlomiksFactions.worldEvents.randomEvents.events.RandomEvent <|-- org.flomik.FlomiksFactions.worldEvents.randomEvents.events.FishermanEvent
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.CastleCommand
+org.bukkit.command.TabCompleter <|.. org.flomik.FlomiksFactions.clan.commands.CastleCommand
+me.clip.placeholderapi.expansion.PlaceholderExpansion <|-- org.flomik.FlomiksFactions.utils.Placeholders
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.ClanPvPListener
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.NexusBlockListener
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.BeaconExplosionListener
+org.flomik.FlomiksFactions.worldEvents.randomEvents.events.RandomEvent <|-- org.flomik.FlomiksFactions.worldEvents.randomEvents.events.RunnerEvent
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.MenuProtectionListener
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.ChatHandler
+org.flomik.FlomiksFactions.worldEvents.randomEvents.events.RandomEvent <|-- org.flomik.FlomiksFactions.worldEvents.randomEvents.events.DiverEvent
+org.bukkit.plugin.java.JavaPlugin <|-- org.flomik.FlomiksFactions.FlomiksFactions
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.ClanChunksCommand
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.ClanTNTListener
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.EventCommand
+org.bukkit.command.TabCompleter <|.. org.flomik.FlomiksFactions.clan.commands.EventCommand
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.ChunkMenuCommand
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.PlayerDataListener
+org.bukkit.command.CommandExecutor <|.. org.flomik.FlomiksFactions.clan.commands.ClanCommand
+org.bukkit.command.TabCompleter <|.. org.flomik.FlomiksFactions.clan.commands.ClanCommand
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.ChatPrefixListener
+org.bukkit.event.Listener <|.. org.flomik.FlomiksFactions.listener.playerClanTerritoryListener
+@enduml

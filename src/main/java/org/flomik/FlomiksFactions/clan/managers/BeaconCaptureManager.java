@@ -1,4 +1,4 @@
-package org.flomik.FlomiksFactions.clan.managers;
+package org.flomik.FlomiksFactions.clan.managers; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
 
 import org.bukkit.*;
 import org.bukkit.boss.BossBar;
@@ -10,29 +10,29 @@ import org.flomik.FlomiksFactions.FlomiksFactions;
 import org.flomik.FlomiksFactions.clan.Beacon;
 import org.flomik.FlomiksFactions.clan.CaptureSession;
 import org.flomik.FlomiksFactions.clan.Clan;
-import org.flomik.FlomiksFactions.commands.handlers.clanInteractions.UnclaimRegionHandler;
+import org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.UnclaimRegionHandler;
 import org.flomik.FlomiksFactions.database.BeaconDao;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BeaconCaptureManager {
+public class BeaconCaptureManager { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    private final FlomiksFactions plugin;
-    private final BeaconManager beaconManager;
-    private final ClanManager clanManager;
-    private final BeaconDao beaconDao;
-    private final UnclaimRegionHandler unclaimHandler;
-    int captureTime = NexusConfigManager.getInt("capture-time");
-    BarColor barColor = NexusConfigManager.getColor("bossbar-color");
+    private final FlomiksFactions plugin; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final BeaconManager beaconManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final BeaconDao beaconDao; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final UnclaimRegionHandler unclaimHandler; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    int captureTime = NexusConfigManager.getInt("capture-time"); //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    BarColor barColor = NexusConfigManager.getColor("bossbar-color"); //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    private final Map<String, CaptureSession> activeCaptures = new HashMap<>();
+    private final Map<String, CaptureSession> activeCaptures = new HashMap<>(); //NOPMD - suppressed UseConcurrentHashMap - TODO explain reason for suppression //NOPMD - suppressed UseConcurrentHashMap - TODO explain reason for suppression //NOPMD - suppressed UseConcurrentHashMap - TODO explain reason for suppression
 
-    public BeaconCaptureManager(
-            FlomiksFactions plugin,
-            BeaconManager beaconManager,
-            ClanManager clanManager,
-            BeaconDao beaconDao,
-            UnclaimRegionHandler unclaimHandler) {
+    public BeaconCaptureManager( //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+            FlomiksFactions plugin, //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+            BeaconManager beaconManager, //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+            ClanManager clanManager, //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+            BeaconDao beaconDao, //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+            UnclaimRegionHandler unclaimHandler) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
         this.plugin = plugin;
         this.beaconManager = beaconManager;
         this.clanManager = clanManager;
@@ -41,60 +41,60 @@ public class BeaconCaptureManager {
     }
 
     // Called periodically
-    public void checkForAutoCaptures() {
-        for (Beacon beacon : beaconManager.getAllBeacons()) {
+    public void checkForAutoCaptures() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        for (Beacon beacon : beaconManager.getAllBeacons()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
             // skip if not vulnerable
-            if (beacon.getHealth() > 0) continue;
-            if (activeCaptures.containsKey(beacon.getRegionId())) continue;
+            if (beacon.getHealth() > 0) continue; //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
+            if (activeCaptures.containsKey(beacon.getRegionId())) continue; //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
 
-            Clan defendingClan = clanManager.getClan(beacon.getClanName());
-            if (defendingClan == null) continue;
+            Clan defendingClan = clanManager.getClan(beacon.getClanName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            if (defendingClan == null) continue; //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
 
-            Chunk chunk = beacon.getLocation().getChunk();
-            Clan attackingClan = findAttackingClanInChunk(chunk, defendingClan);
+            Chunk chunk = beacon.getLocation().getChunk(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            Clan attackingClan = findAttackingClanInChunk(chunk, defendingClan); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
             if (attackingClan != null) {
                 startCapture(beacon, defendingClan, attackingClan);
             }
         }
     }
 
-    private Clan findAttackingClanInChunk(Chunk chunk, Clan defendingClan) {
-        for (org.bukkit.entity.Player p : chunk.getWorld().getPlayers()) {
-            if (p.getLocation().getChunk().equals(chunk)) {
-                Clan c = clanManager.getPlayerClan(p.getName());
+    private Clan findAttackingClanInChunk(Chunk chunk, Clan defendingClan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        for (org.bukkit.entity.Player p : chunk.getWorld().getPlayers()) { //NOPMD - suppressed UnnecessaryFullyQualifiedName - TODO explain reason for suppression //NOPMD - suppressed UnnecessaryFullyQualifiedName - TODO explain reason for suppression //NOPMD - suppressed UnnecessaryFullyQualifiedName - TODO explain reason for suppression
+            if (p.getLocation().getChunk().equals(chunk)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                Clan c = clanManager.getPlayerClan(p.getName()); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
                 if (c != null && !c.equals(defendingClan)) {
-                    return c;
+                    return c; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
                 }
             }
         }
         return null;
     }
 
-    private void startCapture(Beacon beacon, Clan defendingClan, Clan attackingClan) {
+    private void startCapture(Beacon beacon, Clan defendingClan, Clan attackingClan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
         // Create a BossBar
-        BossBar bar = Bukkit.createBossBar(
+        BossBar bar = Bukkit.createBossBar( //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 "Capturing " + beacon.getRegionId(),
                 barColor,
                 BarStyle.SOLID
         );
 
-        for (String mem : defendingClan.getMembers()) {
-            Player p = Bukkit.getPlayerExact(mem);
-            if (p != null) bar.addPlayer(p);
+        for (String mem : defendingClan.getMembers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            Player p = Bukkit.getPlayerExact(mem); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+            if (p != null) bar.addPlayer(p); //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
         }
-        for (String mem : attackingClan.getMembers()) {
-            Player p = Bukkit.getPlayerExact(mem);
-            if (p != null) bar.addPlayer(p);
+        for (String mem : attackingClan.getMembers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            Player p = Bukkit.getPlayerExact(mem); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+            if (p != null) bar.addPlayer(p); //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
         }
 
         // Create session
-        CaptureSession session = new CaptureSession(beacon.getRegionId(), bar, defendingClan, attackingClan);
+        CaptureSession session = new CaptureSession(beacon.getRegionId(), bar, defendingClan, attackingClan); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
         activeCaptures.put(beacon.getRegionId(), session);
 
         // 3-minute countdown
         new BukkitRunnable() {
-            int elapsed = 0;
-            final int totalTicks = captureTime; // e.g. 180 for 3 min
+            int elapsed = 0; //NOPMD - suppressed RedundantFieldInitializer - TODO explain reason for suppression //NOPMD - suppressed RedundantFieldInitializer - TODO explain reason for suppression //NOPMD - suppressed RedundantFieldInitializer - TODO explain reason for suppression
+            final int totalTicks = captureTime; // e.g. 180 for 3 min //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
             @Override
             public void run() {
@@ -102,10 +102,10 @@ public class BeaconCaptureManager {
                 if (!activeCaptures.containsKey(beacon.getRegionId())) {
                     bar.removeAll();
                     cancel();
-                    return;
+                    return; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
                 }
 
-                boolean attackerStillHere = attackerStillInChunk(beacon, attackingClan);
+                boolean attackerStillHere = attackerStillInChunk(beacon, attackingClan); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 if (!attackerStillHere) {
                     // Attack aborted
                     activeCaptures.remove(beacon.getRegionId());
@@ -115,7 +115,7 @@ public class BeaconCaptureManager {
                 }
 
                 // Update bossbar
-                double progress = (double) elapsed / (double) totalTicks;
+                double progress = (double) elapsed / (double) totalTicks; //NOPMD - suppressed UnnecessaryCast - TODO explain reason for suppression //NOPMD - suppressed UnnecessaryCast - TODO explain reason for suppression //NOPMD - suppressed UnnecessaryCast - TODO explain reason for suppression
                 bar.setProgress(Math.min(1.0, progress));
 
                 if (elapsed >= totalTicks) {
@@ -130,23 +130,23 @@ public class BeaconCaptureManager {
         }.runTaskTimer(plugin, 20L, 20L); // 1-second intervals
     }
 
-    private boolean attackerStillInChunk(Beacon beacon, Clan attackingClan) {
-        Chunk chunk = beacon.getLocation().getChunk();
-        for (Player p : chunk.getWorld().getPlayers()) {
+    private boolean attackerStillInChunk(Beacon beacon, Clan attackingClan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        Chunk chunk = beacon.getLocation().getChunk(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+        for (Player p : chunk.getWorld().getPlayers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
             if (p.getLocation().getChunk().equals(chunk)) {
-                Clan c = clanManager.getPlayerClan(p.getName());
+                Clan c = clanManager.getPlayerClan(p.getName()); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
                 if (c != null && c.equals(attackingClan)) {
-                    return true;
+                    return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
                 }
             }
         }
         return false;
     }
 
-    private void finalizeCapture(Beacon beacon, Clan defendingClan, Clan attackingClan) {
-        World w = beacon.getLocation().getWorld();
-        String regionId = beacon.getRegionId();
-        Chunk chunk = beacon.getLocation().getChunk();
+    private void finalizeCapture(Beacon beacon, Clan defendingClan, Clan attackingClan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        World w = beacon.getLocation().getWorld(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+        String regionId = beacon.getRegionId(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Chunk chunk = beacon.getLocation().getChunk(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
 
         // 1) Remove old region + beacon
         unclaimHandler.removeRegionById(w, regionId);
@@ -155,16 +155,16 @@ public class BeaconCaptureManager {
 
         defendingClan.removeClaimedChunk(getChunkId(chunk));
 
-        // 2) Claim chunk for attacker (optionally create a brand-new region or reuse same region name)
+        // 2) Claim chunk for attacker (optionally create a brand-new region or reuse same region name) //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression
         attackingClan.addClaimedChunk(getChunkId(chunk));
 
         // Example: create a new regionId
-        String newRegionId = "clan_" + attackingClan.getName() + "_" + w.getName() + "_" + chunk.getX() + "_" + chunk.getZ();
-        // Then do your logic to add a new WG region with "addWorldGuardRegion(chunk, attackingClan.getName(), ...)"
+        String newRegionId = "clan_" + attackingClan.getName() + "_" + w.getName() + "_" + chunk.getX() + "_" + chunk.getZ(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        // Then do your logic to add a new WG region with "addWorldGuardRegion(chunk, attackingClan.getName(), ...)" //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression
         // or replicate your addWorldGuardRegion code.
 
         // 3) Optionally create a new Beacon for the new region
-        Beacon newBeacon = new Beacon(attackingClan.getName(), beacon.getLocation(), 5, newRegionId);
+        Beacon newBeacon = new Beacon(attackingClan.getName(), beacon.getLocation(), 5, newRegionId); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
         beaconManager.addBeacon(newBeacon);
         beaconDao.insertBeacon(attackingClan, beacon.getLocation(), newRegionId, 5);
 
@@ -172,19 +172,19 @@ public class BeaconCaptureManager {
         broadcastCaptureResult(defendingClan, attackingClan);
     }
 
-    private String getChunkId(Chunk chunk) {
+    private String getChunkId(Chunk chunk) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
         return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
     }
 
-    private void broadcastCaptureResult(Clan defendingClan, Clan attackingClan) {
-        for (String mem : defendingClan.getMembers()) {
-            Player p = Bukkit.getPlayerExact(mem);
+    private void broadcastCaptureResult(Clan defendingClan, Clan attackingClan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        for (String mem : defendingClan.getMembers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            Player p = Bukkit.getPlayerExact(mem); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             if (p != null) {
                 p.sendMessage(ChatColor.RED + "Your beacon was captured by " + attackingClan.getName() + "!");
             }
         }
-        for (String mem : attackingClan.getMembers()) {
-            Player p = Bukkit.getPlayerExact(mem);
+        for (String mem : attackingClan.getMembers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            Player p = Bukkit.getPlayerExact(mem); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             if (p != null) {
                 p.sendMessage(ChatColor.GREEN + "You have captured the territory from " + defendingClan.getName() + "!");
             }

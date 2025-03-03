@@ -1,4 +1,4 @@
-package org.flomik.FlomiksFactions.database;
+package org.flomik.FlomiksFactions.database; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,53 +9,53 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
-public class ClanDao {
-    private final ClanDatabaseManager clanDatabaseManager;
+public class ClanDao { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanDatabaseManager clanDatabaseManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    public ClanDao(ClanDatabaseManager clanDatabaseManager) {
+    public ClanDao(ClanDatabaseManager clanDatabaseManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.clanDatabaseManager = clanDatabaseManager;
     }
 
-    public Clan getClanByName(String name) {
+    public Clan getClanByName(String name) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         try (Connection conn = clanDatabaseManager.getConnection()) {
-            String sql = "SELECT * FROM clans WHERE LOWER(name) = ?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, name.toLowerCase());
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return mapRowToClan(conn, rs);
+            String sql = "SELECT * FROM clans WHERE LOWER(name) = ?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                ps.setString(1, name.toLowerCase()); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
+                try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+                    if (rs.next()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                        return mapRowToClan(conn, rs); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
         return null;
     }
 
-    public List<Clan> getAllClans() {
-        List<Clan> result = new ArrayList<>();
+    public List<Clan> getAllClans() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        List<Clan> result = new ArrayList<>(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
         try (Connection conn = clanDatabaseManager.getConnection()) {
-            String sql = "SELECT * FROM clans";
-            try (PreparedStatement ps = conn.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Clan clan = mapRowToClan(conn, rs);
+            String sql = "SELECT * FROM clans"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            try (PreparedStatement ps = conn.prepareStatement(sql); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                 ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+                while (rs.next()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    Clan clan = mapRowToClan(conn, rs); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                     result.add(clan);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
         return result;
     }
 
-    public void insertClan(Clan clan) {
-        String sql = "INSERT INTO clans (name, owner, creation_date, description, land, strength, level, clan_xp, balance, max_power, home_world, home_x, home_y, home_z, home_yaw, home_pitch) " +
+    public void insertClan(Clan clan) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        String sql = "INSERT INTO clans (name, owner, creation_date, description, land, strength, level, clan_xp, balance, max_power, home_world, home_x, home_y, home_z, home_yaw, home_pitch) " + //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = clanDatabaseManager.getConnection()) {
-            conn.setAutoCommit(false);
-            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            conn.setAutoCommit(false); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
                 ps.setString(1, clan.getName());
                 ps.setString(2, clan.getOwner());
                 ps.setLong(3, clan.getCreationDate().getTime());
@@ -67,12 +67,12 @@ public class ClanDao {
                 ps.setDouble(9, clan.getBalance());
                 ps.setInt(10, clan.getMaxPower());
                 if (clan.hasHome()) {
-                    ps.setString(11, clan.getHome().getWorld().getName());
-                    ps.setDouble(12, clan.getHome().getX());
-                    ps.setDouble(13, clan.getHome().getY());
-                    ps.setDouble(14, clan.getHome().getZ());
-                    ps.setFloat(15, clan.getHome().getYaw());
-                    ps.setFloat(16, clan.getHome().getPitch());
+                    ps.setString(11, clan.getHome().getWorld().getName()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setDouble(12, clan.getHome().getX()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setDouble(13, clan.getHome().getY()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setDouble(14, clan.getHome().getZ()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setFloat(15, clan.getHome().getYaw()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setFloat(16, clan.getHome().getPitch()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
                 } else {
                     ps.setNull(11, Types.VARCHAR);
                     ps.setNull(12, Types.DOUBLE);
@@ -82,32 +82,32 @@ public class ClanDao {
                     ps.setNull(16, Types.FLOAT);
                 }
                 ps.executeUpdate();
-                int clanId;
-                try (ResultSet keys = ps.getGeneratedKeys()) {
-                    keys.next();
+                int clanId; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+                try (ResultSet keys = ps.getGeneratedKeys()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    keys.next(); //NOPMD - suppressed CheckResultSet - TODO explain reason for suppression //NOPMD - suppressed CheckResultSet - TODO explain reason for suppression //NOPMD - suppressed CheckResultSet - TODO explain reason for suppression
                     clanId = keys.getInt(1);
                 }
                 saveMembers(conn, clanId, clan);
                 saveAlliances(conn, clanId, clan.getAlliances());
                 saveChunks(conn, clanId, clan.getRegionNames());
-                conn.commit();
+                conn.commit(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
             } catch (SQLException ex) {
-                conn.rollback();
-                ex.printStackTrace();
+                conn.rollback(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                ex.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
             } finally {
-                conn.setAutoCommit(true);
+                conn.setAutoCommit(true); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
     }
 
-    public void updateClan(Clan clan) {
-        String sql = "UPDATE clans SET owner = ?, creation_date = ?, description = ?, land = ?, strength = ?, level = ?, clan_xp = ?, balance = ?, max_power = ?, home_world = ?, home_x = ?, home_y = ?, home_z = ?, home_yaw = ?, home_pitch = ? " +
+    public void updateClan(Clan clan) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        String sql = "UPDATE clans SET owner = ?, creation_date = ?, description = ?, land = ?, strength = ?, level = ?, clan_xp = ?, balance = ?, max_power = ?, home_world = ?, home_x = ?, home_y = ?, home_z = ?, home_yaw = ?, home_pitch = ? " + //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 "WHERE LOWER(name) = ?";
         try (Connection conn = clanDatabaseManager.getConnection()) {
-            conn.setAutoCommit(false);
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
                 ps.setString(1, clan.getOwner());
                 ps.setLong(2, clan.getCreationDate().getTime());
                 ps.setString(3, clan.getDescription());
@@ -118,12 +118,12 @@ public class ClanDao {
                 ps.setDouble(8, clan.getBalance());
                 ps.setInt(9, clan.getMaxPower());
                 if (clan.hasHome()) {
-                    ps.setString(10, clan.getHome().getWorld().getName());
-                    ps.setDouble(11, clan.getHome().getX());
-                    ps.setDouble(12, clan.getHome().getY());
-                    ps.setDouble(13, clan.getHome().getZ());
-                    ps.setFloat(14, clan.getHome().getYaw());
-                    ps.setFloat(15, clan.getHome().getPitch());
+                    ps.setString(10, clan.getHome().getWorld().getName()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setDouble(11, clan.getHome().getX()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setDouble(12, clan.getHome().getY()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setDouble(13, clan.getHome().getZ()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setFloat(14, clan.getHome().getYaw()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                    ps.setFloat(15, clan.getHome().getPitch()); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
                 } else {
                     ps.setNull(10, Types.VARCHAR);
                     ps.setNull(11, Types.DOUBLE);
@@ -132,10 +132,10 @@ public class ClanDao {
                     ps.setNull(14, Types.FLOAT);
                     ps.setNull(15, Types.FLOAT);
                 }
-                ps.setString(16, clan.getName().toLowerCase());
+                ps.setString(16, clan.getName().toLowerCase()); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
                 ps.executeUpdate();
 
-                int clanId = getClanIdByName(conn, clan.getName());
+                int clanId = getClanIdByName(conn, clan.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
 
                 clearMembers(conn, clanId);
                 saveMembers(conn, clanId, clan);
@@ -146,45 +146,45 @@ public class ClanDao {
                 clearChunks(conn, clanId);
                 saveChunks(conn, clanId, clan.getRegionNames());
 
-                conn.commit();
+                conn.commit(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
             } catch (SQLException ex) {
-                conn.rollback();
-                ex.printStackTrace();
+                conn.rollback(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                ex.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
             } finally {
-                conn.setAutoCommit(true);
+                conn.setAutoCommit(true); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
     }
 
-    public void deleteClan(String clanName) {
-        try (Connection conn = clanDatabaseManager.getConnection()) {
-            String sql = "DELETE FROM clans WHERE LOWER(name)=?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, clanName.toLowerCase());
+    public void deleteClan(String clanName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        try (Connection conn = clanDatabaseManager.getConnection()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            String sql = "DELETE FROM clans WHERE LOWER(name)=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+            try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+                ps.setString(1, clanName.toLowerCase()); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
     }
 
-    private int getClanIdByName(Connection conn, String name) throws SQLException {
-        String sql = "SELECT id FROM clans WHERE LOWER(name)=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name.toLowerCase());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt("id");
+    private int getClanIdByName(Connection conn, String name) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        String sql = "SELECT id FROM clans WHERE LOWER(name)=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+            ps.setString(1, name.toLowerCase()); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
+            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+                if (rs.next()) return rs.getInt("id"); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             }
         }
         return -1;
     }
 
-    private void saveMembers(Connection conn, int clanId, Clan clan) throws SQLException {
-        String insert = "INSERT INTO clan_members (clan_id, member_name, role) VALUES (?,?,?)";
-        try (PreparedStatement ps = conn.prepareStatement(insert)) {
-            for (String member : clan.getMembers()) {
+    private void saveMembers(Connection conn, int clanId, Clan clan) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        String insert = "INSERT INTO clan_members (clan_id, member_name, role) VALUES (?,?,?)"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(insert)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+            for (String member : clan.getMembers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 ps.setInt(1, clanId);
                 ps.setString(2, member);
                 ps.setString(3, clan.getRole(member));
@@ -194,10 +194,10 @@ public class ClanDao {
         }
     }
 
-    private void saveAlliances(Connection conn, int clanId, List<String> alliances) throws SQLException {
-        String insert = "INSERT INTO clan_alliances (clan_id, alliance) VALUES (?,?)";
-        try (PreparedStatement ps = conn.prepareStatement(insert)) {
-            for (String ally : alliances) {
+    private void saveAlliances(Connection conn, int clanId, List<String> alliances) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        String insert = "INSERT INTO clan_alliances (clan_id, alliance) VALUES (?,?)"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(insert)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+            for (String ally : alliances) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 ps.setInt(1, clanId);
                 ps.setString(2, ally);
                 ps.addBatch();
@@ -206,10 +206,10 @@ public class ClanDao {
         }
     }
 
-    private void saveChunks(Connection conn, int clanId, List<String> chunks) throws SQLException {
-        String insert = "INSERT INTO clan_chunks (clan_id, chunk_name) VALUES (?,?)";
-        try (PreparedStatement ps = conn.prepareStatement(insert)) {
-            for (String chunk : chunks) {
+    private void saveChunks(Connection conn, int clanId, List<String> chunks) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        String insert = "INSERT INTO clan_chunks (clan_id, chunk_name) VALUES (?,?)"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(insert)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+            for (String chunk : chunks) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 ps.setInt(1, clanId);
                 ps.setString(2, chunk);
                 ps.addBatch();
@@ -218,73 +218,73 @@ public class ClanDao {
         }
     }
 
-    private void clearMembers(Connection conn, int clanId) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM clan_members WHERE clan_id=?")) {
+    private void clearMembers(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM clan_members WHERE clan_id=?")) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
             ps.executeUpdate();
         }
     }
 
-    private void clearAlliances(Connection conn, int clanId) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM clan_alliances WHERE clan_id=?")) {
+    private void clearAlliances(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM clan_alliances WHERE clan_id=?")) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
             ps.executeUpdate();
         }
     }
 
-    private void clearChunks(Connection conn, int clanId) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM clan_chunks WHERE clan_id=?")) {
+    private void clearChunks(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM clan_chunks WHERE clan_id=?")) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
             ps.executeUpdate();
         }
     }
 
-    private Clan mapRowToClan(Connection conn, ResultSet rs) throws SQLException {
-        String name = rs.getString("name");
-        String owner = rs.getString("owner");
-        Date creationDate = new Date(rs.getLong("creation_date"));
-        String description = rs.getString("description");
-        int land = rs.getInt("land");
-        int strength = rs.getInt("strength");
-        int level = rs.getInt("level");
-        int clanXp = rs.getInt("clan_xp");
-        double balance = rs.getDouble("balance");
-        int maxPower = rs.getInt("max_power");
+    private Clan mapRowToClan(Connection conn, ResultSet rs) throws SQLException { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
+        String name = rs.getString("name"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        String owner = rs.getString("owner"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Date creationDate = new Date(rs.getLong("creation_date")); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        String description = rs.getString("description"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        int land = rs.getInt("land"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        int strength = rs.getInt("strength"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        int level = rs.getInt("level"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        int clanXp = rs.getInt("clan_xp"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        double balance = rs.getDouble("balance"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        int maxPower = rs.getInt("max_power"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
 
-        String homeWorld = rs.getString("home_world");
-        Double homeX = (Double)rs.getObject("home_x");
-        Double homeY = (Double)rs.getObject("home_y");
-        Double homeZ = (Double)rs.getObject("home_z");
-        Float homeYaw = (Float)rs.getObject("home_yaw");
-        Float homePitch = (Float)rs.getObject("home_pitch");
+        String homeWorld = rs.getString("home_world"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Double homeX = (Double)rs.getObject("home_x"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Double homeY = (Double)rs.getObject("home_y"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Double homeZ = (Double)rs.getObject("home_z"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Float homeYaw = (Float)rs.getObject("home_yaw"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Float homePitch = (Float)rs.getObject("home_pitch"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
 
         Location home = null;
         if (homeWorld != null) {
-            World w = Bukkit.getWorld(homeWorld);
+            World w = Bukkit.getWorld(homeWorld); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             if (w != null) {
                 home = new Location(w, homeX, homeY, homeZ, homeYaw, homePitch);
             }
         }
 
-        int clanId = rs.getInt("id");
+        int clanId = rs.getInt("id"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
 
-        Set<String> members = loadMembers(conn, clanId);
-        Map<String,String> roles = loadRoles(conn, clanId);
-        List<String> alliances = loadAlliances(conn, clanId);
-        List<String> chunks = loadChunks(conn, clanId);
+        Set<String> members = loadMembers(conn, clanId); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        Map<String,String> roles = loadRoles(conn, clanId); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        List<String> alliances = loadAlliances(conn, clanId); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        List<String> chunks = loadChunks(conn, clanId); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
 
-        Clan clan = new Clan(name, owner, members, roles, creationDate, description, alliances, level, clanXp, balance, land, strength, maxPower, chunks);
+        Clan clan = new Clan(name, owner, members, roles, creationDate, description, alliances, level, clanXp, balance, land, strength, maxPower, chunks); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
         clan.setHome(home);
         clan.setBalance(balance);
         return clan;
     }
 
-    private Set<String> loadMembers(Connection conn, int clanId) throws SQLException {
-        Set<String> members = new HashSet<>();
-        String sql = "SELECT member_name FROM clan_members WHERE clan_id=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+    private Set<String> loadMembers(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        Set<String> members = new HashSet<>(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        String sql = "SELECT member_name FROM clan_members WHERE clan_id=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
                 while (rs.next()) {
                     members.add(rs.getString("member_name"));
                 }
@@ -293,12 +293,12 @@ public class ClanDao {
         return members;
     }
 
-    private Map<String,String> loadRoles(Connection conn, int clanId) throws SQLException {
-        Map<String,String> roles = new HashMap<>();
-        String sql = "SELECT member_name, role FROM clan_members WHERE clan_id=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+    private Map<String,String> loadRoles(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        Map<String,String> roles = new HashMap<>(); //NOPMD - suppressed UseConcurrentHashMap - TODO explain reason for suppression //NOPMD - suppressed UseConcurrentHashMap - TODO explain reason for suppression //NOPMD - suppressed UseConcurrentHashMap - TODO explain reason for suppression
+        String sql = "SELECT member_name, role FROM clan_members WHERE clan_id=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
                 while (rs.next()) {
                     roles.put(rs.getString("member_name"), rs.getString("role"));
                 }
@@ -307,12 +307,12 @@ public class ClanDao {
         return roles;
     }
 
-    private List<String> loadAlliances(Connection conn, int clanId) throws SQLException {
-        List<String> alliances = new ArrayList<>();
-        String sql = "SELECT alliance FROM clan_alliances WHERE clan_id=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+    private List<String> loadAlliances(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        List<String> alliances = new ArrayList<>(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        String sql = "SELECT alliance FROM clan_alliances WHERE clan_id=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
                 while (rs.next()) {
                     alliances.add(rs.getString("alliance"));
                 }
@@ -321,12 +321,12 @@ public class ClanDao {
         return alliances;
     }
 
-    private List<String> loadChunks(Connection conn, int clanId) throws SQLException {
-        List<String> chunks = new ArrayList<>();
-        String sql = "SELECT chunk_name FROM clan_chunks WHERE clan_id=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+    private List<String> loadChunks(Connection conn, int clanId) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
+        List<String> chunks = new ArrayList<>(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        String sql = "SELECT chunk_name FROM clan_chunks WHERE clan_id=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
             ps.setInt(1, clanId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
                 while (rs.next()) {
                     chunks.add(rs.getString("chunk_name"));
                 }

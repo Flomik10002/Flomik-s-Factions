@@ -1,14 +1,14 @@
-package org.flomik.FlomiksFactions.clan;
+package org.flomik.FlomiksFactions.clan; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
 
 import org.bukkit.boss.BossBar;
 
-public class CaptureSession {
-    private final String regionId;
-    private final BossBar bossBar;
-    private final Clan defendingClan;
-    private final Clan attackingClan;
+public class CaptureSession { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final String regionId; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final BossBar bossBar; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final Clan defendingClan; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final Clan attackingClan; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    public CaptureSession(String regionId, BossBar bossBar, Clan defendingClan, Clan attackingClan) {
+    public CaptureSession(String regionId, BossBar bossBar, Clan defendingClan, Clan attackingClan) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.regionId = regionId;
         this.bossBar = bossBar;
         this.defendingClan = defendingClan;

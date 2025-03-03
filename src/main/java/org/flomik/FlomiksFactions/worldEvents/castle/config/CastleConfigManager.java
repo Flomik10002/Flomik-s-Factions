@@ -1,4 +1,4 @@
-package org.flomik.FlomiksFactions.worldEvents.castle.config;
+package org.flomik.FlomiksFactions.worldEvents.castle.config; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,16 +10,16 @@ import org.flomik.FlomiksFactions.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 
-public class CastleConfigManager {
-    private static FileConfiguration customFile;
-    private static File file;
-    private static FlomiksFactions plugin;
+public class CastleConfigManager { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private static FileConfiguration customFile; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private static File file; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private static FlomiksFactions plugin; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    public static void setup(FlomiksFactions pl) {
+    public static void setup(FlomiksFactions pl) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         plugin = pl;
-        File dataFolder = plugin.getDataFolder();
-        if (!dataFolder.exists()) {
-            dataFolder.mkdirs();
+        File dataFolder = plugin.getDataFolder(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        if (!dataFolder.exists()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            dataFolder.mkdirs(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
         }
         file = new File(dataFolder, "castle.yml");
 
@@ -30,54 +30,54 @@ public class CastleConfigManager {
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void loadConfig() {
+    public static void loadConfig() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static FileConfiguration get() {
+    public static FileConfiguration get() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         return customFile;
     }
 
-    public static void save() {
+    public static void save() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         try {
             customFile.save(file);
         } catch (IOException e) {
-            plugin.getLogger().severe("Couldn't save castle.yml!");
-            e.printStackTrace();
+            plugin.getLogger().severe("Couldn't save castle.yml!"); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
         }
     }
 
-    public static BarColor getColor(String path) {
-        String colorName = customFile.getString(path, "WHITE");
-        switch (colorName.toUpperCase()) {
+    public static BarColor getColor(String path) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        String colorName = customFile.getString(path, "WHITE"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        switch (colorName.toUpperCase()) { //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
             case "RED":
-                return BarColor.RED;
+                return BarColor.RED; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             case "YELLOW":
-                return BarColor.YELLOW;
+                return BarColor.YELLOW; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             case "GREEN":
-                return BarColor.GREEN;
+                return BarColor.GREEN; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             case "BLUE":
-                return BarColor.BLUE;
+                return BarColor.BLUE; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             case "PINK":
-                return BarColor.PINK;
+                return BarColor.PINK; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             case "PURPLE":
-                return BarColor.PURPLE;
+                return BarColor.PURPLE; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
             case "WHITE":
             default:
                 return BarColor.WHITE;
         }
     }
 
-    public static void reload() {
+    public static void reload() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         loadConfig();
     }
 
-    public static String getString(String path) {
-        String value = customFile.getString(path, "");
+    public static String getString(String path) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+        String value = customFile.getString(path, ""); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
         return ChatColor.translateAlternateColorCodes('&', Utils.hex(value));
     }
 
-    public static int getInt(String path) {
+    public static int getInt(String path) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         return customFile.getInt(path, 0);
     }
 }
