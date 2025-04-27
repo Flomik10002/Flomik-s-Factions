@@ -48,6 +48,20 @@ public class ClanDatabaseManager { //NOPMD - suppressed CommentRequired - TODO e
                         "home_pitch FLOAT" +
                         ")");
 
+                stmt.executeUpdate(
+                        "CREATE TABLE IF NOT EXISTS clan_beacons (" +
+                                " id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                " clan_id INT NOT NULL," +
+                                " world TEXT NOT NULL," +
+                                " x DOUBLE NOT NULL," +
+                                " y DOUBLE NOT NULL," +
+                                " z DOUBLE NOT NULL," +
+                                " region_id TEXT NOT NULL," +
+                                " hp INT NOT NULL DEFAULT 5," +
+                                " FOREIGN KEY (clan_id) REFERENCES clans(id) ON DELETE CASCADE" +
+                                ")"
+                );
+
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS clan_members (" +
                         "clan_id INT NOT NULL," +
                         "member_name TEXT NOT NULL," +

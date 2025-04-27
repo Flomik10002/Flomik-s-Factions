@@ -1,6 +1,5 @@
-package org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
+package org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions;
 
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -8,115 +7,218 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
+import org.flomik.FlomiksFactions.utils.UsageUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Logger;
 
-public class InviteHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+/**
+ * Обработчик команды /clan invite <игрок>.
+ * Позволяет лидеру или заместителю отправлять и отзывать приглашения в клан.
+ */
+public class InviteHandler {
 
-    private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanManager clanManager;
+    private final ClanNotificationService notificationService; // Если хотим использовать сервис
+    private final Logger logger = Bukkit.getLogger();
 
-    public InviteHandler(ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    /**
+     * Конструктор принимает {@link ClanManager} для работы с кланами и приглашениями,
+     * а также {@link ClanNotificationService} для рассылки сообщений (необязательно).
+     */
+    public InviteHandler(ClanManager clanManager,
+                         ClanNotificationService notificationService) {
         this.clanManager = clanManager;
+        this.notificationService = notificationService;
     }
 
-    public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        if (args.length > 1) { //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression
-            String playerName = args[1]; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            Clan playerClan = clanManager.getPlayerClan(playerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+    /**
+     * Основной метод обработки команды.
+     *
+     * @param player Игрок, который ввел команду.
+     * @param args   Аргументы команды.
+     * @return true, если команда выполнена (даже если завершилась ошибкой).
+     */
+    public boolean handleCommand(Player player, String[] args) {
+        // Если не указали ник игрока, выводим подсказку
+        if (args.length <= 1) {
+            // Вместо локальной логики:
+            // sendUsageMessage(player);
+            // используем UsageUtil
+            UsageUtil.sendUsageMessage(player, "/clan invite <игрок>");
+            return true;
+        }
 
-            if (clan == null) {
-                player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
-                return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
+        // "Ник" игрока, которого приглашаем или отзываем приглашение
+        String targetName = args[1];
 
-            String playerRole = clan.getRole(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            if (!playerRole.equals("Лидер") && !playerRole.equals("Заместитель")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-                player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель клана может отправлять и отзывать приглашения.");
-                return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
+        // Проверяем, состоит ли командующий в клане
+        Clan clan = clanManager.getPlayerClan(player.getName());
+        if (clan == null) {
+            player.sendMessage(ChatColor.RED + "Вы не состоите в клане.");
+            return true;
+        }
 
-            if (playerClan != null) {
-                player.sendMessage(ChatColor.RED + "Игрок уже участник другого клана!");
-                return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
+        // Проверяем роль: только Лидер или Заместитель
+        String playerRole = clan.getRole(player.getName());
+        if (!isLeaderOrDeputy(playerRole)) {
+            player.sendMessage(ChatColor.RED + "Только Лидер или Заместитель клана может отправлять и отзывать приглашения.");
+            return true;
+        }
 
-            // Получаем текущие приглашения игрока из БД
-            Set<String> invites = clanManager.getInvitationDao().getInvitationsForPlayer(playerName); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+        // Проверяем, не состоит ли целевой игрок уже в другом клане
+        Clan targetClan = clanManager.getPlayerClan(targetName);
+        if (targetClan != null) {
+            player.sendMessage(ChatColor.RED + "Игрок уже состоит в другом клане!");
+            return true;
+        }
 
-            if (invites.contains(clan.getName().toLowerCase())) { //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
-                // Приглашение уже есть, значит мы его отзываем
-                clanManager.getInvitationDao().removeInvitation(playerName, clan.getName().toLowerCase()); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
-                sendMessageToRole(clan, ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " было отменено для игрока " + ChatColor.YELLOW + playerName + ChatColor.GREEN + ".");
+        // Проверяем, есть ли уже приглашение
+        Set<String> invites = clanManager.getInvitationDao().getInvitationsForPlayer(targetName);
+        String clanNameLower = clan.getName().toLowerCase();
 
-                Player invitedPlayer = player.getServer().getPlayer(playerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                if (invitedPlayer != null) {
-                    invitedPlayer.sendMessage(ChatColor.RED + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + " было отменено.");
-                } else {
-                    player.sendMessage(ChatColor.RED + "Игрок " + playerName + " не в сети.");
-                }
-            } else {
-                // Отправляем новое приглашение
-                try {
-                    clanManager.invitePlayer(clan.getName().toLowerCase(), playerName); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
-                    sendMessageToRole(clan, ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " отправлено игроку " + ChatColor.YELLOW + playerName + ChatColor.GREEN + "!");
-                    sendMessageToRole(clan, ChatColor.YELLOW + "Для отмены приглашения игроку " + ChatColor.GOLD + playerName + ChatColor.YELLOW + " повторите команду.");
-
-                    Player invitedPlayer = player.getServer().getPlayer(playerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                    if (invitedPlayer != null) {
-                        TextComponent message = new TextComponent(ChatColor.GREEN + "Вам пришло приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN + " от игрока " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + ". Используйте "); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                        TextComponent joinCommand = new TextComponent(ChatColor.YELLOW + "/clan join " + clan.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                        joinCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan join " + clan.getName()));
-                        message.addExtra(joinCommand);
-                        message.addExtra(new TextComponent(ChatColor.GREEN + " для принятия приглашения."));
-                        invitedPlayer.spigot().sendMessage(message);
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Игрок " + playerName + " не в сети, но приглашение будет доступно.");
-                    }
-
-                    // Таймер для истечения приглашения
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            Set<String> currentInvites = clanManager.getInvitationDao().getInvitationsForPlayer(playerName); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                            if (currentInvites.contains(clan.getName().toLowerCase())) { //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
-                                // Удаляем приглашение по истечению времени
-                                clanManager.getInvitationDao().removeInvitation(playerName, clan.getName().toLowerCase()); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
-
-                                sendMessageToRole(clan, ChatColor.RED + "Приглашение для игрока " + ChatColor.YELLOW + playerName + ChatColor.RED + " в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.RED + " истекло.");
-                                Player invitedPlayer = player.getServer().getPlayer(playerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                                if (invitedPlayer != null) {
-                                    invitedPlayer.sendMessage(ChatColor.RED + "Ваше приглашение в клан " + ChatColor.YELLOW + clan.getName() + ChatColor.RED + " истекло.");
-                                }
-                            }
-                        }
-                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("FlomiksFactions"), 5 * 60 * 20);
-                } catch (IllegalArgumentException e) {
-                    player.sendMessage(ChatColor.RED + e.getMessage());
-                }
-            }
+        // Если приглашение уже есть — это отзыв
+        if (invites.contains(clanNameLower)) {
+            revokeInvitation(player, clan, targetName);
         } else {
-            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: "); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan invite <игрок>"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan invite "));
-            usageMessage.addExtra(clickCommand);
-            player.spigot().sendMessage(usageMessage);
+            // Иначе отправляем новое приглашение
+            sendNewInvitation(player, clan, targetName);
         }
 
         return true;
     }
 
-    private void sendMessageToRole(Clan clan, String message) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        List<String> rolesToNotify = List.of("Лидер", "Заместитель"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        for (String role : rolesToNotify) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            List<String> playersWithRole = clan.getPlayersWithRole(role); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            for (String playerName : playersWithRole) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                Player player = Bukkit.getPlayer(playerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                if (player != null) {
-                    player.sendMessage(message);
+    /**
+     * Проверяет, является ли роль "Лидер" или "Заместитель".
+     */
+    private boolean isLeaderOrDeputy(String role) {
+        return Objects.equals(role, "Лидер") || Objects.equals(role, "Заместитель");
+    }
+
+    /**
+     * Отзывает существующее приглашение.
+     */
+    private void revokeInvitation(Player commandSender, Clan clan, String targetName) {
+        String clanName = clan.getName();
+        // Удаляем приглашение
+        clanManager.getInvitationDao().removeInvitation(targetName, clanName.toLowerCase());
+
+        notificationService.sendMessageToRoles(
+                clan,
+                List.of("Лидер", "Заместитель"),
+                ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clanName
+                        + ChatColor.GREEN + " было отменено для игрока " + ChatColor.YELLOW + targetName + ChatColor.GREEN + "."
+        );
+
+        // Уведомляем целевого игрока, если он онлайн
+        Player invitedPlayer = commandSender.getServer().getPlayer(targetName);
+        if (invitedPlayer != null) {
+            invitedPlayer.sendMessage(ChatColor.RED + "Приглашение в клан " + ChatColor.YELLOW + clanName + " было отменено.");
+        } else {
+            commandSender.sendMessage(ChatColor.RED + "Игрок " + targetName + " не в сети.");
+        }
+    }
+
+    /**
+     * Отправляет новое приглашение (или ловит ошибку).
+     */
+    private void sendNewInvitation(Player commandSender, Clan clan, String targetName) {
+        String clanName = clan.getName();
+
+        try {
+            // Отправляем приглашение через ClanManager
+            clanManager.invitePlayer(clanName.toLowerCase(), targetName);
+
+            // Уведомляем роль клана (Лидер/Заместитель)
+            notificationService.sendMessageToRoles(
+                    clan,
+                    List.of("Лидер", "Заместитель"),
+                    ChatColor.GREEN + "Приглашение в клан " + ChatColor.YELLOW + clanName
+                            + ChatColor.GREEN + " отправлено игроку " + ChatColor.YELLOW + targetName + ChatColor.GREEN + "!"
+            );
+            notificationService.sendMessageToRoles(
+                    clan,
+                    List.of("Лидер", "Заместитель"),
+                    ChatColor.YELLOW + "Для отмены приглашения игроку " + ChatColor.GOLD + targetName
+                            + ChatColor.YELLOW + " повторите команду."
+            );
+
+            // Уведомляем целевого игрока
+            Player invitedPlayer = commandSender.getServer().getPlayer(targetName);
+            if (invitedPlayer != null) {
+                sendInviteMessage(invitedPlayer, clan, commandSender.getName());
+            } else {
+                commandSender.sendMessage(ChatColor.RED + "Игрок " + targetName + " не в сети, но приглашение будет доступно.");
+            }
+
+            // Запускаем таймер истечения приглашения (5 минут)
+            scheduleInvitationExpiration(clan, targetName, commandSender);
+
+        } catch (IllegalArgumentException e) {
+            commandSender.sendMessage(ChatColor.RED + e.getMessage());
+             logger.warning("Ошибка при приглашении: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Шаблонное сообщение целевому игроку о приглашении в клан.
+     * Можно упростить использованием UsageUtil.buildClickableCommand(...)
+     */
+    private void sendInviteMessage(Player invitedPlayer, Clan clan, String inviterName) {
+        // Можно собрать кусочки:
+        TextComponent message = new TextComponent(
+                ChatColor.GREEN + "Вам пришло приглашение в клан " + ChatColor.YELLOW + clan.getName()
+                        + ChatColor.GREEN + " от игрока " + ChatColor.YELLOW + inviterName + ChatColor.GREEN + ". Используйте "
+        );
+
+        // Сокращаем код, используя UsageUtil:
+        TextComponent clickable = UsageUtil.buildClickableCommand(
+                "/clan join " + clan.getName(),   // отображаемое
+                "/clan join " + clan.getName()    // кликабельное
+        );
+        message.addExtra(clickable);
+        message.addExtra(new TextComponent(ChatColor.GREEN + " для принятия приглашения."));
+
+        invitedPlayer.spigot().sendMessage(message);
+    }
+
+    /**
+     * Планирует задачу, которая через 5 минут проверит, не осталось ли приглашение в БД,
+     * и при необходимости удалит его.
+     */
+    private void scheduleInvitationExpiration(Clan clan, String targetName, Player commandSender) {
+        final String clanName = clan.getName();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Set<String> currentInvites = clanManager.getInvitationDao().getInvitationsForPlayer(targetName);
+                if (currentInvites.contains(clanName.toLowerCase())) {
+                    // Удаляем просроченное приглашение
+                    clanManager.getInvitationDao().removeInvitation(targetName, clanName.toLowerCase());
+
+                    // Уведомляем клан
+                    notificationService.sendMessageToRoles(
+                            clan,
+                            List.of("Лидер", "Заместитель"),
+                            ChatColor.RED + "Приглашение для игрока " + ChatColor.YELLOW + targetName
+                                    + ChatColor.RED + " в клан " + ChatColor.YELLOW + clanName + ChatColor.RED + " истекло."
+                    );
+
+                    // Уведомляем игрока
+                    Player invitedPlayer = commandSender.getServer().getPlayer(targetName);
+                    if (invitedPlayer != null) {
+                        invitedPlayer.sendMessage(ChatColor.RED + "Ваше приглашение в клан "
+                                + ChatColor.YELLOW + clanName + ChatColor.RED + " истекло.");
+                    }
                 }
             }
-        }
+        }.runTaskLater(
+                Bukkit.getPluginManager().getPlugin("FlomiksFactions"),
+                5 * 60 * 20L
+        );
     }
 }

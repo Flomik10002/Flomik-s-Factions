@@ -1,76 +1,127 @@
-package org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
+package org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.utils.UsageUtil;
 
-public class BankCommandHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private final Economy economy; // из Vault //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+/**
+ * Команда /clan bank <deposit|withdraw> <сумма>
+ */
+public class BankCommandHandler {
 
-    public BankCommandHandler(ClanManager clanManager, Economy economy) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanManager clanManager;
+    private final Economy economy; // из Vault
+
+    public BankCommandHandler(ClanManager clanManager, Economy economy) {
         this.clanManager = clanManager;
         this.economy = economy;
     }
 
-    public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        if (args.length < 3) { //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression
-            player.sendMessage(ChatColor.YELLOW + "Использование: /clan bank <deposit|withdraw> <сумма>");
-            return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+    /**
+     * /clan bank <deposit|withdraw> <сумма>
+     */
+    public boolean handleCommand(Player player, String[] args) {
+        // Если нет нужного количества аргументов => подсказка
+        if (args.length < 3) {
+            UsageUtil.sendUsageMessage(player, "/clan bank <deposit|withdraw> <сумма>");
+            return true;
         }
 
-        String subCommand = args[1].toLowerCase(); //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression //NOPMD - suppressed UseLocaleWithCaseConversions - TODO explain reason for suppression
-        String amountStr = args[2]; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        double amount; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try {
-            amount = Double.parseDouble(amountStr);
-        } catch (NumberFormatException ex) {
-            player.sendMessage(ChatColor.RED + "Некорректная сумма.");
-            return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+        // Второй аргумент: "deposit" или "withdraw"
+        String subCommand = args[1].toLowerCase();
+        // Третий аргумент: сумма
+        String amountStr = args[2];
+
+        // Парсим сумму
+        double amount = parseAmount(player, amountStr);
+        if (amount < 0) {
+            // parseAmount вернул -1, если число некорректно
+            return true;
         }
 
-        Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        // Проверяем, что игрок в клане
+        Clan clan = clanManager.getPlayerClan(player.getName());
         if (clan == null) {
             player.sendMessage(ChatColor.RED + "Вы не состоите в клане!");
-            return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+            return true;
         }
 
-        if (subCommand.equals("deposit")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            if (amount <= 0) {
-                player.sendMessage(ChatColor.RED + "Сумма должна быть > 0.");
-                return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
-            if (!economy.has(player, amount)) {
-                player.sendMessage(ChatColor.RED + "У вас нет столько денег!");
-                return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
-            economy.withdrawPlayer(player, amount);
-            clan.deposit(amount);
-
-            clanManager.saveClan(clan);
-            player.sendMessage(ChatColor.GREEN + "Вы внесли " + amount + " в банк клана. Текущий баланс: " + clan.getBalance());
-
-        } else if (subCommand.equals("withdraw")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            String role = clan.getRole(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            if (!role.equals("Лидер") && !role.equals("Заместитель")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-                player.sendMessage(ChatColor.RED + "Снимать деньги из банка может только Лидер или Заместитель!");
-                return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
-
-            try {
-                clan.withdraw(amount);
-                economy.depositPlayer(player, amount);
-                clanManager.saveClan(clan);
-                player.sendMessage(ChatColor.GREEN + "Вы сняли " + amount + " из банка клана. Остаток: " + clan.getBalance());
-            } catch (IllegalArgumentException e) {
-                player.sendMessage(ChatColor.RED + e.getMessage());
-            }
-        } else {
-            player.sendMessage(ChatColor.RED + "Неизвестная команда. Используйте /clan bank deposit|withdraw <сумма>");
+        switch (subCommand) {
+            case "deposit":
+                handleDeposit(player, clan, amount);
+                break;
+            case "withdraw":
+                handleWithdraw(player, clan, amount);
+                break;
+            default:
+                player.sendMessage(ChatColor.RED + "Неизвестная команда!");
+                UsageUtil.sendUsageMessage(player, "/clan bank <deposit|withdraw> <сумма>");
+                break;
         }
-
         return true;
+    }
+
+    /**
+     * Обработка пополнения банка.
+     */
+    private void handleDeposit(Player player, Clan clan, double amount) {
+        if (amount <= 0) {
+            player.sendMessage(ChatColor.RED + "Сумма должна быть > 0.");
+            return;
+        }
+        if (!economy.has(player, amount)) {
+            player.sendMessage(ChatColor.RED + "У вас нет столько денег!");
+            return;
+        }
+
+        // Списываем у игрока, добавляем в банк клана
+        economy.withdrawPlayer(player, amount);
+        clan.deposit(amount);
+        clanManager.saveClan(clan);
+
+        player.sendMessage(ChatColor.GREEN + "Вы внесли " + amount
+                + " в банк клана. Текущий баланс: " + clan.getBalance());
+    }
+
+    /**
+     * Обработка снятия денег из банка.
+     */
+    private void handleWithdraw(Player player, Clan clan, double amount) {
+        // Проверяем, что игрок - лидер или заместитель
+        if (!clanManager.isLeaderOrDeputy(clan, player)) {
+            player.sendMessage(ChatColor.RED + "Снимать деньги из банка может только Лидер или Заместитель!");
+            return;
+        }
+        if (amount <= 0) {
+            player.sendMessage(ChatColor.RED + "Сумма должна быть > 0.");
+            return;
+        }
+
+        try {
+            clan.withdraw(amount);
+            economy.depositPlayer(player, amount);
+            clanManager.saveClan(clan);
+
+            player.sendMessage(ChatColor.GREEN + "Вы сняли " + amount
+                    + " из банка клана. Остаток: " + clan.getBalance());
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(ChatColor.RED + e.getMessage());
+        }
+    }
+
+    /**
+     * Парсит сумму. Если ошибка - выводит сообщение
+     * и возвращает -1.
+     */
+    private double parseAmount(Player player, String amountStr) {
+        try {
+            return Double.parseDouble(amountStr);
+        } catch (NumberFormatException ex) {
+            player.sendMessage(ChatColor.RED + "Некорректная сумма: " + amountStr);
+            return -1;
+        }
     }
 }

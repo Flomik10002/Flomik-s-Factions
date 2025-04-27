@@ -7,15 +7,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 
 import java.util.Objects;
 
 public class DemoteHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
     private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanNotificationService clanNotificationService;
 
-    public DemoteHandler(ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public DemoteHandler(ClanManager clanManager, ClanNotificationService clanNotificationService) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.clanManager = clanManager;
+        this.clanNotificationService = clanNotificationService;
     }
 
     public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
@@ -36,7 +39,7 @@ public class DemoteHandler { //NOPMD - suppressed CommentRequired - TODO explain
 
             try {
                 clan.demoteMember(player.getName(), targetDemPlayerName);
-                clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetDemPlayerName + ChatColor.GREEN + " понижен в должности.");
+                clanNotificationService.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetDemPlayerName + ChatColor.GREEN + " понижен в должности.");
 
                 String targetPlayerRole = clan.getRole(targetDemPlayerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
                 Player targetPlayer = Bukkit.getPlayerExact(targetDemPlayerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression

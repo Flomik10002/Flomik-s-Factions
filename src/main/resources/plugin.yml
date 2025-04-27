@@ -36,6 +36,9 @@ commands:
   castle:
     description: Управление замком
     permission: op
+  startcapture:
+    description: Захват территории
+    permission: op
 
 permissions:
   clan.op:

@@ -1,158 +1,135 @@
-package org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
+package org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
-import org.flomik.FlomiksFactions.clan.managers.BeaconManager;
+import org.flomik.FlomiksFactions.clan.nexus.BeaconManager;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 import org.flomik.FlomiksFactions.database.BeaconDao;
+import org.flomik.FlomiksFactions.utils.UsageUtil;
 
-import java.util.Map;
+/**
+ * Обработчик команды "/clan unclaim" (или "/clan unclaim all"),
+ * а также логика снятия привата с чанка/всех чанков.
+ */
+public class UnclaimRegionHandler {
 
-public class UnclaimRegionHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanManager clanManager;
+    private final ClanNotificationService clanNotificationService;
+    private final BeaconDao beaconDao;
+    private final BeaconManager beaconManager;
 
-    private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private final BeaconDao beaconDao; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private final BeaconManager beaconManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-
-    public UnclaimRegionHandler(ClanManager clanManager, BeaconDao beaconDao, BeaconManager beaconManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public UnclaimRegionHandler(ClanManager clanManager,
+                                ClanNotificationService clanNotificationService,
+                                BeaconDao beaconDao,
+                                BeaconManager beaconManager) {
         this.clanManager = clanManager;
+        this.clanNotificationService = clanNotificationService;
         this.beaconDao = beaconDao;
         this.beaconManager = beaconManager;
     }
 
-
-    public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-
-        if (clan == null || !isLeaderOrDeputy(player, clan)) {
-            player.sendMessage(ChatColor.RED + "У вас нет прав для выполнения этой команды.");
-            return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+    /**
+     * /clan unclaim [all]
+     */
+    public boolean handleCommand(Player player, String[] args) {
+        Clan clan = clanManager.getPlayerClan(player.getName());
+        if (!clanManager.isLeaderOrDeputy(clan, player)) {
+            player.sendMessage(ChatColor.RED + "У вас нет прав для выполнения этой команды или вы не в клане.");
+            return true;
         }
 
-        if (args.length > 1 && args[1].equalsIgnoreCase("all")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-
+        // Если 2й арг "all", снимаем все приваты
+        if (args.length > 1 && "all".equalsIgnoreCase(args[1])) {
             unclaimAllRegionsForClan(player, clan);
-        } else {
-
+        } else if (args.length == 1) {
+            // unclaim текущий чанк
             unclaimCurrentChunk(player, clan);
+        } else {
+            // лишний аргумент → подсказка
+            UsageUtil.sendUsageMessage(player, "/clan unclaim [all]");
         }
-
         return true;
     }
 
-
-    private void unclaimCurrentChunk(Player player, Clan clan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        Chunk chunk = player.getLocation().getChunk(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        String chunkId = getChunkId(chunk); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-
+    /**
+     * Снимаем приват с текущего чанка (где стоит игрок).
+     */
+    private void unclaimCurrentChunk(Player player, Clan clan) {
+        Chunk chunk = player.getLocation().getChunk();
+        String chunkId = clanManager.getChunkId(chunk);
 
         if (!clan.hasClaimedChunk(chunkId)) {
             player.sendMessage(ChatColor.RED + "Этот чанк не принадлежит вашему клану.");
             return;
         }
 
+        clanManager.removeWorldGuardRegion(chunk, clan.getName());
 
-        removeWorldGuardRegion(chunk, clan.getName());
-
-        String regionId = "clan_" + clan.getName() + "_" + chunkId; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        // Удаляем маяк из БД/менеджера
+        String regionId = "clan_" + clan.getName() + "_" + chunkId;
         beaconDao.deleteBeaconByRegionId(regionId);
         beaconManager.removeBeacon(regionId);
 
-
+        // Если home был в этом чанке, убираем
         if (isHomeInChunk(clan, chunk)) {
             clan.removeHome();
-            player.sendMessage(ChatColor.YELLOW + "Точка дома была удалена, так как она находилась в этом привате.");
+            player.sendMessage(ChatColor.YELLOW + "Точка дома была удалена, так как находилась в этом привате.");
         }
-
 
         clan.removeClaimedChunk(chunkId);
-        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " убрал приват с чанка!");
+        clanNotificationService.sendClanMessage(clan,
+                ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName()
+                        + ChatColor.GREEN + " убрал приват с чанка!");
     }
 
-    public void removeRegionById(World world, String regionId) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        WorldGuard wg = WorldGuard.getInstance(); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
-        RegionContainer container = wg.getPlatform().getRegionContainer(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-        RegionManager regions = container.get(BukkitAdapter.adapt(world)); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+    /**
+     * Снимаем приват со всех чанков клана.
+     */
+    private void unclaimAllRegionsForClan(Player player, Clan clan) {
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 
-        if (regions != null) {
-            regions.removeRegion(regionId);
-        }
-    }
+        for (World world : player.getServer().getWorlds()) {
+            RegionManager regions = container.get(BukkitAdapter.adapt(world));
+            if (regions == null) continue;
 
-
-    private void unclaimAllRegionsForClan(Player player, Clan clan) { //NOPMD - suppressed CognitiveComplexity - TODO explain reason for suppression //NOPMD - suppressed CognitiveComplexity - TODO explain reason for suppression //NOPMD - suppressed CognitiveComplexity - TODO explain reason for suppression
-        WorldGuard wg = WorldGuard.getInstance(); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
-        RegionContainer container = wg.getPlatform().getRegionContainer(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-
-        for (World world : player.getServer().getWorlds()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            RegionManager regions = container.get(BukkitAdapter.adapt(world)); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-
-            if (regions != null) {
-                for (Map.Entry<String, ProtectedRegion> entry : regions.getRegions().entrySet()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                    ProtectedRegion region = entry.getValue(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-
-
-                    if (region.getId().startsWith("clan_" + clan.getName()) && isLeaderOrDeputy(player, clan)) {
-                        regions.removeRegion(region.getId());
-
-                        Location homeLocation = clan.getHome(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                        if (homeLocation != null && isHomeInRegion(region, homeLocation)) {
-                            clan.removeHome();
-                            clanManager.sendClanMessage(clan,ChatColor.YELLOW + "Точка дома была удалена, так как она находилась в одном из удалённых приватов.");
-                        }
-                    }
+            // Ищем регионы, начинающиеся на "clan_<Имя>"
+            // Удаляем их
+            regions.getRegions().entrySet().removeIf(entry -> {
+                String regionId = entry.getKey();
+                ProtectedRegion region = entry.getValue();
+                if (regionId.startsWith("clan_" + clan.getName().toLowerCase())) {
+                    // Удаляем маяк
+                    beaconDao.deleteBeaconByRegionId(regionId);
+                    beaconManager.removeBeacon(regionId);
+                    return true; // удаляем из Map
                 }
-                clan.clearClaimedChunks();
-            }
-        }
-        clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " убрал все приваты!");
-    }
-
-
-    private boolean isLeaderOrDeputy(Player player, Clan clan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        String playerRole = clan.getRole(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        return playerRole.equals("Лидер") || playerRole.equals("Заместитель"); //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-    }
-
-
-    private String getChunkId(Chunk chunk) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        return chunk.getWorld().getName() + "_" + chunk.getX() + "_" + chunk.getZ();
-    }
-
-
-    public void removeWorldGuardRegion(Chunk chunk, String clanName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        WorldGuard wg = WorldGuard.getInstance(); //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression //NOPMD - suppressed ShortVariable - TODO explain reason for suppression
-        RegionContainer container = wg.getPlatform().getRegionContainer(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-        RegionManager regions = container.get(BukkitAdapter.adapt(chunk.getWorld())); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        String regionId = "clan_" + clanName + "_" + getChunkId(chunk); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        if (regions != null) {
-            regions.removeRegion(regionId);
-        }
-    }
-
-
-    private boolean isHomeInChunk(Clan clan, Chunk chunk) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        Location homeLocation = clan.getHome(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-        if (homeLocation == null) { //NOPMD - suppressed SimplifyBooleanReturns - TODO explain reason for suppression //NOPMD - suppressed SimplifyBooleanReturns - TODO explain reason for suppression //NOPMD - suppressed SimplifyBooleanReturns - TODO explain reason for suppression
-            return false; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+                return false; // не удаляем
+            });
         }
 
-        return homeLocation.getChunk().equals(chunk);
+        // Удаляем все чанки у клана
+        clan.clearClaimedChunks();
+
+        // Если Home в удалённом чанке, убираем
+        if (clan.getHome() != null) {
+            clan.removeHome();
+            clanNotificationService.sendClanMessage(clan,
+                    ChatColor.YELLOW + "Точка дома была удалена, так как находилась в одном из удалённых приватов.");
+        }
+
+        clanNotificationService.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + player.getName()
+                + ChatColor.GREEN + " убрал все приваты!");
     }
 
-
-    private boolean isHomeInRegion(ProtectedRegion region, Location homeLocation) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        String regionId = region.getId(); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        String homeChunkId = getChunkId(homeLocation.getChunk()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        return regionId.contains(homeChunkId);
+    private boolean isHomeInChunk(Clan clan, Chunk chunk) {
+        Location homeLoc = clan.getHome();
+        return homeLoc != null && homeLoc.getChunk().equals(chunk);
     }
 }

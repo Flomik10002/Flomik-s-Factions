@@ -2,7 +2,8 @@ package org.flomik.FlomiksFactions.register; //NOPMD - suppressed PackageCase - 
 
 import org.bukkit.plugin.PluginManager;
 import org.flomik.FlomiksFactions.FlomiksFactions;
-import org.flomik.FlomiksFactions.clan.managers.NexusConfigManager;
+import org.flomik.FlomiksFactions.clan.nexus.NexusBlockListener;
+import org.flomik.FlomiksFactions.clan.nexus.NexusConfigManager;
 import org.flomik.FlomiksFactions.listener.*;
 import org.flomik.FlomiksFactions.listener.CastleInteractListener;
 
@@ -14,7 +15,7 @@ public class EventRegistrar { //NOPMD - suppressed CommentRequired - TODO explai
         pm.registerEvents(playerJoinListener, plugin);
         playerJoinListener.startPeriodicStatsUpdate(plugin);
 
-        pm.registerEvents(new playerClanTerritoryListener(plugin.getClanManager(), plugin), plugin);
+        pm.registerEvents(new PlayerClanTerritoryListener(plugin.getClanManager()), plugin);
         pm.registerEvents(new PlayerDeathStrengthListener(plugin.getPlayerDataHandler()), plugin);
         pm.registerEvents(new ChatPrefixListener(plugin.getClanManager()), plugin);
         pm.registerEvents(new ClanTNTListener(plugin.getClanManager(), plugin), plugin);
@@ -22,5 +23,6 @@ public class EventRegistrar { //NOPMD - suppressed CommentRequired - TODO explai
         pm.registerEvents(new BeaconExplosionListener(plugin.getBeaconManager(), plugin.getBeaconDao(), NexusConfigManager.getInt("tnt-radius")), plugin);
         pm.registerEvents(new NexusBlockListener(plugin.getClaimRegionHandler(), plugin.getClanManager()), plugin);
         pm.registerEvents(new CastleInteractListener(plugin.getCastleEvent(), plugin.getLootManager()), plugin);
+        pm.registerEvents(new BeaconProtectionListener(plugin.getBeaconManager()), plugin);
     }
 }

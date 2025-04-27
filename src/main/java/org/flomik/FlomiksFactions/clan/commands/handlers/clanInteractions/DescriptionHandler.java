@@ -6,15 +6,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 
 import java.util.Arrays;
 
 public class DescriptionHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
     private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanNotificationService clanNotificationService;
 
-    public DescriptionHandler(ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public DescriptionHandler(ClanManager clanManager, ClanNotificationService clanNotificationService) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.clanManager = clanManager;
+        this.clanNotificationService = clanNotificationService;
     }
 
     public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
@@ -52,7 +55,7 @@ public class DescriptionHandler { //NOPMD - suppressed CommentRequired - TODO ex
             clanManager.updateClan(playerClan);
 
 
-            clanManager.sendClanMessage(playerClan, ChatColor.GREEN + "Описание клана успешно обновлено!");
+            clanNotificationService.sendClanMessage(playerClan, ChatColor.GREEN + "Описание клана успешно обновлено!");
 
             if (wasTruncated) {
                 player.sendMessage(ChatColor.YELLOW + "Описание было слишком длинным и было обрезано до 48 символов.");

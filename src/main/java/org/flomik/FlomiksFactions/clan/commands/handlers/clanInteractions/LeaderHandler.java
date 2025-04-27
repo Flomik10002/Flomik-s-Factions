@@ -6,13 +6,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 
 public class LeaderHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
     private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanNotificationService clanNotificationService;
 
-    public LeaderHandler(ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public LeaderHandler(ClanManager clanManager, ClanNotificationService clanNotificationService) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.clanManager = clanManager;
+        this.clanNotificationService = clanNotificationService;
     }
 
     public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
@@ -48,7 +51,7 @@ public class LeaderHandler { //NOPMD - suppressed CommentRequired - TODO explain
 
                 player.sendMessage(ChatColor.GREEN + "Вы передали права Лидера клана " + ChatColor.YELLOW + playerClan.getName() + ChatColor.GREEN + " игроку " + ChatColor.YELLOW + newLeaderName + ChatColor.GREEN + ".");
                 Player oldLeader = player.getServer().getPlayer(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                clanManager.sendClanMessage(playerClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " передал лидерство клана игроку " + ChatColor.YELLOW + newLeader.getName());
+                clanNotificationService.sendClanMessage(playerClan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " передал лидерство клана игроку " + ChatColor.YELLOW + newLeader.getName());
                 if (oldLeader != null) {
                     oldLeader.sendMessage(ChatColor.YELLOW + "Теперь вы Заместитель клана " + ChatColor.GOLD + playerClan.getName() + ChatColor.YELLOW + ".");
                 }

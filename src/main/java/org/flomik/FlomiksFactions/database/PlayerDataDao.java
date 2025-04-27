@@ -1,225 +1,222 @@
-package org.flomik.FlomiksFactions.database; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
+package org.flomik.FlomiksFactions.database;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class PlayerDataDao { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+/**
+ * DAO для работы с базой данных игроков.
+ * Управляет сохранением и получением данных о игроках.
+ */
+public class PlayerDataDao {
 
-    private final PlayerDatabaseManager playerDatabaseManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd"); //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final PlayerDatabaseManager playerDatabaseManager;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public PlayerDataDao(PlayerDatabaseManager playerDatabaseManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    /**
+     * Конструктор принимает менеджер базы данных.
+     */
+    public PlayerDataDao(PlayerDatabaseManager playerDatabaseManager) {
         this.playerDatabaseManager = playerDatabaseManager;
     }
 
-    private void ensurePlayerExists(String playerName) throws SQLException { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            String sql = "INSERT OR IGNORE INTO player_data (player_name) VALUES (?)"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            try (PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                ps.setString(1, playerName);
-                ps.executeUpdate();
-            }
-        }
+    /**
+     * Проверяет, существует ли запись о игроке в базе, и если нет — создает её.
+     */
+    private void ensurePlayerExists(String playerName) {
+        String sql = "INSERT OR IGNORE INTO player_data (player_name) VALUES (?)";
+        executeUpdate(sql, playerName);
     }
 
     /**
-     * Проверка, есть ли данные о игроке.
+     * Универсальный метод выполнения UPDATE и INSERT SQL-запросов.
+     * @param sql - SQL-запрос
+     * @param params - параметры запроса
      */
-    public boolean hasPlayerData(String playerName) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        String sql = "SELECT player_name FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                return rs.next(); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
-        return false;
-    }
-
-    /**
-     * Дата первого входа
-     */
-    public boolean hasFirstJoinDate(String playerName) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        String sql = "SELECT firstJoinDate FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                if (rs.next()) {
-                    return rs.getString("firstJoinDate") != null; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
-        return false;
-    }
-
-    public void setFirstJoinDate(String playerName, LocalDate date) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "UPDATE player_data SET firstJoinDate=? WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ensurePlayerExists(playerName);
-            ps.setString(1, date.format(DATE_FORMATTER));
-            ps.setString(2, playerName);
+    private void executeUpdate(String sql, Object... params) {
+        try (Connection conn = playerDatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            setParameters(ps, params);
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
+            handleSQLException(e);
         }
     }
 
-    public String getFirstJoinDate(String playerName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "SELECT firstJoinDate FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                if (rs.next()) {
-                    String date = rs.getString("firstJoinDate"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-                    return date != null ? date : "Неизвестно"; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-                }
+    /**
+     * Универсальный метод выполнения SELECT SQL-запросов.
+     * @param sql - SQL-запрос
+     * @param params - параметры запроса
+     * @return ResultSet с результатами запроса
+     */
+    private ResultSet executeQuery(String sql, Object... params) {
+        try {
+            Connection conn = playerDatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            setParameters(ps, params);
+            return ps.executeQuery();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return null;
+    }
+
+    /**
+     * Устанавливает параметры в PreparedStatement, автоматически определяя их тип.
+     */
+    private void setParameters(PreparedStatement ps, Object... params) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            if (params[i] instanceof Integer) {
+                ps.setInt(i + 1, (Integer) params[i]);
+            } else if (params[i] instanceof String) {
+                ps.setString(i + 1, (String) params[i]);
+            }
+        }
+    }
+
+    /**
+     * Логирует ошибки SQL вместо простого вывода `printStackTrace()`.
+     */
+    private void handleSQLException(SQLException e) {
+        System.err.println("Ошибка базы данных: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    /**
+     * Проверяет, существует ли игрок в базе данных.
+     */
+    public boolean hasPlayerData(String playerName) {
+        String sql = "SELECT player_name FROM player_data WHERE player_name=?";
+        try (ResultSet rs = executeQuery(sql, playerName)) {
+            return rs != null && rs.next();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return false;
+    }
+
+    /**
+     * Проверяет, есть ли у игрока дата первого входа.
+     */
+    public boolean hasFirstJoinDate(String playerName) {
+        String sql = "SELECT firstJoinDate FROM player_data WHERE player_name=?";
+        try (ResultSet rs = executeQuery(sql, playerName)) {
+            return rs != null && rs.next() && rs.getString("firstJoinDate") != null;
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return false;
+    }
+
+    /**
+     * Устанавливает дату первого входа игрока.
+     */
+    public void setFirstJoinDate(String playerName, LocalDate date) {
+        ensurePlayerExists(playerName);
+        String sql = "UPDATE player_data SET firstJoinDate=? WHERE player_name=?";
+        executeUpdate(sql, date.format(DATE_FORMATTER), playerName);
+    }
+
+    /**
+     * Получает дату первого входа игрока, если её нет — возвращает "Неизвестно".
+     */
+    public String getFirstJoinDate(String playerName) {
+        String sql = "SELECT firstJoinDate FROM player_data WHERE player_name=?";
+        try (ResultSet rs = executeQuery(sql, playerName)) {
+            if (rs != null && rs.next()) {
+                return rs.getString("firstJoinDate") != null ? rs.getString("firstJoinDate") : "Неизвестно";
             }
         } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
+            handleSQLException(e);
         }
         return "Неизвестно";
     }
 
     /**
-     * Уровень и сила (strength), а также maxStrength
+     * Сохраняет атрибуты игрока: уровень, силу, макс. силу.
      */
-    public void savePlayerAttributes(String playerName, int level, int strength, int maxStrength) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        String sql = "UPDATE player_data SET level=?, strength=?, maxStrength=? WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ensurePlayerExists(playerName);
-            ps.setInt(1, level);
-            ps.setInt(2, strength);
-            ps.setInt(3, maxStrength);
-            ps.setString(4, playerName);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
+    public void savePlayerAttributes(String playerName, int level, int strength, int maxStrength) {
+        ensurePlayerExists(playerName);
+        String sql = "UPDATE player_data SET level=?, strength=?, maxStrength=? WHERE player_name=?";
+        executeUpdate(sql, level, strength, maxStrength, playerName);
     }
 
-    public int getPlayerLevel(String playerName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "SELECT level FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                if (rs.next()) {
-                    return rs.getInt("level"); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-                }
+    /**
+     * Универсальный метод получения числовых атрибутов игрока (уровень, сила, макс. сила).
+     */
+    private int getPlayerAttribute(String playerName, String attribute, int defaultValue) {
+        String sql = "SELECT " + attribute + " FROM player_data WHERE player_name=?";
+        try (ResultSet rs = executeQuery(sql, playerName)) {
+            if (rs != null && rs.next()) {
+                return rs.getInt(attribute);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
+            handleSQLException(e);
         }
-        return 1;
+        return defaultValue;
     }
 
-    public void setPlayerLevel(String playerName, int level) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "UPDATE player_data SET level=? WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ensurePlayerExists(playerName);
-            ps.setInt(1, level);
-            ps.setString(2, playerName);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
+    /**
+     * Получает уровень игрока (по умолчанию 1).
+     */
+    public int getPlayerLevel(String playerName) {
+        return getPlayerAttribute(playerName, "level", 1);
     }
 
-    public int getPlayerStrength(String playerName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "SELECT strength FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                if (rs.next()) {
-                    return rs.getInt("strength"); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
-        return 0;
+    /**
+     * Получает силу игрока (по умолчанию 0).
+     */
+    public int getPlayerStrength(String playerName) {
+        return getPlayerAttribute(playerName, "strength", 0);
     }
 
-    public void setPlayerStrength(String playerName, int strength) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "UPDATE player_data SET strength=? WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ensurePlayerExists(playerName);
-            ps.setInt(1, strength);
-            ps.setString(2, playerName);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
+    /**
+     * Получает максимальную силу игрока (по умолчанию 10).
+     */
+    public int getPlayerMaxStrength(String playerName) {
+        return getPlayerAttribute(playerName, "maxStrength", 10);
     }
 
-    public void addPlayerStrength(String playerName, int strengthToAdd) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "UPDATE player_data SET strength = strength + ? WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ensurePlayerExists(playerName);
-            ps.setInt(1, strengthToAdd);
-            ps.setString(2, playerName);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
+    /**
+     * Устанавливает уровень игрока.
+     */
+    public void setPlayerLevel(String playerName, int level) {
+        ensurePlayerExists(playerName);
+        String sql = "UPDATE player_data SET level=? WHERE player_name=?";
+        executeUpdate(sql, level, playerName);
     }
 
-    public int getPlayerMaxStrength(String playerName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "SELECT maxStrength FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                if (rs.next()) {
-                    return rs.getInt("maxStrength"); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
-        return 10;
+    /**
+     * Устанавливает силу игрока.
+     */
+    public void setPlayerStrength(String playerName, int strength) {
+        ensurePlayerExists(playerName);
+        String sql = "UPDATE player_data SET strength=? WHERE player_name=?";
+        executeUpdate(sql, strength, playerName);
     }
 
-    public void setPlayTime(String playerName, int ticksPlayed) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "UPDATE player_data SET playTime=? WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ensurePlayerExists(playerName);
-            ps.setInt(1, ticksPlayed);
-            ps.setString(2, playerName);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
+    /**
+     * Добавляет силу игроку.
+     */
+    public void addPlayerStrength(String playerName, int strengthToAdd) {
+        ensurePlayerExists(playerName);
+        String sql = "UPDATE player_data SET strength = strength + ? WHERE player_name=?";
+        executeUpdate(sql, strengthToAdd, playerName);
     }
 
-    public int getPlayTime(String playerName) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        String sql = "SELECT playTime FROM player_data WHERE player_name=?"; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-        try (Connection conn = playerDatabaseManager.getConnection(); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-             PreparedStatement ps = conn.prepareStatement(sql)) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            ps.setString(1, playerName);
-            try (ResultSet rs = ps.executeQuery()) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-                if (rs.next()) {
-                    return rs.getInt("playTime"); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression //NOPMD - suppressed AvoidPrintStackTrace - TODO explain reason for suppression
-        }
-        return 0;
+    /**
+     * Устанавливает время игры игрока.
+     */
+    public void setPlayTime(String playerName, int ticksPlayed) {
+        ensurePlayerExists(playerName);
+        String sql = "UPDATE player_data SET playTime=? WHERE player_name=?";
+        executeUpdate(sql, ticksPlayed, playerName);
+    }
+
+    /**
+     * Получает время игры игрока (по умолчанию 0).
+     */
+    public int getPlayTime(String playerName) {
+        return getPlayerAttribute(playerName, "playTime", 0);
     }
 }

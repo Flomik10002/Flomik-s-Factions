@@ -1,4 +1,4 @@
-package org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
+package org.flomik.FlomiksFactions.clan.commands.handlers.playerInteractions;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -7,49 +7,73 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
+import org.flomik.FlomiksFactions.utils.UsageUtil;
 
-public class ModerHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+/**
+ * Класс обработчика команды `/clan moder`.
+ * Позволяет лидеру назначить игрока заместителем клана.
+ */
+public class ModerHandler {
+    private final ClanManager clanManager;
+    private final ClanNotificationService clanNotificationService;
 
-    private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-
-    public ModerHandler(ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    /**
+     * Конструктор принимает менеджер клана.
+     */
+    public ModerHandler(ClanManager clanManager, ClanNotificationService clanNotificationService) {
         this.clanManager = clanManager;
+        this.clanNotificationService = clanNotificationService;
     }
 
-    public boolean handleCommand(Player player, String[] args) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        if (args.length > 1) { //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression
-            String targetPromPlayerName = args[1]; //NOPMD - suppressed LongVariable - TODO explain reason for suppression //NOPMD - suppressed LongVariable - TODO explain reason for suppression //NOPMD - suppressed LongVariable - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            Player targetPlayer = Bukkit.getPlayerExact(targetPromPlayerName); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-
-            if (clan == null) {
-                player.sendMessage(ChatColor.RED + "Не удалось найти ваш клан.");
-                return false; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
-
-            String playerRole = clan.getRole(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            if (!playerRole.equals("Лидер")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-                player.sendMessage(ChatColor.RED + "Только Лидер может добавить Заместителя.");
-                return false; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-            }
-
-            try {
-                clan.moderMember(player.getName(), targetPromPlayerName);
-                clanManager.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPromPlayerName + ChatColor.GREEN + " назначен заместителем.");
-                clanManager.removePlayerFromClanRegions(targetPlayer, clan);
-                clanManager.addPlayerToClanRegionsAsOwner(targetPlayer, clan);
-            } catch (IllegalArgumentException e) {
-                player.sendMessage(ChatColor.RED + e.getMessage());
-            }
-            clanManager.saveClan(clan);
-            return true; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        } else {
-            TextComponent usageMessage = new TextComponent(ChatColor.YELLOW + "Использование: "); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            TextComponent clickCommand = new TextComponent(ChatColor.GOLD + "/clan moder <игрок>"); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            clickCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/clan moder "));
-            usageMessage.addExtra(clickCommand);
-            player.spigot().sendMessage(usageMessage);
+    /**
+     * Обрабатывает команду `/clan moder <игрок>`.
+     * @param player - Игрок, использующий команду.
+     * @param args - Аргументы команды.
+     * @return true, если команда выполнена успешно.
+     */
+    public boolean handleCommand(Player player, String[] args) {
+        if (args.length <= 1) {
+            UsageUtil.sendUsageMessage(player, "/clan moder <игрок>");
+            return true;
         }
+
+        String targetPlayerName = args[1];
+        Clan clan = clanManager.getPlayerClan(player.getName());
+
+        if (clan == null) {
+            player.sendMessage(ChatColor.RED + "Не удалось найти ваш клан.");
+            return false;
+        }
+
+        if (!"Лидер".equals(clan.getRole(player.getName()))) {
+            player.sendMessage(ChatColor.RED + "Только Лидер может назначить Заместителя.");
+            return false;
+        }
+
+        Player targetPlayer = Bukkit.getPlayerExact(targetPlayerName);
+        if (targetPlayer == null) {
+            player.sendMessage(ChatColor.RED + "Игрок " + targetPlayerName + " не найден в сети.");
+            return false;
+        }
+
+        try {
+            clan.moderMember(player.getName(), targetPlayerName);
+            clanNotificationService.sendClanMessage(clan, ChatColor.GREEN + "Игрок " + ChatColor.YELLOW + targetPlayerName + ChatColor.GREEN + " назначен заместителем.");
+            updatePlayerClanRegions(targetPlayer, clan);
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(ChatColor.RED + e.getMessage());
+        }
+
+        clanManager.saveClan(clan);
         return true;
+    }
+
+    /**
+     * Обновляет владение регионами клана после изменения ранга игрока.
+     */
+    private void updatePlayerClanRegions(Player targetPlayer, Clan clan) {
+        clanManager.removePlayerFromClanRegions(targetPlayer, clan);
+        clanManager.addPlayerToClanRegionsAsOwner(targetPlayer, clan);
     }
 }

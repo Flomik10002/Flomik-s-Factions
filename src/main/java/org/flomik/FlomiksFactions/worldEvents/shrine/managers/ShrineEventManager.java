@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.flomik.FlomiksFactions.FlomiksFactions;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 import org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent;
 
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.Set;
 public class ShrineEventManager { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
     private final ShrineEvent shrineEvent; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanNotificationService clanNotificationService;
     private final FlomiksFactions plugin; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
     private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
     private BossBar captureBossBar; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
@@ -26,8 +28,9 @@ public class ShrineEventManager { //NOPMD - suppressed CommentRequired - TODO ex
     private final Set<Player> playersInZone; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
     private Clan capturingClan; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    public ShrineEventManager(ShrineEvent shrineEvent, FlomiksFactions plugin, ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public ShrineEventManager(ShrineEvent shrineEvent, ClanNotificationService clanNotificationService, FlomiksFactions plugin, ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.shrineEvent = shrineEvent;
+        this.clanNotificationService = clanNotificationService;
         this.plugin = plugin;
         this.clanManager = clanManager;
         this.playersInZone = new HashSet<>();
@@ -122,7 +125,7 @@ public class ShrineEventManager { //NOPMD - suppressed CommentRequired - TODO ex
                     }
                 }
 
-                clanManager.sendClanMessage(capturingClan, ChatColor.translateAlternateColorCodes('&',
+                clanNotificationService.sendClanMessage(capturingClan, ChatColor.translateAlternateColorCodes('&',
                         plugin.getShrineConfigManager().get().getString("messages.capture-start"))); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
             }
 
@@ -206,7 +209,7 @@ public class ShrineEventManager { //NOPMD - suppressed CommentRequired - TODO ex
 
             String successMessage = plugin.getShrineConfigManager().get().getString("messages.capture-success-reward") //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
                     .replace("{clan_xp}", String.valueOf(clanXpReward));
-            clanManager.sendClanMessage(capturingClan, ChatColor.translateAlternateColorCodes('&', successMessage));
+            clanNotificationService.sendClanMessage(capturingClan, ChatColor.translateAlternateColorCodes('&', successMessage));
 
             rewardPlayersInZone();
         }

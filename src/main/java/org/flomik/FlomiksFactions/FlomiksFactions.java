@@ -1,12 +1,16 @@
-package org.flomik.FlomiksFactions; //NOPMD - suppressed CouplingBetweenObjects - TODO explain reason for suppression //NOPMD - suppressed CouplingBetweenObjects - TODO explain reason for suppression //NOPMD - suppressed CouplingBetweenObjects - TODO explain reason for suppression
+package org.flomik.FlomiksFactions;
 
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.flomik.FlomiksFactions.clan.managers.*;
 import org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.ClaimRegionHandler;
 import org.flomik.FlomiksFactions.clan.commands.handlers.clanInteractions.UnclaimRegionHandler;
+import org.flomik.FlomiksFactions.clan.nexus.Beacon;
+import org.flomik.FlomiksFactions.clan.nexus.BeaconCaptureManager;
+import org.flomik.FlomiksFactions.clan.nexus.BeaconManager;
+import org.flomik.FlomiksFactions.clan.nexus.NexusConfigManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 import org.flomik.FlomiksFactions.database.*;
 import org.flomik.FlomiksFactions.register.CommandRegistrar;
 import org.flomik.FlomiksFactions.register.EventRegistrar;
@@ -22,38 +26,52 @@ import org.flomik.FlomiksFactions.player.PlayerDataHandler;
 import org.flomik.FlomiksFactions.worldEvents.shrine.config.ShrineConfigManager;
 import org.flomik.FlomiksFactions.worldEvents.shrine.event.ShrineEvent;
 
-public final class FlomiksFactions extends JavaPlugin { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private BeaconDao beaconDao; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ClaimRegionHandler claimRegionHandler; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private UnclaimRegionHandler unclaimRegionHandler; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private BeaconManager beaconManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private BeaconDatabaseManager beaconDatabaseManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ChunkMenuManager chunkMenuManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private PlayerDataHandler playerDataHandler; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ShrineEvent shrineEvent; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private CastleEvent castleEvent; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private RandomEventManager eventManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private Economy economy; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private EventScheduler eventScheduler; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ClanDatabaseManager clanDatabaseManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ClanDao clanDao; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private InvitationDao invitationDao; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private PlayerDatabaseManager playerDatabaseManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private CastleLootManager lootManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private HeadsManager headsManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private ShrineConfigManager shrineConfigManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+import java.util.List;
+
+public final class FlomiksFactions extends JavaPlugin {
+
+    // ------------------------------------------------------------------------
+    //  ССЫЛКИ НА МЕНЕДЖЕРЫ/DAO/ETC
+    // ------------------------------------------------------------------------
+    private ClanManager clanManager;
+    private ClanNotificationService clanNotificationService;
+    private BeaconManager beaconManager;
+    private BeaconDao beaconDao;
+    private ChunkMenuManager chunkMenuManager;
+    private PlayerDataHandler playerDataHandler;
+    private ShrineEvent shrineEvent;
+    private CastleEvent castleEvent;
+    private RandomEventManager eventManager;
+    private EventScheduler eventScheduler;
+    private ClanDatabaseManager clanDatabaseManager;
+    private ClanDao clanDao;
+    private InvitationDao invitationDao;
+    private PlayerDatabaseManager playerDatabaseManager;
+    private CastleLootManager lootManager;
+    private HeadsManager headsManager;
+    private ShrineConfigManager shrineConfigManager; // если используете
+    private UnclaimRegionHandler unclaimRegionHandler;
+    private ClaimRegionHandler claimRegionHandler;
+    private BeaconCaptureManager captureManager;
+
+    // ------------------------------------------------------------------------
+    //  ДРУГИЕ ПОЛЯ
+    // ------------------------------------------------------------------------
+    private Economy economy;
+
+    // ------------------------------------------------------------------------
+    //  ЖИЗНЕННЫЙ ЦИКЛ
+    // ------------------------------------------------------------------------
 
     @Override
     public void onEnable() {
-        setupConfigs();
-        setupDatabase();
-        setupDependencies();
+        initializeConfigs();
+        initializeDatabase();
+        initializeDependencies();
         registerCommandsAndEvents();
-
         startSchedulers();
 
-        getLogger().info("Плагин успешно запущен!");
+        getLogger().info("Плагин FlomiksFactions успешно запущен!");
     }
 
     @Override
@@ -63,15 +81,126 @@ public final class FlomiksFactions extends JavaPlugin { //NOPMD - suppressed Com
         denyClanTNT();
         stopEvents();
 
-        getLogger().info("Плагин успешно отключён.");
+        getLogger().info("Плагин FlomiksFactions успешно отключён.");
     }
 
+    // ------------------------------------------------------------------------
+    //  ИНИЦИАЛИЗАЦИЯ
+    // ------------------------------------------------------------------------
+
+    private void initializeConfigs() {
+        // Castle
+        CastleConfigManager.setup(this);
+        CastleConfigManager.loadConfig();
+        CastleConfigManager.get().options().copyDefaults(true);
+        CastleConfigManager.save();
+
+        // Shrine
+        ShrineConfigManager.setup(this);
+        ShrineConfigManager.loadConfig();
+        ShrineConfigManager.get().options().copyDefaults(true);
+        ShrineConfigManager.save();
+
+        // Nexus
+        NexusConfigManager.setup(this);
+        NexusConfigManager.loadConfig();
+        NexusConfigManager.get().options().copyDefaults(true);
+        NexusConfigManager.save();
+    }
+
+    private void initializeDatabase() {
+        try {
+            // ClanDB
+            clanDatabaseManager = new ClanDatabaseManager();
+            clanDatabaseManager.initDatabase(this);
+            clanDatabaseManager.createTables();
+            clanDao = new ClanDao(clanDatabaseManager);
+            invitationDao = new InvitationDao(clanDatabaseManager);
+
+            playerDatabaseManager = new PlayerDatabaseManager();
+            playerDatabaseManager.initDatabase(this);
+            playerDatabaseManager.createTables();
+
+            beaconDao = new BeaconDao(clanDatabaseManager);
+
+            beaconDao.getAllBeacons().forEach(beaconManager::addBeacon);
+
+        } catch (Exception e) {
+            getLogger().severe("Ошибка при настройке базы данных: " + e.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+        }
+    }
+
+    private void initializeDependencies() {
+        // Vault
+        if (!setupEconomy()) {
+            getLogger().severe("Vault не найден! Экономика не будет работать.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Создаём менеджеры
+        clanManager = new ClanManager(this, clanDao, invitationDao);
+        clanNotificationService = new ClanNotificationService(clanManager);
+
+        beaconManager = new BeaconManager();
+        captureManager = new BeaconCaptureManager(this, beaconManager, clanManager, beaconDao);
+        lootManager = new CastleLootManager(this);
+        headsManager = new HeadsManager(this);
+        playerDataHandler = new PlayerDataHandler(this);
+        eventManager = new RandomEventManager(this);
+        eventScheduler = new EventScheduler(this, eventManager);
+        chunkMenuManager = new ChunkMenuManager(this, clanManager);
+
+        // Shrine
+        shrineConfigManager = new ShrineConfigManager(); // если нужно
+        shrineEvent = new ShrineEvent(this, shrineConfigManager);
+
+        // Castle
+        castleEvent = new CastleEvent(this, headsManager);
+
+        // Создаём хендлеры claim/unclaim
+        unclaimRegionHandler = new UnclaimRegionHandler(clanManager, clanNotificationService, beaconDao, beaconManager);
+        claimRegionHandler = new ClaimRegionHandler(clanManager, clanNotificationService, beaconDao, beaconManager);
+    }
+
+    // ------------------------------------------------------------------------
+    //  REGISTRATION (COMMANDS / EVENTS)
+    // ------------------------------------------------------------------------
+    private void registerCommandsAndEvents() {
+        CommandRegistrar.registerCommands(this);
+        EventRegistrar.registerEvents(this);
+    }
+
+    // ------------------------------------------------------------------------
+    //  START BACKGROUND TASKS
+    // ------------------------------------------------------------------------
+    private void startSchedulers() {
+        new StrengthTickListener(playerDataHandler).addStrength(this);
+        new ClanPvPListener(this, clanManager);
+
+        // PlaceholderAPI
+        new Placeholders(this, playerDataHandler, clanManager).register();
+
+        eventScheduler.start();
+
+        // Если нужен check beacons HP
+        // startZeroHpCheck();
+    }
+
+    // ------------------------------------------------------------------------
+    //  ОТКЛЮЧЕНИЕ / СОХРАНЕНИЕ
+    // ------------------------------------------------------------------------
     private void saveData() {
-        if (shrineEvent != null) shrineEvent.saveShrinesToFile(); //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
+        if (shrineEvent != null) {
+            shrineEvent.saveShrinesToFile();
+        }
     }
 
     private void closeDatabase() {
-        if (clanDatabaseManager != null) clanDatabaseManager.close(); //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
+        if (clanDatabaseManager != null) {
+            clanDatabaseManager.close();
+        }
     }
 
     private void denyClanTNT() {
@@ -79,130 +208,35 @@ public final class FlomiksFactions extends JavaPlugin { //NOPMD - suppressed Com
     }
 
     private void stopEvents() {
-        if (eventManager.isRunning()) eventManager.stopEvent(); //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression //NOPMD - suppressed ControlStatementBraces - TODO explain reason for suppression
-    }
-
-    private void setupConfigs() {
-        CastleConfigManager.setup(this);
-        CastleConfigManager.loadConfig();
-        CastleConfigManager.get().options().copyDefaults(true);
-        CastleConfigManager.save();
-
-        ShrineConfigManager.setup(this);
-        ShrineConfigManager.loadConfig();
-        ShrineConfigManager.get().options().copyDefaults(true);
-        ShrineConfigManager.save();
-
-        NexusConfigManager.setup(this);
-        NexusConfigManager.loadConfig();
-        NexusConfigManager.get().options().copyDefaults(true);
-        NexusConfigManager.save();
-    }
-
-    private void setupDatabase() {
-        try {
-            this.clanDatabaseManager = new ClanDatabaseManager();
-            clanDatabaseManager.initDatabase(this);
-            clanDatabaseManager.createTables();
-
-            this.clanDao = new ClanDao(clanDatabaseManager);
-            this.invitationDao = new InvitationDao(clanDatabaseManager);
-
-            this.playerDatabaseManager = new PlayerDatabaseManager();
-            playerDatabaseManager.initDatabase(this);
-            playerDatabaseManager.createTables();
-
-            this.beaconDatabaseManager = new BeaconDatabaseManager();
-            beaconDatabaseManager.initDatabase(this);
-            beaconDatabaseManager.createTables();
-
-            this.beaconDao = new BeaconDao(clanDatabaseManager);
-
-        } catch (Exception e) { //NOPMD - suppressed AvoidCatchingGenericException - TODO explain reason for suppression //NOPMD - suppressed AvoidCatchingGenericException - TODO explain reason for suppression //NOPMD - suppressed AvoidCatchingGenericException - TODO explain reason for suppression
-            getLogger().severe("Ошибка при настройке базы данных: " + e.getMessage()); //NOPMD - suppressed GuardLogStatement - TODO explain reason for suppression //NOPMD - suppressed GuardLogStatement - TODO explain reason for suppression //NOPMD - suppressed GuardLogStatement - TODO explain reason for suppression
-            getServer().getPluginManager().disablePlugin(this); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+        if (eventManager != null && eventManager.isRunning()) {
+            eventManager.stopEvent();
         }
     }
 
-    private void setupDependencies() {
-        if (!setupEconomy()) {
-            getLogger().severe("Vault не найден! Экономика не будет работать.");
-            getServer().getPluginManager().disablePlugin(this); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            return;
+    // ------------------------------------------------------------------------
+    //  ECONOMY (VAULT)
+    // ------------------------------------------------------------------------
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
         }
-
-        this.clanManager = new ClanManager(this, clanDao, invitationDao);
-        this.beaconManager = new BeaconManager();
-        this.lootManager = new CastleLootManager(this);
-        this.headsManager = new HeadsManager(this);
-        this.playerDataHandler = new PlayerDataHandler(this);
-        this.eventManager = new RandomEventManager(this);
-        this.eventScheduler = new EventScheduler(this, eventManager);
-        this.chunkMenuManager = new ChunkMenuManager(this, clanManager);
-        this.shrineEvent = new ShrineEvent(this, shrineConfigManager);
-        this.castleEvent = new CastleEvent(this, headsManager);
-        this.unclaimRegionHandler = new UnclaimRegionHandler(clanManager, beaconDao,
-                beaconManager);
-        this.claimRegionHandler = new ClaimRegionHandler(
-                clanManager,
-                unclaimRegionHandler,
-                shrineEvent,
-                beaconDao,
-                beaconManager
-        );
-
-    }
-
-    private void startSchedulers() {
-        new StrengthTickListener(playerDataHandler).addStrength(this);
-        new ClanPvPListener(this, clanManager);
-        new Placeholders(this, playerDataHandler, clanManager).register();
-
-        eventScheduler.start();
-    }
-
-    private void startZeroHpCheck() { //NOPMD - suppressed UnusedPrivateMethod - TODO explain reason for suppression //NOPMD - suppressed UnusedPrivateMethod - TODO explain reason for suppression //NOPMD - suppressed UnusedPrivateMethod - TODO explain reason for suppression
-        // how often we check, in ticks (default 100 = every 5 seconds)
-        int checkInterval = NexusConfigManager.getInt("zero-hp-check-interval");
-        if (checkInterval < 1) { //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression //NOPMD - suppressed AvoidLiteralsInIfCondition - TODO explain reason for suppression
-            checkInterval = 100; // fallback
-        }
-
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            beaconManager.getAllBeacons().forEach(beacon -> {
-                if (beacon.getHealth() <= 0) {
-                    // Here is where you handle "zero HP" logic.
-                    // For example, you might mark this beacon as "vulnerable" or auto-start a capture event. //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression //NOPMD - suppressed CommentSize - TODO explain reason for suppression
-
-                    // Simple example: log it
-                    getLogger().info("Beacon " + beacon.getRegionId() //NOPMD - suppressed GuardLogStatement - TODO explain reason for suppression //NOPMD - suppressed GuardLogStatement - TODO explain reason for suppression //NOPMD - suppressed GuardLogStatement - TODO explain reason for suppression
-                            + " (clan " + beacon.getClanName()
-                            + ") is at 0 HP and can be captured!");
-                }
-            });
-        }, 0L, checkInterval);
-    }
-
-
-    public boolean setupEconomy() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-        if (getServer().getPluginManager().getPlugin("Vault") == null) { //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
-            return false; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class); //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression //NOPMD - suppressed LawOfDemeter - TODO explain reason for suppression
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
-            return false; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+            return false;
         }
         economy = rsp.getProvider();
         return economy != null;
     }
 
-    private void registerCommandsAndEvents() {
-        CommandRegistrar.registerCommands(this);
-        EventRegistrar.registerEvents(this);
-    }
-
+    // ------------------------------------------------------------------------
+    //  GETTERS (если нужны другим классам)
+    // ------------------------------------------------------------------------
     public Economy getEconomy() {
         return economy;
+    }
+
+    public ClanNotificationService getClanNotificationService() {
+        return clanNotificationService;
     }
 
     public ShrineEvent getShrineEvent() {
@@ -221,7 +255,7 @@ public final class FlomiksFactions extends JavaPlugin { //NOPMD - suppressed Com
         return beaconDao;
     }
 
-    public ChunkMenuManager getMenuManager() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public ChunkMenuManager getMenuManager() {
         return chunkMenuManager;
     }
 
@@ -241,7 +275,7 @@ public final class FlomiksFactions extends JavaPlugin { //NOPMD - suppressed Com
         return eventManager;
     }
 
-    public ClanDatabaseManager getDatabaseManager() { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public ClanDatabaseManager getDatabaseManager() {
         return clanDatabaseManager;
     }
 
@@ -263,5 +297,9 @@ public final class FlomiksFactions extends JavaPlugin { //NOPMD - suppressed Com
 
     public ShrineConfigManager getShrineConfigManager() {
         return shrineConfigManager;
+    }
+
+    public BeaconCaptureManager getCaptureManager() {
+        return captureManager;
     }
 }

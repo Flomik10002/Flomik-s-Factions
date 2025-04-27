@@ -238,7 +238,7 @@ public class ShrineEvent { //NOPMD - suppressed CommentRequired - TODO explain r
                         .replace("{y}", String.valueOf(activeShrineLocation.getBlockY()))
                         .replace("{z}", String.valueOf(activeShrineLocation.getBlockZ()))));
 
-        ShrineEventManager captureManager = new ShrineEventManager(this, plugin, plugin.getClanManager()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
+        ShrineEventManager captureManager = new ShrineEventManager(this, plugin.getClanNotificationService(), plugin, plugin.getClanManager()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
         captureManager.startCaptureMechanism();
     }
 

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
+import org.flomik.FlomiksFactions.clan.notifications.ClanNotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LeaveHandler { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
     private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    private final ClanNotificationService clanNotificationService;
     private final ConcurrentHashMap<String, Long> pendingDisbands; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
 
-    public LeaveHandler(ClanManager clanManager, ConcurrentHashMap<String, Long> pendingDisbands) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    public LeaveHandler(ClanManager clanManager, ClanNotificationService clanNotificationService, ConcurrentHashMap<String, Long> pendingDisbands) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
         this.clanManager = clanManager;
+        this.clanNotificationService = clanNotificationService;
         this.pendingDisbands = pendingDisbands;
     }
 
@@ -96,7 +99,7 @@ public class LeaveHandler { //NOPMD - suppressed CommentRequired - TODO explain 
             try {
                 clanManager.leaveClan(player.getName());
                 clanManager.removePlayerFromClanRegions(player, clan);
-                clanManager.sendClanMessage(clan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " покидает ваш клан.");
+                clanNotificationService.sendClanMessage(clan, ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " покидает ваш клан.");
                 player.sendMessage(ChatColor.GREEN + "Вы успешно покинули клан " + ChatColor.YELLOW + clan.getName() + ChatColor.GREEN +".");
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + e.getMessage());

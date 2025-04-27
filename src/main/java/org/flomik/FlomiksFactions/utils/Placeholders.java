@@ -1,4 +1,4 @@
-package org.flomik.FlomiksFactions.utils; //NOPMD - suppressed PackageCase - TODO explain reason for suppression //NOPMD - suppressed PackageCase - TODO explain reason for suppression
+package org.flomik.FlomiksFactions.utils;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -8,25 +8,31 @@ import org.flomik.FlomiksFactions.clan.Clan;
 import org.flomik.FlomiksFactions.clan.managers.ClanManager;
 import org.flomik.FlomiksFactions.player.PlayerDataHandler;
 
-public class Placeholders extends PlaceholderExpansion { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private final PlayerDataHandler playerDataHandler; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
-    private final ClanManager clanManager; //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+/**
+ * Класс отвечает за регистрацию плейсхолдеров PlaceholderAPI.
+ * Обеспечивает динамическое отображение информации о кланах и игроках.
+ */
+public class Placeholders extends PlaceholderExpansion {
+    private final PlayerDataHandler playerDataHandler;
+    private final ClanManager clanManager;
 
-    public Placeholders(FlomiksFactions plugin, PlayerDataHandler playerDataHandler, ClanManager clanManager) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
+    /**
+     * Конструктор принимает зависимости (менеджер игроков и кланов).
+     */
+    public Placeholders(FlomiksFactions plugin, PlayerDataHandler playerDataHandler, ClanManager clanManager) {
         this.playerDataHandler = playerDataHandler;
         this.clanManager = clanManager;
-        plugin.setupEconomy();
+        plugin.getEconomy();
     }
 
-    private int getOnlineClanMembersCount(Clan clan) { //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed MethodArgumentCouldBeFinal - TODO explain reason for suppression
-        int onlineCount = 0;
-        for (String member : clan.getMembers()) { //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            Player onlinePlayer = Bukkit.getPlayer(member); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            if (onlinePlayer != null && onlinePlayer.isOnline()) {
-                onlineCount++;
-            }
-        }
-        return onlineCount;
+    /**
+     * Получает количество онлайн-участников клана.
+     */
+    private int getOnlineClanMembersCount(Clan clan) {
+        return (int) clan.getMembers().stream()
+                .map(Bukkit::getPlayer)
+                .filter(player -> player != null && player.isOnline())
+                .count();
     }
 
     @Override
@@ -49,68 +55,52 @@ public class Placeholders extends PlaceholderExpansion { //NOPMD - suppressed Co
         return "1.0";
     }
 
+    /**
+     * Обрабатывает запрос на получение плейсхолдера.
+     */
     @Override
-    public String onPlaceholderRequest(Player player, String identifier) { //NOPMD - suppressed NPathComplexity - TODO explain reason for suppression //NOPMD - suppressed NPathComplexity - TODO explain reason for suppression
+    public String onPlaceholderRequest(Player player, String identifier) {
         if (player == null) {
-            return ""; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+            return "";
         }
 
         if (clanManager == null) {
-            return "Ошибка: ClanManager не инициализирован"; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+            return "Ошибка: ClanManager не инициализирован";
         }
 
-        if (identifier.equals("clan_name")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return clan != null ? clan.getName() : "Нет клана"; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
+        // Получаем клан игрока один раз, чтобы не дублировать код
+        Clan clan = clanManager.getPlayerClan(player.getName());
+
+        switch (identifier) {
+            case "clan_name":
+                return clan != null ? clan.getName() : "Нет клана";
+
+            case "clan_role":
+                return clan != null ? clan.getRole(player.getName()) : "Нет";
+
+            case "clan_lands":
+                return String.valueOf(clan != null ? clan.getLands() : 0);
+
+            case "clan_level":
+                return String.valueOf(clan != null ? clan.getLevel() : 0);
+
+            case "clan_strength":
+                return String.valueOf(clan != null ? clan.getStrength() : 0);
+
+            case "clan_online_members":
+                return String.valueOf(clan != null ? getOnlineClanMembersCount(clan) : 0);
+
+            case "player_level":
+                return String.valueOf(playerDataHandler.getPlayerLevel(player.getName()));
+
+            case "kills":
+                return String.valueOf(playerDataHandler.getKills(player));
+
+            case "deaths":
+                return String.valueOf(playerDataHandler.getDeaths(player));
+
+            default:
+                return null;
         }
-
-        if (identifier.equals("clan_role")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return (clan != null) ? clan.getRole(player.getName()) : "Нет"; //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-        if (identifier.equals("clan_lands")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            int clanLands = (clan != null) ? clan.getLands() : 0; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(clanLands); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-        if (identifier.equals("clan_level")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            int clanLevel = (clan != null) ? clan.getLevel() : 0; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(clanLevel); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-        if (identifier.equals("clan_strenght")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            int clanStrength = (clan != null) ? clan.getStrength() : 0; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(clanStrength); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-        if (identifier.equals("clan_online_members")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            Clan clan = clanManager.getPlayerClan(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            int onlineClanMembers = (clan != null) ? getOnlineClanMembersCount(clan) : 0; //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(onlineClanMembers); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-
-        if (identifier.equals("player_level")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            int level = playerDataHandler.getPlayerLevel(player.getName()); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(level); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-
-        if (identifier.equals("kills")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            int kills = playerDataHandler.getKills(player); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(kills); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-
-        if (identifier.equals("deaths")) { //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression //NOPMD - suppressed LiteralsFirstInComparisons - TODO explain reason for suppression
-            int deaths = playerDataHandler.getDeaths(player); //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression //NOPMD - suppressed LocalVariableCouldBeFinal - TODO explain reason for suppression
-            return String.valueOf(deaths); //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression //NOPMD - suppressed OnlyOneReturn - TODO explain reason for suppression
-        }
-
-        return null;
     }
 }
