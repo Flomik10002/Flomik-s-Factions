@@ -10,7 +10,7 @@ import org.flomik.FlomiksFactions.clan.commands.PlayerCommand;
 import org.flomik.FlomiksFactions.clan.commands.CastleCommand;
 import org.flomik.FlomiksFactions.clan.commands.EventCommand;
 import org.flomik.FlomiksFactions.clan.commands.ShrineCommand;
-import org.flomik.FlomiksFactions.commands.StartCaptureCommand;
+import org.flomik.FlomiksFactions.clan.commands.StartCaptureCommand;
 
 public class CommandRegistrar { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
     public static void registerCommands(FlomiksFactions plugin) { //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression //NOPMD - suppressed CommentRequired - TODO explain reason for suppression
